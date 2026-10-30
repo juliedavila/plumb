@@ -1,0 +1,21 @@
+id: P-002
+title: Cap the roadmap backlog at fifteen ideas
+status: proposed
+provenance:
+  author: person
+  requested_by: the product lead
+  request: Written by hand after the stream-mapping workshop, where the backlog was the one queue nobody had agreed a limit for.
+  created: "2026-10-22"
+  based_on: 6b8e48c6d7e9
+why: >-
+  The roadmap backlog is the only queue on the stream with no limit, so accepted ideas only pile up there and wait.
+  Fifteen is about one quarter of design work at today's pace: triage accepts a new idea only when design pulls one
+  out, and an idea that is not pulled within a quarter goes back to the customer with a reason. The plan already
+  marks “Set a WIP limit on every queue” done, and this makes the map say the same.
+ops:
+  - op: modify
+    kind: element
+    id: roadmap-backlog
+    set:
+      description: Accepted ideas waiting for design, capped at fifteen; triage accepts a new one only when design pulls one out.
+      attrs: { wip_limit: 15, flow_source: declared, flow_as_of: "2026-10-22" }

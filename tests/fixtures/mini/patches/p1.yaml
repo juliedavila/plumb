@@ -1,0 +1,6 @@
+id: p1
+title: Rename the intake desk
+status: accepted
+why: The counter calls it the front desk.
+ops:
+  - { op: modify, kind: element, id: intake, set: { name: Front desk, attrs: { wait_days: 1 } } }

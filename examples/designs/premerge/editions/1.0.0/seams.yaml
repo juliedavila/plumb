@@ -1,0 +1,138 @@
+# The shared layer of the example portfolio: namespace shared. Written by hand for the examples,
+# in the shape of a shared file two shipped designs would carry together. It holds everything that crosses between the two
+# fictional designs it "ships" with, Findings intake (namespace intake, the platform) and Pre-merge checks (namespace
+# premerge, the module): the vocabulary both place parts in, the shared code hosting system and its premise, the
+# contracts that cross with their security marks, every crossing written whole, the capabilities that cross, the seam,
+# and display names for the far-side parts.
+#
+# Nobody edits this file. The organization changes the shared layer through patches in ./patches/ (its own seam with
+# Asset inventory cleanup arrives that way, in P-002 and P-003), and shared/file-intact compares this file with the
+# sha256 that engine.yaml recorded under shared_from. References into a design are always namespaced
+# (intake:class-registry); the shared layer's own records are bare. The manual-work catalog is its own file,
+# manual-work.yaml, in the same namespace.
+namespace: shared
+version: "1.0.0"
+schema: { model: 5, design_engine: "0.4" }
+
+systems:
+  - { id: engineering, name: Engineering system, description: "Where every team's code is hosted, built, checked and merged." }
+  - { id: people, name: People, description: The people who decide and accept. }
+zones:
+  - { id: existing, name: Existing systems, description: Systems that run today and that a design connects to but does not own. }
+  - { id: outside, name: Outside content, description: "Content that people outside a team can write: scanner output, test reports, pull request text and repository files." }
+
+# Shared parts: parts neither design owns. Every connection either design has to one of them is a crossing, written
+# below. The owner is a role, which the root's team map assigns to a team.
+parts:
+  - id: code-host
+    name: Code hosting and CI
+    kind: service
+    system: engineering
+    zone: existing
+    owner: the developer platform owner
+    description: Hosts every repository, runs CI on each change and merges what passes. Both designs connect to it.
+    holds_nonpublic: true
+    rests_on: [SH-1]
+
+claims:
+  - id: SH-1
+    kind: premise
+    statement: Coding agents cannot read the protected check logs or the class fixtures that the CI keeps for each run.
+    grade: judgment
+    source: "The developer platform lead, from the CI's access settings."
+    fallback: Pre-merge checks keep failing-check detail out of the CI and give it to agents only through the check runner.
+
+# Contracts that cross, each defined once. security is the mark: relevant, the floor the authors' checks derive
+# (their rule codes; the engine adds the floor its own checks derive and takes the union), and any raise by a person.
+# A raise only adds. A mark of relevant: false on a contract the floor marks relevant is refused (shared/mark-valid).
+contracts:
+  - name: ProvenClass
+    description: "One proven finding class as pre-merge checks need it: the rule pattern, a safe example and the rule version. Never the expected outcome, which stays in intake's class oracle."
+    fields: [class_id, rule, safe_example, rule_version]
+    untrusted_fields: []
+    produced_by: [intake:class-registry]
+    consumed_by: [premerge:check-runner]
+    security: { relevant: true, floor: [agent-input] }
+  - name: MergeStamp
+    description: The signed stamp on one merge, naming the classes that were checked and their rule versions.
+    fields: [merge_id, repository, classes, rule_versions, signature]
+    untrusted_fields: []
+    evidence_content: true
+    produced_by: [premerge:stamp-signer]
+    consumed_by: [intake:merge-ledger]
+    security: { relevant: true, floor: [signed-record] }
+  - name: CheckYield
+    description: "For each class and week, how often its check fired, was overridden and was switched off."
+    fields: [class_id, week, fired, overridden, switched_off]
+    untrusted_fields: []
+    produced_by: [premerge:yield-reporter]
+    consumed_by: [intake:class-tuner]
+    security:
+      relevant: true
+      floor: []
+      raised:
+        by: the shared layer's authors
+        why: A fall in yield is how intake learns that teams are switching a check off, so losing this feed hides a control that has stopped working.
+  - name: RepoOwners
+    description: "The owning team of each repository, from the code host's ownership settings, which only administrators change."
+    fields: [repository, owning_team]
+    untrusted_fields: []
+    produced_by: [code-host]
+    consumed_by: [intake:dedup]
+    security: { relevant: false, floor: [] }
+  - name: MergeRequest
+    description: A merge request as the code host sends it, with its title and description as the author wrote them.
+    fields: [merge_request_id, repository, commit, title, description]
+    untrusted_fields: [title, description]
+    produced_by: [code-host]
+    consumed_by: [premerge:merge-hook]
+    security: { relevant: true, floor: [outsider-text] }
+  - name: CheckResult
+    description: "The check runner's pass or fail on one change. The code host blocks the merge on a fail."
+    fields: [merge_request_id, commit, result, failed_checks]
+    untrusted_fields: []
+    produced_by: [premerge:check-runner]
+    consumed_by: [code-host]
+    security: { relevant: true, floor: [gate-feed] }
+
+# Crossings: every relationship whose ends have different homes, written whole. A crossing counts as declared because
+# it is written here. point names the interface point (I1 to I6 here).
+crossings:
+  - { id: x01, from: intake:class-registry, to: premerge:check-runner, kind: data, label: Publishes proven classes, carries: [ProvenClass], point: I1, content: structured }
+  - { id: x02, from: premerge:stamp-signer, to: intake:merge-ledger, kind: evidence, label: Signed merge stamps, carries: [MergeStamp], point: I2 }
+  - { id: x03, from: premerge:yield-reporter, to: intake:class-tuner, kind: feedback, label: Check yield per class, carries: [CheckYield], point: I3 }
+  - { id: x04, from: code-host, to: intake:dedup, kind: data, label: Repository owners, carries: [RepoOwners], point: I4, content: structured }
+  - { id: x05, from: code-host, to: premerge:merge-hook, kind: data, label: Merge requests, carries: [MergeRequest], point: I5, content: untrusted }
+  - { id: x06, from: premerge:check-runner, to: code-host, kind: control, label: Pass or fail on each change, carries: [CheckResult], point: I6 }
+
+# Capabilities that cross: units name them bare. Pre-merge checks waits on intake for both; intake never waits on
+# pre-merge checks.
+capabilities:
+  - { id: cap.classes-published, name: Proven classes published, provided_by: [intake], required_by: [premerge] }
+  - { id: cap.stamps-accepted, name: Merge stamps accepted, provided_by: [intake], required_by: [premerge] }
+
+seams:
+  - id: intake-premerge
+    name: Findings intake and pre-merge checks
+    between: [intake, premerge]
+    owner_role: the pre-merge checks owner
+    checks: [security/agent-reach, security/evidence-partitioned]   # rules whose subjects straddle the seam
+    never_cross: [intake:ClassOracle]                                 # the expected outcomes stay with intake
+    exposure:                                   # per side: the far-side parts at its edge that coding agents reach
+      intake: [premerge:check-runner]
+      premerge: []
+    default_exceptions:                         # an organization's own list for this seam replaces it
+      - contracts: [CheckYield]
+        accepted_by: the security risk owner
+        until: intake:M2
+        why: The two teams are still wiring the yield feed, so a new route for it should flag rather than stop either build until intake's second milestone.
+
+names:
+  "intake:class-registry": Proven class registry
+  "intake:merge-ledger": Merge ledger
+  "intake:class-tuner": Class tuner
+  "intake:dedup": Deduplication
+  "premerge:check-runner": Check runner
+  "premerge:stamp-signer": Stamp signer
+  "premerge:yield-reporter": Yield reporter
+  "premerge:merge-hook": Merge request hook

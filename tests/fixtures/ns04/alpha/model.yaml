@@ -1,0 +1,17 @@
+systems:
+  - { id: A, name: Intake }
+zones:
+  - { id: core, name: Core }
+elements:
+  - { id: intake, name: Intake service, kind: service, system: A, zone: core, owner: appsec }
+  - { id: rule-store, name: Rule store, kind: store, system: A, zone: ci, owner: appsec, partitioned_by: [tenant] }
+  - { id: publisher, name: Rule publisher, kind: service, system: A, zone: core, owner: devplat, rests_on: [SH-1] }
+relationships:
+  - { id: r1, from: intake, to: publisher, kind: data, carries: [Finding], content: structured }
+  - { id: r2, from: publisher, to: rule-store, kind: data, carries: [Finding] }
+contracts:
+  - { name: Finding, description: One finding., produced_by: [intake, publisher], consumed_by: [publisher, rule-store] }
+views:
+  - { id: main, title: Intake and its edge, elements: [intake, publisher, rule-store, beta:runner, code-host] }
+claims:
+  - { id: CL-1, statement: Findings arrive in one queue., kind: premise, grade: untested, rests_on: [beta:CL-9] }

@@ -1,0 +1,4 @@
+breaks: Beta declares schema 0.5, newer than the engine reads.
+expect:
+  - { rule: core/schema-known, severity: error, subject: "beta (engine.yaml)" }
+note: The build stops at this finding, so nothing else is reported.

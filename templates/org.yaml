@@ -1,0 +1,86 @@
+# Starting point for instances/shared/org.yaml. All six teams are fictional.
+# Keep ids aligned with instances/shared/team-map.yaml. Replace the names and estimates locally.
+# Capacity is a WIP limit in concurrent units, not a headcount or a percentage.
+# Copy this file only when adopting an org layer, then reimport BOTH editions so teams have one home.
+# Later changes belong in proposed root patches. Do not edit the shipped seams.yaml.
+# Empty seam_exceptions leaves shipped defaults in force. A seam mapped to [] declines its default.
+# No risk acceptance or slowdown is supplied by this template.
+teams: 
+  - id: alpha
+    name: Team Alpha
+    lead: the Team Alpha lead
+    description: An invented team for the fictional organization.
+    row_owner: the Team Alpha lead
+    capacity: 
+      value: 4
+      source: agent
+      by: agent:org-template
+      as_of: 2026-10-28
+      confidence: low
+      note: Fictional starting estimate. Ask the row owner for a stated value before use.
+  - id: beta
+    name: Team Beta
+    lead: the Team Beta lead
+    description: An invented team for the fictional organization.
+    row_owner: the Team Beta lead
+    capacity: 
+      value: 4
+      source: agent
+      by: agent:org-template
+      as_of: 2026-10-28
+      confidence: low
+      note: Fictional starting estimate. Ask the row owner for a stated value before use.
+  - id: gamma
+    name: Team Gamma
+    lead: the Team Gamma lead
+    description: An invented team for the fictional organization.
+    row_owner: the Team Gamma lead
+    capacity: 
+      value: 4
+      source: agent
+      by: agent:org-template
+      as_of: 2026-10-28
+      confidence: low
+      note: Fictional starting estimate. Ask the row owner for a stated value before use.
+  - id: delta
+    name: Team Delta
+    lead: the Team Delta lead
+    description: An invented team for the fictional organization.
+    row_owner: the Team Delta lead
+    capacity: 
+      value: 4
+      source: agent
+      by: agent:org-template
+      as_of: 2026-10-28
+      confidence: low
+      note: Fictional starting estimate. Ask the row owner for a stated value before use.
+  - id: epsilon
+    name: Team Epsilon
+    lead: the Team Epsilon lead
+    description: An invented team for the fictional organization.
+    row_owner: the Team Epsilon lead
+    capacity: 
+      value: 4
+      source: agent
+      by: agent:org-template
+      as_of: 2026-10-28
+      confidence: low
+      note: Fictional starting estimate. Ask the row owner for a stated value before use.
+  - id: zeta
+    name: Team Zeta
+    lead: the Team Zeta lead
+    description: An invented team for the fictional organization.
+    row_owner: the Team Zeta lead
+    capacity: 
+      value: 4
+      source: agent
+      by: agent:org-template
+      as_of: 2026-10-28
+      confidence: low
+      note: Fictional starting estimate. Ask the row owner for a stated value before use.
+activities: 
+  []
+slowdowns: 
+  []
+seam_exceptions: 
+  {}

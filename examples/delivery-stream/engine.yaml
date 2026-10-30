@@ -1,0 +1,22 @@
+name: delivery-stream
+title: "Delivery stream: from idea to production"
+description: >-
+  One product team's value stream for a fictional note-taking app, from a customer's idea to a change running in
+  production, with the feedback loops that bring what happened back to the start. It shows the engine on a design
+  that has nothing to do with security.
+packs: [generic, plan, flow, tracker]
+ladder: [none, stand-in, existing-tool, built]
+flow:
+  max_handoffs: 6
+  max_age_days: 90   # a flow number older than this is a finding
+  streams: [stream]  # the views that are value streams (default: every view that draws a handoff)
+teams:
+  max_share: 0.25   # flag a team that owns more than a quarter of the open units
+glossary:          # what this design's words mean on the page, over the engine's own terms (src/core/glossary.ts)
+  zone: Where a change stands in the stream, before commitment, committed or live. A relationship that leaves a band hands the change on to the next stage.
+  value stream:
+    definition: The path a change takes from a customer's idea to running in production, with every step, queue and hand-off on it.
+    forms: [value stream, value streams, stream]
+status:            # what turns a milestone red or amber; these are the defaults, written out to show where they live
+  red: [no-provider, unowned-blocker, error-finding, slipped]
+  amber: [unowned, untested-premise, tracker-disagrees, idle-ready, earlier-milestone]

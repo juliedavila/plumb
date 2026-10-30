@@ -1,0 +1,29 @@
+# How this organization's Jira holds its teams' standing work: an org mapping, so no phase or unit
+# sections. Edited by the program lead from the draft. The raw export is ./export/ (engine.yaml
+# tracker.export), made by tests/fixtures/portfolio/make-jira-export.ts; inventory.json is what discovery found in it.
+adapter: jira
+kind: org
+team:                           # how an issue names its team: the Owning team select field
+  as: custom-field
+  field: customfield_10201
+  match:
+    appsec-platform: AppSec Platform
+    vuln-mgmt: Vulnerability Management
+    detection-response: Detection and Response
+    product-eng: Product Engineering
+    dev-platform: Developer Platform
+    governance-risk: Governance and Risk
+status:
+  by: name
+  map: { Backlog: todo, "To Do": todo, "In Progress": doing, "In Review": doing, Done: done }
+window_days: 90
+designs:                        # design work, which never counts as standing work
+  label_prefix: "de-unit:"      # de-unit:intake:U-04 names a unit of a design; a bare de-unit:U-04 does not
+activities:                     # first match wins, top to bottom; each matcher kind is used once
+  - { activity: vuln-triage, match: { labels: [vuln-triage] } }
+  - { activity: pentest-coordination, match: { type: ["Pen test"] } }
+  - { activity: incident-oncall, match: { project: INC } }
+  - { activity: questionnaires, match: { components: ["Customer assurance"] } }
+  - { activity: audit-evidence, match: { parent: GRC-1 } }
+  - { activity: scanner-rule-upkeep, match: { field: { customfield_10410: Scanner rules } } }
+flow_items: { Story: feature, Task: risk, "Pen test": risk, Incident: defect, Epic: feature }

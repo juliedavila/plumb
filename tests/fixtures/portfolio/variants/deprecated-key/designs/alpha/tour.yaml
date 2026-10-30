@@ -1,0 +1,5 @@
+title: A short tour of alpha
+steps:
+  - target: { gate: A1 }   # the 0.3 key; 0.4 reads it through milestone and warns
+    title: The first milestone
+    say: Alpha takes hub events in and sends the spec to beta.

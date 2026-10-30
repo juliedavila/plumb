@@ -1,0 +1,35 @@
+# The base fixture's shared layer: the smallest one every 0.4 rule can be broken against. Two designs, alpha and
+# beta, one seam between them, one plain shared part and one that coding agents reach. A portfolio check of the base
+# reports nothing; each folder under ../../variants/ breaks one thing. See examples/README.md.
+namespace: shared
+version: "1.0.0"
+schema: { model: 5, design_engine: "0.4" }
+systems:
+  - { id: work, name: Work, description: Where both fixture designs place their parts. }
+zones:
+  - { id: inner, name: Inner, description: Parts inside the organization. }
+parts:
+  - { id: hub, name: Hub, kind: service, system: work, zone: inner, owner: the hub owner, description: "A service both designs connect to, edited by hand." }
+  - { id: sandbox, name: Agent sandbox, kind: service, system: work, zone: inner, owner: the hub owner, description: Where coding agents run., agent_reachable: true }
+contracts:
+  - { name: Spec, description: The spec alpha sends beta., produced_by: [alpha:a-out], consumed_by: [beta:b-in], security: { relevant: false, floor: [] } }
+  - { name: HubEvent, description: An event the hub sends alpha., produced_by: [hub], consumed_by: [alpha:a-in], security: { relevant: false, floor: [] } }
+  - { name: Task, description: A task alpha hands the agent sandbox., produced_by: [alpha:a-out], consumed_by: [sandbox], security: { relevant: true, floor: [agent-input] } }
+crossings:
+  - { id: s1, from: alpha:a-out, to: beta:b-in, kind: data, carries: [Spec], point: I1 }
+  - { id: s2, from: hub, to: alpha:a-in, kind: data, carries: [HubEvent], point: I2 }
+  - { id: s3, from: alpha:a-out, to: sandbox, kind: data, carries: [Task], point: I3 }
+capabilities:
+  - { id: cap.spec, provided_by: [alpha], required_by: [beta] }
+seams:
+  - id: alpha-beta
+    between: [alpha, beta]
+    owner_role: the seam owner
+    checks: []
+    never_cross: [alpha:Secret]
+    exposure: { alpha: [], beta: [] }
+    default_exceptions: []
+names:
+  "alpha:a-in": Alpha in
+  "alpha:a-out": Alpha out
+  "beta:b-in": Beta in

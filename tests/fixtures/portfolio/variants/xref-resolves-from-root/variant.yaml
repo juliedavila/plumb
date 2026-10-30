@@ -1,0 +1,4 @@
+breaks: The org activity chores is relieved by alpha:AU-9, a unit alpha does not hold. A reference from the root into a design must name a record that design's composed edition holds.
+expect:
+  - { rule: core/xref-resolves, severity: error, subject: "org:chores (activity)" }
+note: Condition (c) of the rule. Also in alpha's own build, which resolves the root's references into alpha.

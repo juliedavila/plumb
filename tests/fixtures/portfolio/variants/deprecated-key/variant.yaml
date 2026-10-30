@@ -1,0 +1,4 @@
+breaks: Alpha, a schema 0.4 design, has a tour step that targets a milestone with the old key gate, which src/migrate/keys.ts lists as renamed to milestone.
+expect:
+  - { rule: core/deprecated-key, severity: warning, subject: "alpha tour.yaml, the step's gate key" }
+note: The step still works, read through the new key. The message names the file, the line, the new key and the version that removes the old one.

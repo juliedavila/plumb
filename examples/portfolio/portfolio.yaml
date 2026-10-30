@@ -1,0 +1,13 @@
+# The example portfolio: three fictional designs over one shared root. It owns no records, only
+# its choice of designs, its root and its horizon. bun plumb.ts portfolio build writes portfolio.lock beside it.
+schema: "0.4"
+name: example
+title: Findings to fixes
+root: ../shared
+designs:
+  - { namespace: intake, from: ../designs/intake }
+  - { namespace: premerge, from: ../designs/premerge }
+  - { namespace: inventory, from: ../designs/inventory }
+presenting: released   # presenting composes each design's newest released edition, with today's status
+working: latest        # working composes the working trees
+horizon_months: 12

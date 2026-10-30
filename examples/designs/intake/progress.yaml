@@ -1,0 +1,9 @@
+# Today's status of Findings intake's units, set by people beside the plan. U-10's entry only overrides its flow
+# item: the page says "set here" beside it.
+units:
+  U-01: { status: done, date: "2026-10-30", by: the AppSec platform lead }
+  U-02: { status: doing, date: "2026-11-02", by: the AppSec platform lead }
+  U-04: { status: doing, date: "2026-10-26", by: the vulnerability management lead }
+  U-05: { status: doing, date: "2026-11-09", by: the vulnerability management lead }
+  U-06: { status: doing, date: "2026-11-09", by: the vulnerability management lead }
+  U-10: { flow_item: risk }

@@ -1,0 +1,4 @@
+breaks: "The slowdown SD-1 on chores names no one who accepted it."
+expect:
+  - { rule: org/slowdown-valid, severity: error, subject: "org:SD-1 (slowdown)" }
+note: "The slowdown is not applied, so team A's share stays 0.25."

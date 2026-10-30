@@ -1,0 +1,148 @@
+# The organization's own records: namespace org. Fictional: six teams named by what they do, each
+# lead named by a role title (in a real deployment, a person's name goes here). This file never ships in an edition.
+#
+# Every number is an estimate with provenance: value, source (person, agent, tracker or derived), by,
+# as_of and confidence, with an optional note, a person's `stated` figure kept beside a measured value, and `history`
+# for values from before the engine kept a record. After day one nobody writes history by hand: accepted patches in
+# ./patches/ are the rest of it (P-001 changes AppSec platform's capacity, P-004 the first tracker refresh). Agents
+# never edit this file; they propose patches (P-005 is one, waiting for the approver).
+#
+# The expected findings in ../README.md assume a build on 2026-11-16.
+teams:
+  - id: appsec-platform
+    name: AppSec platform
+    description: Builds and runs the security tooling every other team uses.
+    lead: the AppSec platform lead
+    row_owner: the AppSec platform lead
+    capacity:
+      value: 6
+      source: person
+      by: the AppSec platform lead
+      as_of: "2026-08-03"
+      confidence: medium
+      history:
+        - { value: 7, source: person, by: the AppSec platform lead, as_of: "2026-05-04", confidence: low }
+  - id: vuln-mgmt
+    name: Vulnerability management
+    description: Triages, validates and tracks every security finding until it is fixed.
+    lead: the vulnerability management lead
+    row_owner: the vulnerability management lead
+    capacity:
+      value: 3
+      source: person
+      by: the vulnerability management lead
+      as_of: "2026-11-02"
+      confidence: medium
+      note: Two analysts moved to the incident rotation in September.
+      history:
+        - { value: 4, source: person, by: the vulnerability management lead, as_of: "2026-08-10", confidence: medium }
+        - { value: 5, source: person, by: the vulnerability management lead, as_of: "2026-05-11", confidence: low }
+  - id: detection-response
+    name: Detection and response
+    description: Runs detection, alerting and the incident on-call rotation.
+    lead: the detection and response lead
+    row_owner: the detection and response lead
+    capacity: { value: 4, source: person, by: the detection and response lead, as_of: "2026-10-19", confidence: medium }
+  - id: product-eng
+    name: Product engineering
+    description: Builds the product. Lends engineers to security work, two pairs at a time.
+    lead: the product engineering lead
+    row_owner: the product engineering lead
+    capacity: { value: 2, source: person, by: the product engineering lead, as_of: "2026-10-26", confidence: high, note: Two pairs are lent to security work at a time. }
+  - id: dev-platform
+    name: Developer platform
+    description: Runs code hosting, CI and the paths every change takes to production.
+    lead: the developer platform lead
+    row_owner: the developer platform lead
+    # stated in July and not refreshed since: older than estimates.stale_after_days at the build date
+    capacity: { value: 3, source: person, by: the developer platform lead, as_of: "2026-07-20", confidence: medium }
+  - id: governance-risk
+    name: Governance and risk
+    description: Keeps the risk register, runs audits and answers customers' security questions.
+    lead: the governance and risk lead
+    row_owner: the governance and risk lead
+    # not stated by the row's owner: the page marks it
+    capacity: { value: 4, source: person, by: the program lead, as_of: "2026-10-12", confidence: low, note: Estimated at the planning review; the team's lead has not stated it yet. }
+
+# Standing work that takes a share of a team's capacity. bau keeps the lights on; stream is another value
+# stream the team serves. relieved_by names a unit or a milestone in a design; retire takes the share to zero and
+# reduce takes it to `to`, an estimate in its own right.
+activities:
+  - id: vuln-triage
+    team: vuln-mgmt
+    name: Manual vulnerability triage and validation
+    type: bau
+    flow_item: risk
+    share: { value: 0.25, source: person, by: the vulnerability management lead, as_of: "2026-09-14", confidence: medium }
+    manual_work: finding-triage
+    relieved_by:
+      - at: intake:U-09
+        effect: reduce
+        to: { value: 0.12, source: person, by: the vulnerability management lead, as_of: "2026-11-02", confidence: low }
+      - { at: intake:U-14, effect: retire }
+  - id: pentest-coordination
+    team: appsec-platform
+    name: Penetration test coordination
+    type: bau
+    flow_item: risk
+    share: { value: 0.10, source: person, by: the AppSec platform lead, as_of: "2026-09-28", confidence: medium }
+  - id: incident-oncall
+    team: detection-response
+    name: Incident on-call
+    type: bau
+    flow_item: defect
+    share: { value: 0.30, source: person, by: the detection and response lead, as_of: "2026-09-21", confidence: medium }
+  - id: audit-evidence
+    team: governance-risk
+    name: Audit evidence collection
+    type: bau
+    flow_item: risk
+    share: { value: 0.25, source: person, by: the governance and risk lead, as_of: "2026-09-07", confidence: medium }
+    manual_work: evidence-gathering
+    relieved_by:
+      - at: inventory:M1
+        effect: reduce
+        to: { value: 0.10, source: person, by: the governance and risk lead, as_of: "2026-09-07", confidence: low }
+  - id: scanner-rule-upkeep
+    team: appsec-platform
+    name: Scanner rule upkeep
+    type: bau
+    flow_item: debt
+    share: { value: 0.17, source: person, by: the AppSec platform lead, as_of: "2026-09-28", confidence: medium }
+    manual_work: rule-tuning
+    relieved_by:
+      - at: intake:U-10
+        effect: reduce
+        to: { value: 0.08, source: person, by: the AppSec platform lead, as_of: "2026-09-28", confidence: medium }
+  - id: questionnaires
+    team: governance-risk
+    name: Customer security questionnaires
+    type: stream
+    flow_item: feature
+    share: { value: 0.20, source: person, by: the governance and risk lead, as_of: "2026-10-12", confidence: medium }
+
+# A deliberate slowdown, recorded as a bet with the risk it raises.
+slowdowns:
+  - id: SD-1
+    activity: vuln-triage
+    what: Triage only critical and high findings by hand; medium and low findings wait in the queue.
+    share_during: { value: 0.10, source: person, by: the vulnerability management lead, as_of: "2026-11-10", confidence: medium }
+    from: "2026-11-15"
+    until: intake:M2
+    max_until: "2027-03-31"
+    risk:
+      rises: Medium and low findings wait about 30 days for triage instead of about 5.
+      refs: [intake:finding-queue]
+      level: medium
+    accepted_by: [the security risk owner, the business risk owner]
+    accepted_at: "2026-11-10"
+    review_by: "2027-01-15"
+
+# The organization's own exceptions to the seam rule, keyed by seam. A list for a seam replaces the
+# shipped default for that seam, and an empty list declines it. This one is on intake's own module seam.
+seam_exceptions:
+  "intake:autotriage":
+    - contracts: [intake:TriageHint]
+      accepted_by: the head of vulnerability management
+      until: "2027-01-29"
+      why: The triage team is still deciding where the agent's hints should land, so a second route for them should flag rather than stop intake's build while it does.

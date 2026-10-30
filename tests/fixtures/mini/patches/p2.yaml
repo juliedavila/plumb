@@ -1,0 +1,7 @@
+id: p2
+title: Add a bell
+status: accepted
+why: Customers need a way to call someone.
+ops:
+  - { op: add, kind: element, value: { id: bell, name: Bell, kind: ui, owner: counter } }
+  - { op: add, kind: relationship, value: { id: r20, from: customer, to: bell, kind: control } }

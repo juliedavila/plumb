@@ -1,0 +1,4 @@
+breaks: "Alpha pins beta 1.0.0 and beta pins alpha 1.0.0: a pin loop, which no exact pins can satisfy."
+expect:
+  - { rule: core/xref-no-cycle, severity: error, subject: "alpha and beta (pins)" }
+note: "The message names the loop. No edition exists here; the loop is found from the pins in engine.yaml before any pin is resolved, so no stale-pin finding follows."

@@ -1,0 +1,42 @@
+# The shared layer for two fictional designs: alpha (findings intake) and beta (pre-merge checks).
+namespace: shared
+version: "0.1.0"
+schema: { model: 5, design_engine: "0.4" }
+systems:
+  - { id: ENG, name: Engineering system }
+zones:
+  - { id: ci, name: Build and test }
+parts:
+  - id: code-host
+    name: Code hosting
+    kind: service
+    system: ENG
+    zone: ci
+    owner: the developer platform lead
+    rests_on: [SH-1]
+claims:
+  - { id: SH-1, statement: Coding agents cannot read the regression stage's tests., kind: premise, grade: judgment, fallback: Keep the tests in a store agents cannot reach. }
+contracts:
+  - { name: CheckRule, description: A rule a check runs., produced_by: [alpha:rule-store], consumed_by: [beta:runner] }
+  - { name: CheckYield, description: What the checks found., produced_by: [beta:runner], consumed_by: [alpha:intake] }
+  - { name: SourceEvent, description: A change to the code., produced_by: [code-host], consumed_by: [alpha:intake], untrusted_fields: [message] }
+crossings:
+  - { id: x1, from: alpha:rule-store, to: beta:runner, kind: data, carries: [CheckRule], point: I1 }
+  - { id: x2, from: beta:runner, to: alpha:intake, kind: feedback, carries: [CheckYield], point: I2 }
+  - { id: x3, from: code-host, to: alpha:intake, kind: data, carries: [SourceEvent], content: untrusted }
+capabilities:
+  - { id: proven-rules, provided_by: [alpha], required_by: [beta] }
+seams:
+  - id: alpha-beta
+    between: [alpha, beta]
+    owner_role: the platform lead
+    checks: [security/agent-reach]
+    never_cross: [ProofCondition]
+    exposure:
+      alpha: [beta:runner]
+names:
+  alpha: Findings intake
+  beta: Pre-merge checks
+  alpha:rule-store: Rule store
+  alpha:intake: Intake service
+  beta:runner: Check runner

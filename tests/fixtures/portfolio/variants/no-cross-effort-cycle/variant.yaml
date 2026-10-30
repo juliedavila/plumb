@@ -1,0 +1,4 @@
+breaks: "Alpha's Send the spec to beta now requires cap.loop, which beta's Take the spec in provides, and Take the spec in requires cap.spec, which Send the spec to beta provides."
+expect:
+  - { rule: portfolio/no-cross-effort-cycle, severity: error, subject: "alpha:AU-2 and beta:BU-1 (units)" }
+note: "Each design's own plan has no cycle: in a lone build a shared capability counts as provided across the seam."

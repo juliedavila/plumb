@@ -1,0 +1,6 @@
+name: alpha
+title: Findings intake
+schema: "0.4"
+namespace: alpha
+root: ../shared
+packs: [generic, plan, security]

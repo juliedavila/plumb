@@ -1,0 +1,4 @@
+breaks: "Beta's unit Use the spec has no flow item, and beta's root has an org layer."
+expect:
+  - { rule: portfolio/unit-has-flow-item, severity: warning, subject: "beta:BU-2 (unit)" }
+note: "Also in beta's own build."

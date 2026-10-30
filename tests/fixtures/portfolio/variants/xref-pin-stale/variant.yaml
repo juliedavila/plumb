@@ -1,0 +1,4 @@
+breaks: "Alpha pins beta 1.0.0. In the working view the portfolio composes beta's working copy, whose part b-in, named by the shared layer's crossing s1, no longer says batch: nightly as 1.0.0 did."
+expect:
+  - { rule: core/xref-pin-stale, severity: warning, subject: "alpha (its pin on beta 1.0.0)" }
+note: "The finding lists Beta in as changed. In the presenting view, which composes beta 1.0.0, the pin is current. rehash.ts freezes the edition and writes the pin."

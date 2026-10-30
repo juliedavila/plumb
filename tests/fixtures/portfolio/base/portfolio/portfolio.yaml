@@ -1,0 +1,10 @@
+schema: "0.4"
+name: fixture
+title: Fixture portfolio
+root: ../shared
+designs:
+  - { namespace: alpha, from: ../designs/alpha }
+  - { namespace: beta, from: ../designs/beta }
+presenting: released
+working: latest
+horizon_months: 12

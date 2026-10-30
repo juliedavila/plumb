@@ -1,0 +1,55 @@
+phases:
+  - id: ph1
+    name: Open the counter
+    exit_test: A customer can drop off a bike and get a ticket.
+    order: 1
+  - id: ph2
+    name: Run the workshop
+    exit_test: A ticketed bike comes back repaired within a week.
+    order: 2
+units:
+  - id: u1
+    title: Write the ticket form
+    kind: code
+    phase: ph1
+    elements:
+      - id: intake
+        from: none
+        to: stand-in
+    provides:
+      - tickets
+    check: A ticket can be filled in.
+    owner: counter operations
+    status: todo
+    owner_as_written: counter operations
+  - id: u2
+    title: Set up the repair queue
+    kind: agreement
+    phase: ph2
+    requires:
+      - tickets
+    provides:
+      - queue
+    check: The queue has a limit everyone agreed.
+    owner: repair operations
+    owner_as_written: repair operations
+  - id: u3
+    title: Measure repair time
+    kind: measurement
+    phase: ph2
+    requires:
+      - queue
+    provides:
+      - timing
+    check: A week of repair times is recorded.
+    owner: repair operations
+    owner_as_written: repair operations
+  - id: u10
+    title: Train the mechanic on the queue
+    kind: agreement
+    phase: ph2
+    requires:
+      - queue
+    check: The mechanic pulls from the queue.
+    owner: repair operations
+    owner_as_written: repair operations

@@ -1,0 +1,4 @@
+breaks: "The slowdown SD-1 on chores is valid and in force, and its review_by date, 2026-11-01, has passed at the build date of 2026-11-16."
+expect:
+  - { rule: org/slowdown-overdue, severity: warning, subject: "org:SD-1 (slowdown)" }
+note: "It is still applied: team A's share is 0.1 while it runs."

@@ -1,0 +1,88 @@
+teams:
+  []
+systems:
+  - id: shopsys
+    name: Shop
+zones:
+  - id: floor
+    name: Shop floor
+elements:
+  - id: customer
+    name: Customer
+    kind: person
+    owner: counter operations
+    wait_days: 0
+    start: true
+    owner_as_written: counter operations
+  - id: intake
+    name: Intake desk
+    kind: person
+    owner: counter operations
+    system: shopsys
+    zone: floor
+    wait_days: 1
+    owner_as_written: counter operations
+  - id: queue1
+    name: Repair queue
+    kind: queue
+    owner: repair operations
+    wip_limit: 5
+    owner_as_written: repair operations
+  - id: mechanic
+    name: Mechanic
+    kind: person
+    owner: repair operations
+    wait_days: 2
+    owner_as_written: repair operations
+  - id: pickup
+    name: Pickup shelf
+    kind: store
+    owner: counter operations
+    end: true
+    owner_as_written: counter operations
+relationships:
+  - id: r1
+    from: customer
+    to: intake
+    kind: data
+    carries:
+      - ticket
+  - id: r2
+    from: intake
+    to: queue1
+    kind: handoff
+  - id: r3
+    from: queue1
+    to: mechanic
+    kind: control
+  - id: r4
+    from: mechanic
+    to: pickup
+    kind: handoff
+  - id: r10
+    from: mechanic
+    to: intake
+    kind: feedback
+    label: questions
+contracts:
+  - name: ticket
+    produced_by:
+      - customer
+    consumed_by:
+      - intake
+views:
+  - id: v1
+    title: Whole shop
+    elements:
+      - customer
+      - intake
+      - queue1
+      - mechanic
+      - pickup
+  - id: v2
+    title: Counter
+    elements:
+      - customer
+      - intake
+    relationships:
+      - r1

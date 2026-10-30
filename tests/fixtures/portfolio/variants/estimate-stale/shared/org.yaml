@@ -1,0 +1,27 @@
+# The base fixture's org layer: two teams within capacity, one activity relieved by a unit of alpha, no slowdown and
+# no exception. Dates assume a build on 2026-11-16.
+teams:
+  - id: team-a
+    name: Team A
+    description: Owns alpha.
+    lead: the team A lead
+    row_owner: the team A lead
+    capacity: { value: 4, source: person, by: the team A lead, as_of: "2026-11-02", confidence: medium }
+  - id: team-b
+    name: Team B
+    description: Owns beta and the shared parts.
+    lead: the team B lead
+    row_owner: the team B lead
+    capacity: { value: 4, source: person, by: the team B lead, as_of: "2026-06-01", confidence: medium }   # older than 90 days at 2026-11-16
+activities:
+  - id: chores
+    team: team-a
+    name: Chores
+    type: bau
+    flow_item: debt
+    share: { value: 0.25, source: person, by: the team A lead, as_of: "2026-11-02", confidence: medium }
+    manual_work: chore-work
+    relieved_by:
+      - { at: alpha:AU-3, effect: retire }
+slowdowns: []
+seam_exceptions: {}

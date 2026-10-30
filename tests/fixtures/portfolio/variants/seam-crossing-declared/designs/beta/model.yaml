@@ -1,0 +1,21 @@
+elements:
+  - id: b-in
+    name: Beta in
+    kind: service
+    system: work
+    zone: inner
+    owner: team-b
+    description: Takes the spec in.
+  - id: b-out
+    name: Beta out
+    kind: service
+    system: work
+    zone: inner
+    owner: team-b
+    description: Uses the spec.
+relationships:
+  - { id: b1, from: b-in, to: b-out, kind: data, carries: [BetaWork] }
+  - { id: b2, from: b-out, to: shared:sandbox, kind: data, carries: [BetaNote] }   # beta's own edge to a shared part
+contracts:
+  - { name: BetaWork, description: Work beta passes along., produced_by: [b-in], consumed_by: [b-out] }
+  - { name: BetaNote, description: A note from a customer about the spec., untrusted_fields: [text], produced_by: [b-out], consumed_by: [shared:sandbox] }

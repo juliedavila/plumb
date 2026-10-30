@@ -1,0 +1,53 @@
+{
+  "self": "https://tracker.example.test/rest/api/3/project/search?maxResults=50&startAt=0",
+  "maxResults": 50,
+  "startAt": 0,
+  "total": 4,
+  "isLast": true,
+  "values": [
+    {
+      "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+      "self": "https://tracker.example.test/rest/api/3/project/10010",
+      "id": "10010",
+      "key": "SEC",
+      "name": "Security engineering",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "style": "classic",
+      "isPrivate": false
+    },
+    {
+      "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+      "self": "https://tracker.example.test/rest/api/3/project/10011",
+      "id": "10011",
+      "key": "INC",
+      "name": "Incidents",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "style": "classic",
+      "isPrivate": false
+    },
+    {
+      "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+      "self": "https://tracker.example.test/rest/api/3/project/10012",
+      "id": "10012",
+      "key": "GRC",
+      "name": "Governance and risk",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "style": "classic",
+      "isPrivate": false
+    },
+    {
+      "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+      "self": "https://tracker.example.test/rest/api/3/project/10013",
+      "id": "10013",
+      "key": "PLAT",
+      "name": "Platform",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "style": "classic",
+      "isPrivate": false
+    }
+  ]
+}

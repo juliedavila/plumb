@@ -1,0 +1,8 @@
+id: p4
+title: A broken patch
+status: rejected
+why: Shows op errors.
+ops:
+  - { op: modify, kind: element, id: nosuch, set: { name: X } }
+  - { op: add, kind: team, value: { id: counter, name: Duplicate } }
+  - { op: add, kind: unit, value: { id: u11, title: Use a ghost, kind: code, phase: ph1, requires: [ghost], check: never } }

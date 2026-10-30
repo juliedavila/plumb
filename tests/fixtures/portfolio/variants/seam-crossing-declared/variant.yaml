@@ -1,0 +1,4 @@
+breaks: "Beta's own relationship b2 carries BetaNote, a contract with an untrusted field, into the agent sandbox, a shared part coding agents reach, and the shared layer does not hold it."
+expect:
+  - { rule: portfolio/seam-crossing-declared, severity: error, subject: "beta:b2 (relationship)" }
+note: "Security-relevant twice over: it ends at an agent-reachable part and carries untrusted fields. It is not marked content: untrusted, so agent-reach finds no exposure. Also in beta's own build."

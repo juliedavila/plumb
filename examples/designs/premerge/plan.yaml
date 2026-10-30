@@ -1,0 +1,131 @@
+# Pre-merge checks' plan. Its third milestone waits on two capabilities Findings intake provides across the seam
+# (cap.classes-published and cap.stamps-accepted, declared in the shared layer). Statuses live in progress.yaml, so
+# the released edition shows today's progress too.
+phases:
+  - id: M1
+    order: 1
+    name: Checks run on every merge request
+    exit_test: Every merge request in the first ten repositories runs the starter checks, and a failing check blocks the merge.
+    delivers: Starter checks on every merge request in the first ten repositories.
+    means: A known flaw is caught before merge, not after release.
+    target: "2026-12-04"
+    accountable: the head of security engineering
+    lead: the developer platform lead
+  - id: M2
+    order: 2
+    name: Agents fix what the checks find
+    exit_test: The fix agent proposes a fix for most failing checks, an engineer approves each one, and every override is logged with a reason.
+    delivers: Most failing checks come with a fix ready to approve.
+    means: A failing check costs a team minutes, not a ticket.
+    target: "2027-02-26"
+    accountable: the head of security engineering
+    lead: the product engineering lead
+  - id: M3
+    order: 3
+    name: Proven classes stop at merge
+    exit_test: Every class intake publishes runs as a check within a day, every merge carries a signed stamp in intake's ledger, and intake receives the yield weekly.
+    delivers: Intake's proven classes checked on every merge, with a signed stamp and the yield sent back.
+    means: A class of flaw proven once is stopped everywhere, and we can show which merges were checked.
+    target: "2027-05-28"
+    accountable: the head of security engineering
+    lead: the developer platform lead
+units:
+  # ── Checks run on every merge request ──
+  - id: U-01
+    title: Hook merge requests
+    kind: code
+    phase: M1
+    elements: [{ id: merge-hook, from: none, to: built }]
+    provides: [cap.hooked]
+    check: Opening a merge request in a pilot repository starts a check run within a minute.
+    flow_item: feature
+  - id: U-02
+    title: Run the starter checks on every change
+    kind: code
+    phase: M1
+    elements: [{ id: check-runner, from: none, to: stand-in }]
+    requires: [cap.hooked]
+    provides: [cap.runner]
+    check: The starter checks run on every change in ten repositories, and a failing check blocks the merge.
+    flow_item: risk
+  - id: U-03
+    title: Catalog checks per repository
+    kind: code
+    phase: M1
+    elements: [{ id: check-catalog, from: none, to: built }]
+    provides: [cap.catalog]
+    check: The catalog lists, for each repository, the checks it runs and their rule versions.
+    flow_item: debt
+  # ── Agents fix what the checks find ──
+  - id: U-04
+    title: Fix agent proposes fixes
+    kind: code
+    phase: M2
+    rests_on: [PM-1]
+    elements: [{ id: fix-agent, from: none, to: built }]
+    requires: [cap.runner]
+    provides: [cap.fixes]
+    check: For a failing check of a proven class, the agent proposes a fix on the same merge request within ten minutes.
+    flow_item: feature
+  - id: U-05
+    title: Agent retests its fix before review
+    kind: code
+    phase: M2
+    elements: [{ id: fix-agent, from: built, to: built }]
+    requires: [cap.fixes]
+    check: Every fix the agent proposes has passed the failing check again before an engineer sees it.
+    flow_item: risk
+    relieves: [{ manual_work: retest-after-fix, effect: reduce, rests_on: PM-1 }]
+  - id: U-06
+    title: People approve every agent fix
+    kind: agreement
+    phase: M2
+    elements: [{ id: review-gate, from: none, to: built }]
+    requires: [cap.fixes]
+    provides: [cap.reviewed]
+    check: No agent fix merges without an engineer's approval bound to its commit.
+    flow_item: risk
+  - id: U-07
+    title: Log every override
+    kind: code
+    phase: M2
+    elements: [{ id: override-log, from: none, to: built }]
+    requires: [cap.reviewed]
+    check: Every override of a failing check is in the log with who made it and why.
+    flow_item: risk
+  # ── Proven classes stop at merge ──
+  - id: U-08
+    title: Compile proven classes into checks
+    kind: code
+    phase: M3
+    elements: [{ id: check-runner, from: stand-in, to: built }]
+    requires: [cap.runner, cap.catalog, cap.classes-published]
+    provides: [cap.class-checks]
+    check: A class intake publishes runs as a check in every cataloged repository within a day.
+    flow_item: risk
+  - id: U-09
+    title: Sign a stamp on every merge
+    kind: code
+    phase: M3
+    elements: [{ id: stamp-signer, from: none, to: built }]
+    requires: [cap.class-checks, cap.stamps-accepted]
+    check: Every merge carries a stamp that intake's ledger verifies and keeps.
+    flow_item: risk
+  - id: U-10
+    title: Report check yield to intake
+    kind: code
+    phase: M3
+    elements: [{ id: yield-reporter, from: none, to: built }]
+    requires: [cap.class-checks]
+    check: Intake receives each class's weekly yield, and the numbers match the check runs and the override log.
+    flow_item: debt
+  - id: U-11
+    title: Close repeat findings the checks prove fixed
+    kind: code
+    phase: M3
+    rests_on: [PM-2]
+    elements: [{ id: yield-reporter, from: built, to: built }]
+    requires: [cap.class-checks]
+    check: When a class's check passes on a fix, the matching open findings are closed with a link to the merge.
+    flow_item: risk
+    relieves: [{ manual_work: finding-triage, effect: reduce, rests_on: PM-2 }]

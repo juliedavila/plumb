@@ -1,0 +1,3 @@
+# A fictional shared root for the namespace tests: the shared layer in seams.yaml, the org layer in org.yaml.
+kind: root
+schema: "0.4"

@@ -1,0 +1,6 @@
+name: beta
+title: Pre-merge checks
+schema: "0.4"
+namespace: beta
+root: ../shared
+packs: [generic, plan, security]

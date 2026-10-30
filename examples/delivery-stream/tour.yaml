@@ -1,0 +1,60 @@
+# The presentation tour for this instance (DEMO.md, sections 1 and 2). Each step names a live target in the built
+# page; the build warns when a target is gone. Captions keep one shape: what is on screen, what it shows, what follows.
+title: The method on a value stream
+steps:
+  - target: overview
+    title: A process map that can fail a check
+    say: One product team's path from a customer's idea to a change in production, with the people, queues and tools in between. Nothing here is about security; the method is the same one the security instance uses.
+  - target: { view: stream }
+    title: The stream, end to end
+    say: Every step has an owner team and a hand-off to the next. The shaded bands are zones, and here a zone is where a change stands, before commitment, committed or live. The drawing is generated from the model, so it cannot drift from it.
+  - target: { view: stream }
+    highlight: [customers, idea-inbox, product-triage, roadmap-backlog]
+    title: Where an idea waits first
+    say: A customer's idea passes two queues and a triage step before anyone commits to it. The same view stays on screen; only the highlight moves.
+  - target: { view: stream }
+    highlight: [write-change-request, sprint-backlog, build-change, code-review, ci-pipeline, artifact-registry, test-queue, manual-test, release-approval, deploy-service]
+    title: The committed zone
+    say: This band is the committed zone, every step a change passes once the team has agreed to build it, from the change request to the deploy. The next step opens it on its own.
+  - target: { zone: committed }
+    title: One zone, and what crosses its border
+    say: This is the committed band from the drawing just shown, opened on its own. It draws the zone's parts and the relationships among them, generated from the model. Each doorway on the edge is another zone the work leaves for or comes from, with its count; selecting one goes there.
+  - target: { element: ci-pipeline }
+    title: One part and everything that touches it
+    say: The CI pipeline shows its owner, what it hands to whom, and the work units that change it. Most steps have no unit yet, and that is part of the story.
+  - target: { rule: flow/path-handoff-limit }
+    title: Too many hand-offs
+    say: The check walks the map from customers to production and counts the team boundaries against the limit this instance sets. A long hand-off chain is where changes wait.
+  - target: { rule: flow/queue-has-wip-limit }
+    title: A queue with no limit
+    say: The roadmap backlog declares no work-in-progress limit. Under each rule is one sentence a newcomer can read about what goes wrong when it fails.
+  - target: { patch: P-001 }
+    title: Fold release approval into the deploy gate
+    say: The change review leads with who proposed it, here an agent at the delivery lead's request, and then its verdict, a review before accepting, because the patch counts on two pieces of work that are not done yet. The before and after drawing shows the hand-off the patch removes and the finding it fixes, before anyone accepts it.
+  - target: { patch: P-002 }
+    title: A change a person wrote
+    say: A person can write a patch as well as an agent. The product lead wrote this one by hand to cap the roadmap backlog. It passes every check and fixes two findings, so the review asks for nothing before a person accepts it.
+  - target: plan
+    title: The plan falls out of the map
+    say: Three milestones, each a piece of value delivered and checked by a definition of done a person can check. "Can start now" is computed from capabilities and ranked by how much each unit unblocks, not by a calendar.
+  - target: { unit: U-07 }
+    title: Why a unit waits
+    say: A blocked unit names the capability it waits on and the unit that provides it, with that unit's own status, so a reader can see whether the blocker can itself start.
+  - target: { claim: PR-2 }
+    title: What the plan is betting on
+    say: The Strategy page ranks each premise by the evidence behind it first, then by the open work exposed to it before its first test lands. This one is untested, and parts, relationships and units rest on it; its view shows what would be in question if it were false, and the fallback.
+  - target: notes
+    title: Questions pinned where they apply
+    say: Notes and questions sit on the records they are about and gather here, open questions first. They come from notes.yaml, written by people, by agents and by this page under the dev server; nothing is pulled from a tracker or chat. When Claude answers in the file, the page reloads with the answer.
+  - target: { tracker: match }
+    title: The plan against the tracker
+    say: Reconciliation shows disagreements first, each kind with why it appears and how to settle it, then likely matches to confirm, then the agreement collapsed. The engine read exported files and never called the tracker.
+  - target: { unit: U-03 }
+    title: Tracker state never overwrites the plan
+    say: “Set a WIP limit on every queue” is done in the plan and still in progress in the tracker. Both are shown side by side, flagged as a disagreement, and a person settles it.
+  - target: teams
+    title: Who owns the work, and who waits on whom
+    say: Owners sit on parts, and every unit inherits them from the parts it changes. Each team names its lead, and a unit takes its owner team's lead unless it names its own. The page shows each team's share of the open work, which teams wait on which, and owner and verifier being one team, labelled as a team-level proxy.
+  - target: { present: 2 }
+    title: Where we stand, for leadership
+    say: Present mode opens on the milestone road. Each status is computed and says why; the export that slipped turns the current milestone red, and the delivery lead's green on the next shows as an override. Only the decisions are written by hand.

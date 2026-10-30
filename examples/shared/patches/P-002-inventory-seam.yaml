@@ -1,0 +1,37 @@
+# The organization's own seam, written into the shared layer by a patch: seams.yaml is never edited. Asset inventory
+# cleanup is the organization's design, so nothing shipped knows about it.
+id: P-002
+title: Declare the seam from asset inventory cleanup to findings intake
+status: accepted
+provenance:
+  author: person
+  requested_by: the governance and risk lead
+  created: "2026-09-21"
+why: Asset inventory cleanup will tell findings intake which team owns each asset, so the connection, its contract, the capability intake waits on and the seam between the two designs belong in the shared layer.
+ops:
+  - op: add
+    kind: contract
+    value:
+      name: AssetOwnership
+      description: "The team that owns each asset, by repository and cloud account, so a finding reaches the right queue."
+      fields: [asset_id, asset_kind, owning_team]
+      untrusted_fields: []
+      produced_by: [inventory:ownership-api]
+      consumed_by: [intake:dedup]
+  - op: add
+    kind: relationship
+    value: { id: x07, from: inventory:ownership-api, to: intake:dedup, kind: data, label: Asset owners, carries: [AssetOwnership], content: structured }
+  - op: add
+    kind: capability
+    value: { id: cap.asset-owners, name: Asset owners published, provided_by: [inventory], required_by: [intake] }
+  - op: add
+    kind: seam
+    value:
+      id: inventory-intake
+      name: Asset inventory and findings intake
+      between: [inventory, intake]
+      owner_role: the asset inventory owner
+      checks: []
+      never_cross: []
+      exposure: { inventory: [], intake: [] }
+decision: { by: the program lead, at: "2026-09-22", reason: "The connection crosses between two designs, so it is written whole in the shared layer." }

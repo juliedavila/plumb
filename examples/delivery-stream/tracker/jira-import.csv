@@ -1,0 +1,19 @@
+Issue Id,Issue Type,Summary,Description,Acceptance criteria,Parent,Labels,Delivery team,Outward issue link (Depends on),Outward issue link (Depends on),Outward issue link (Depends on)
+1,Story,Pair design and product on change requests,"Plumb unit U-11, phase Shorten it.
+Requires: cap.lead-time-target.
+Provides: cap.joint-spec.","The last five change requests were written by a designer and a product manager together, with no separate design handoff.",NOTE-3,de-unit:U-11,,,,
+2,Story,Review within one working day,"Plumb unit U-14, phase Shorten it.
+Requires: cap.review-time-measured, cap.preview-envs.
+Provides: cap.review-sla.","Ninety percent of pull requests get a first review within one working day, for four weeks running.",NOTE-3,de-unit:U-14,App engineering,,,
+3,Story,Review the stream in every retro,"Plumb unit U-17, phase Keep it short.
+Requires: cap.lead-time-dashboard.
+Provides: cap.stream-review.",The last six retro notes each record the lead-time trend and one action on the slowest step.,NOTE-4,de-unit:U-17,Product,,,
+4,Story,Alert when a queue passes its WIP limit,"Plumb unit U-18, phase Keep it short.
+Requires: cap.wip-limits, cap.lead-time-dashboard.
+Provides: cap.wip-alerts.",Pushing a queue past its limit in a test board posts an alert to the owning team's channel within five minutes.,NOTE-4,de-unit:U-18,Platform,,,
+5,Story,Feed usage into triage,"Plumb unit U-20, phase Keep it short.
+Requires: cap.support-feedback-loop.
+Provides: cap.usage-feedback.",Triage notes for the last four weeks cite the usage report for each accepted or rejected idea.,NOTE-4,de-unit:U-20,Product,,,
+6,Story,Quarterly stream health review,"Plumb unit U-21, phase Keep it short.
+Requires: cap.stream-review, cap.wip-alerts, cap.usage-feedback.
+Provides: cap.stream-health.","Once a quarter all seven team leads review lead time, handoffs and queue alerts together and record one decision.",NOTE-4,de-unit:U-21,Product,3,4,5

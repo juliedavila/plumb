@@ -1,0 +1,130 @@
+# Asset inventory cleanup's plan. The first milestone is reached, so the relief it carries for audit evidence
+# collection (org.yaml) has landed. Most units are transition work: they move a part whose disposition in
+# current.yaml is transition, replace or retire, or retire a part outright (to: retired). cap.asset-owners crosses
+# to Findings intake through the organization's seam (patches/P-002).
+phases:
+  - id: M1
+    order: 1
+    name: Know what we have
+    exit_test: Every repository and cloud account is listed with at least one candidate owner, and the first audit export has run.
+    delivers: A list of every repository and cloud account, with candidate owners.
+    means: We can say what we own before we argue about who owns it.
+    target: "2026-10-30"
+    accountable: the governance and risk lead
+    lead: the governance and risk lead
+  - id: M2
+    order: 2
+    name: One owned list
+    exit_test: Every asset has one confirmed owner in the list, intake reads owners from it, and the legacy CMDB export is switched off.
+    delivers: One asset list with one confirmed owner per asset, served to findings intake.
+    means: Findings, alerts and audits all name the same owner for an asset.
+    target: "2027-01-15"
+    accountable: the governance and risk lead
+    lead: the governance and risk lead
+  - id: M3
+    order: 3
+    name: Old lists retired
+    exit_test: No script or spreadsheet outside the list keeps asset owners, and every alert carries the owning team.
+    delivers: The old lists and scripts gone, and owners on every alert.
+    means: There is one answer to who owns an asset, and incidents start with it.
+    target: "2027-03-26"
+    accountable: the governance and risk lead
+    lead: the detection and response lead
+units:
+  # ── Know what we have ──
+  - id: U-01
+    title: Crawl every repository
+    kind: code
+    phase: M1
+    elements: [{ id: repo-crawler, from: stand-in, to: existing-tool }]
+    provides: [cap.crawled]
+    check: The crawler lists every repository the code host holds, with its declared owners.
+    flow_item: risk
+  - id: U-02
+    title: List every cloud account
+    kind: code
+    phase: M1
+    elements: [{ id: reconciler, from: none, to: stand-in }]
+    provides: [cap.accounts]
+    check: Every cloud account appears once in the reconciler's input, with its tags.
+    flow_item: risk
+  - id: U-03
+    title: Export audit evidence from the list
+    kind: code
+    phase: M1
+    rests_on: [IV-2]
+    elements: [{ id: audit-export, from: none, to: stand-in }]
+    requires: [cap.crawled]
+    check: The audit export writes the ownership evidence the last audit asked for, from the list alone.
+    flow_item: risk
+    relieves: [{ manual_work: evidence-gathering, effect: reduce, rests_on: IV-2 }]
+  # ── One owned list ──
+  - id: U-04
+    title: Reconcile owners into one list
+    kind: code
+    phase: M2
+    rests_on: [IV-1]
+    elements: [{ id: reconciler, from: stand-in, to: built }, { id: asset-list, from: none, to: built }]
+    requires: [cap.crawled, cap.accounts]
+    provides: [cap.one-list]
+    check: Every asset has one owner in the list, and the stewards have confirmed nine in ten of them.
+    flow_item: feature
+  - id: U-05
+    title: Publish asset owners to intake
+    kind: code
+    phase: M2
+    elements: [{ id: ownership-api, from: none, to: built }]
+    requires: [cap.one-list]
+    provides: [cap.asset-owners]
+    check: Findings intake reads each asset's owner from the feed, and an unknown asset returns no owner rather than a guess.
+    flow_item: feature
+  - id: U-06
+    title: Retire the legacy CMDB export
+    kind: code
+    phase: M2
+    elements: [{ id: legacy-cmdb-export, from: existing-tool, to: retired }]
+    requires: [cap.one-list]
+    check: The nightly CMDB export is switched off, and nothing that read it fails.
+    flow_item: debt
+  - id: U-07
+    title: Retire the nightly scan scripts
+    kind: code
+    phase: M2
+    elements: [{ id: scan-scripts, from: built, to: retired }]
+    requires: [cap.crawled]
+    check: The scan scripts are deleted from the scheduler, and the crawler covers every repository they scanned.
+    flow_item: debt
+  - id: U-08
+    title: Retire the ownership macros
+    kind: code
+    phase: M2
+    elements: [{ id: ownership-macros, from: built, to: retired }]
+    requires: [cap.accounts]
+    check: The macros are removed from the shared workbook, and no one has run them for a month.
+    flow_item: debt
+  # ── Old lists retired ──
+  - id: U-09
+    title: Retire the cloud tag sync job
+    kind: code
+    phase: M3
+    elements: [{ id: tag-sync-job, from: built, to: retired }]
+    requires: [cap.one-list]
+    check: The tag sync job is switched off, and account owners come only from the list.
+    flow_item: debt
+  - id: U-10
+    title: Enrich alerts with owners
+    kind: code
+    phase: M3
+    elements: [{ id: alert-enrichment, from: existing-tool, to: built }]
+    requires: [cap.one-list]
+    provides: [cap.enriched]
+    check: Every security alert carries the owning team from the list within a minute of firing.
+    flow_item: feature
+  - id: U-11
+    title: Page the owning team on incidents
+    kind: code
+    phase: M3
+    elements: [{ id: alert-enrichment, from: built, to: built }]
+    requires: [cap.enriched]
+    check: An incident on an asset pages its owning team's on-call first.
+    flow_item: feature

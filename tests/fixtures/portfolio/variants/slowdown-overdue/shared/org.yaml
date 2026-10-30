@@ -1,0 +1,37 @@
+# The base fixture's org layer: two teams within capacity, one activity relieved by a unit of alpha, no slowdown and
+# no exception. Dates assume a build on 2026-11-16.
+teams:
+  - id: team-a
+    name: Team A
+    description: Owns alpha.
+    lead: the team A lead
+    row_owner: the team A lead
+    capacity: { value: 4, source: person, by: the team A lead, as_of: "2026-11-02", confidence: medium }
+  - id: team-b
+    name: Team B
+    description: Owns beta and the shared parts.
+    lead: the team B lead
+    row_owner: the team B lead
+    capacity: { value: 4, source: person, by: the team B lead, as_of: "2026-11-02", confidence: medium }
+activities:
+  - id: chores
+    team: team-a
+    name: Chores
+    type: bau
+    flow_item: debt
+    share: { value: 0.25, source: person, by: the team A lead, as_of: "2026-11-02", confidence: medium }
+    manual_work: chore-work
+    relieved_by:
+      - { at: alpha:AU-3, effect: retire }
+slowdowns:
+  - id: SD-1
+    activity: chores
+    what: Do the chores once a week instead of daily.
+    share_during: { value: 0.1, source: person, by: the team A lead, as_of: "2026-10-14", confidence: medium }
+    from: "2026-10-15"
+    until: alpha:A1
+    risk: { rises: Chores pile up for a week at a time. }
+    accepted_by: [the security risk owner, the business risk owner]
+    accepted_at: "2026-10-14"
+    review_by: "2026-11-01"   # passed at the build date of 2026-11-16
+seam_exceptions: {}

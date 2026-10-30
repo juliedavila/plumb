@@ -1,0 +1,4 @@
+breaks: Alpha's own contract AlphaWork names beta's part b-out as a producer. A design names its own records and its root's, never another design's, outside a descriptive record.
+expect:
+  - { rule: core/xref-resolves, severity: error, subject: "alpha:AlphaWork (contract)" }
+note: Also in alpha's own build. The reference resolves in the portfolio, and it is still an error there. No generic rule reports the same name again.

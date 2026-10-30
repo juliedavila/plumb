@@ -1,0 +1,39 @@
+id: P-001
+title: Fold release approval into the automated deploy gate
+status: proposed
+provenance:
+  author: agent
+  agent: { tool: Claude Code }
+  requested_by: the delivery lead
+  request: Find a change that removes a team hand-off from the release path without losing the release note.
+  created: "2026-10-21"
+  based_on: 6b8e48c6d7e9
+why: >-
+  The weekly release meeting adds a four-day wait and one more team handoff to every change, and it approves what the
+  test report already says. Once the release checklist is automated (U-08) and gates the deploy (U-09), a passing
+  test report can go straight to the deploy service, and the deploy publishes the release note itself.
+ops:
+  - op: remove
+    kind: element
+    id: release-approval
+  - op: remove
+    kind: contract
+    id: ReleaseApproval
+  - op: add
+    kind: relationship
+    value: { id: h16, from: manual-test, to: deploy-service, kind: handoff, label: Passing test report, carries: [TestReport] }
+  - op: add
+    kind: relationship
+    value: { id: d09, from: deploy-service, to: release-notes, kind: data, label: Publishes what changed, carries: [ReleaseNote] }
+  - op: modify
+    kind: contract
+    id: TestReport
+    set: { consumed_by: [manual-test, deploy-service] }
+  - op: modify
+    kind: contract
+    id: ReleaseNote
+    set: { produced_by: [deploy-service, release-notes] }
+  - op: modify
+    kind: view
+    id: stream
+    set: { elements: [customers, idea-inbox, product-triage, roadmap-backlog, design-exploration, write-change-request, sprint-backlog, build-change, code-review, ci-pipeline, artifact-registry, test-queue, manual-test, deploy-service, production] }

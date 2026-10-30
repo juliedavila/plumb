@@ -1,0 +1,4 @@
+breaks: "The organization's exception on the seam alpha-beta names no risk acceptor."
+expect:
+  - { rule: org/exception-valid, severity: error, subject: "shared:alpha-beta (seam), the organization's exception" }
+note: "The exception does not apply. It replaces the seam's default (none here) all the same, which changes nothing."

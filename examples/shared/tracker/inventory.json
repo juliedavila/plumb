@@ -1,0 +1,347 @@
+{
+  "adapter": "jira",
+  "flavor": "cloud",
+  "issues": 121,
+  "projects": [
+    {
+      "key": "GRC",
+      "name": "Governance and risk",
+      "style": "company-managed",
+      "issues": 20
+    },
+    {
+      "key": "INC",
+      "name": "Incidents",
+      "style": "company-managed",
+      "issues": 20
+    },
+    {
+      "key": "PLAT",
+      "name": "Platform",
+      "style": "company-managed",
+      "issues": 24
+    },
+    {
+      "key": "SEC",
+      "name": "Security engineering",
+      "style": "company-managed",
+      "issues": 57
+    }
+  ],
+  "issueTypes": [
+    {
+      "id": "10100",
+      "name": "Epic",
+      "level": 1,
+      "subtask": false,
+      "count": 1
+    },
+    {
+      "id": "10104",
+      "name": "Incident",
+      "level": 0,
+      "subtask": false,
+      "count": 20
+    },
+    {
+      "id": "10103",
+      "name": "Pen test",
+      "level": 0,
+      "subtask": false,
+      "count": 4
+    },
+    {
+      "id": "10101",
+      "name": "Story",
+      "level": 0,
+      "subtask": false,
+      "count": 32
+    },
+    {
+      "id": "10102",
+      "name": "Task",
+      "level": 0,
+      "subtask": false,
+      "count": 64
+    }
+  ],
+  "hierarchy": [
+    {
+      "level": 1,
+      "types": [
+        "Epic"
+      ],
+      "count": 1
+    },
+    {
+      "level": 0,
+      "types": [
+        "Incident",
+        "Pen test",
+        "Story",
+        "Task"
+      ],
+      "count": 120
+    }
+  ],
+  "fields": [
+    {
+      "id": "customfield_10410",
+      "name": "Work category",
+      "role": "other",
+      "type": "option",
+      "custom": true,
+      "count": 6,
+      "values": [
+        {
+          "name": "Scanner rules",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "id": "parent",
+      "name": "Parent",
+      "role": "parent",
+      "type": "issuelink",
+      "custom": false,
+      "count": 5
+    },
+    {
+      "id": "customfield_10201",
+      "name": "Owning team",
+      "role": "team",
+      "type": "option",
+      "custom": true,
+      "count": 116,
+      "values": [
+        {
+          "name": "Vulnerability Management",
+          "count": 32
+        },
+        {
+          "name": "Detection and Response",
+          "count": 26
+        },
+        {
+          "name": "AppSec Platform",
+          "count": 22
+        },
+        {
+          "name": "Governance and Risk",
+          "count": 18
+        },
+        {
+          "name": "Developer Platform",
+          "count": 10
+        },
+        {
+          "name": "Product Engineering",
+          "count": 8
+        }
+      ]
+    }
+  ],
+  "linkTypes": [
+    {
+      "id": "10300",
+      "name": "Blocks",
+      "inward": "is blocked by",
+      "outward": "blocks",
+      "count": 0
+    },
+    {
+      "id": "10301",
+      "name": "Relates",
+      "inward": "relates to",
+      "outward": "relates to",
+      "count": 0
+    }
+  ],
+  "statuses": [
+    {
+      "id": "10201",
+      "name": "To Do",
+      "category": "todo",
+      "categoryName": "To Do",
+      "count": 6
+    },
+    {
+      "id": "10200",
+      "name": "Backlog",
+      "category": "todo",
+      "categoryName": "To Do",
+      "count": 3
+    },
+    {
+      "id": "10202",
+      "name": "In Review",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 8
+    },
+    {
+      "id": "3",
+      "name": "In Progress",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 6
+    },
+    {
+      "id": "10203",
+      "name": "Done",
+      "category": "done",
+      "categoryName": "Done",
+      "count": 98
+    }
+  ],
+  "components": [
+    {
+      "name": "Triage",
+      "count": 19,
+      "project": "SEC"
+    },
+    {
+      "name": "Paging",
+      "count": 18,
+      "project": "INC"
+    },
+    {
+      "name": "Customer assurance",
+      "count": 7,
+      "project": "GRC"
+    },
+    {
+      "name": "Scanners",
+      "count": 6,
+      "project": "SEC"
+    },
+    {
+      "name": "Audit",
+      "count": 5,
+      "project": "GRC"
+    }
+  ],
+  "labels": [
+    {
+      "name": "vuln-triage",
+      "count": 20
+    },
+    {
+      "name": "de-unit:premerge:U-04",
+      "count": 4
+    },
+    {
+      "name": "de-unit:intake:U-01",
+      "count": 3
+    },
+    {
+      "name": "de-unit:inventory:U-04",
+      "count": 3
+    },
+    {
+      "name": "de-unit:inventory:U-10",
+      "count": 3
+    },
+    {
+      "name": "de-unit:intake:U-02",
+      "count": 2
+    },
+    {
+      "name": "de-unit:intake:U-03",
+      "count": 2
+    },
+    {
+      "name": "de-unit:intake:U-04",
+      "count": 2
+    },
+    {
+      "name": "de-unit:intake:U-05",
+      "count": 2
+    },
+    {
+      "name": "de-unit:intake:U-06",
+      "count": 2
+    },
+    {
+      "name": "de-unit:inventory:U-11",
+      "count": 2
+    },
+    {
+      "name": "de-unit:premerge:U-01",
+      "count": 2
+    },
+    {
+      "name": "de-unit:premerge:U-02",
+      "count": 2
+    },
+    {
+      "name": "de-unit:premerge:U-03",
+      "count": 2
+    },
+    {
+      "name": "de-unit:U-04",
+      "count": 1
+    },
+    {
+      "name": "de-unit:intake:U-07",
+      "count": 1
+    },
+    {
+      "name": "de-unit:intake:U-10",
+      "count": 1
+    },
+    {
+      "name": "de-unit:inventory:U-01",
+      "count": 1
+    },
+    {
+      "name": "de-unit:inventory:U-02",
+      "count": 1
+    },
+    {
+      "name": "de-unit:inventory:U-03",
+      "count": 1
+    },
+    {
+      "name": "de-unit:inventory:U-05",
+      "count": 1
+    },
+    {
+      "name": "de-unit:inventory:U-07",
+      "count": 1
+    },
+    {
+      "name": "de-unit:premerge:U-05",
+      "count": 1
+    },
+    {
+      "name": "de-unit:premerge:U-06",
+      "count": 1
+    }
+  ],
+  "fixVersions": [],
+  "containers": [
+    {
+      "key": "GRC-1",
+      "type": "Epic",
+      "level": 1,
+      "summary": "Audit evidence for the annual audit",
+      "children": 5
+    }
+  ],
+  "notes": [],
+  "source": {
+    "dir": "tracker/export",
+    "files": [
+      "field.json",
+      "issueLinkType.json",
+      "issuetype.json",
+      "project.json",
+      "search-1.json",
+      "search-2.json",
+      "serverInfo.json",
+      "status.json"
+    ]
+  }
+}

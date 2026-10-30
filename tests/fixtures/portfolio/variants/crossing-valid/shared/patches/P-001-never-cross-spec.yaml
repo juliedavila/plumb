@@ -1,0 +1,11 @@
+id: P-001
+title: Put the spec on the never-cross list
+status: accepted
+provenance: { author: person, requested_by: the team A lead, created: "2026-11-03" }
+why: Beta should derive the spec itself.
+ops:
+  - op: modify
+    kind: seam
+    id: alpha-beta
+    set: { never_cross: ["alpha:Secret", Spec] }
+decision: { by: the fixture approver, at: "2026-11-04", reason: Accepted to show the check. }

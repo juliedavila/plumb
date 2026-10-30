@@ -1,0 +1,6 @@
+id: p10
+title: Describe the bell
+status: accepted
+why: Applies only after p2 (natural order puts p10 after p2).
+ops:
+  - { op: modify, kind: element, id: bell, set: { description: A brass bell on the counter } }

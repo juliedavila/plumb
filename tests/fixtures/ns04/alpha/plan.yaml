@@ -1,0 +1,6 @@
+phases:
+  - { id: M1, name: Findings flow into one queue, exit_test: A finding from each scanner lands in the queue., order: 1 }
+  - { id: M2, name: Rules are published, exit_test: A proven rule reaches the checks., order: 2 }
+units:
+  - { id: U-1, title: Build the intake service, kind: code, phase: M1, elements: [{ id: intake, from: none, to: built }], provides: [queue], check: Findings land., status: done, flow_item: feature }
+  - { id: U-2, title: Publish proven rules, kind: code, phase: M2, elements: [{ id: publisher, from: none, to: built }], requires: [queue], provides: [proven-rules], check: A rule is published., flow_item: feature }

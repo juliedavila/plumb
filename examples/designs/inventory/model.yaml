@@ -1,0 +1,109 @@
+# Asset inventory cleanup. Fictional. The target design: a crawler and the cloud account list feed
+# a reconciler that keeps one owned asset list, which feeds alert enrichment, the audit export and, across the
+# organization's own seam, findings intake. What exists today, and what goes away, is in current.yaml.
+#
+# v01 is this design's own edge from the shared code hosting system, carrying repository text anyone with commit
+# access can write. Nothing declares it, so the seam rule reports it as an undeclared security-relevant crossing.
+systems:
+  - { id: inventory, name: Asset inventory, description: "Knows every asset and the team that owns it." }
+zones:
+  - { id: records, name: Asset records, description: The reconciled records and what reads them. }
+elements:
+  - id: repo-crawler
+    name: Repository crawler
+    kind: service
+    system: inventory
+    zone: records
+    owner: dev-platform
+    description: Reads every repository's settings and metadata from the code host.
+  - id: cloud-accounts
+    name: Cloud account list
+    kind: external-system
+    system: inventory
+    zone: existing
+    owner: dev-platform
+    description: "The cloud provider's list of accounts and their tags."
+  - id: reconciler
+    name: Reconciler
+    kind: service
+    system: inventory
+    zone: records
+    owner: governance-risk
+    description: Matches each repository, account and service to one owning team.
+    rests_on: [IV-1]
+  - id: asset-list
+    name: Asset list
+    kind: store
+    system: inventory
+    zone: records
+    owner: governance-risk
+    description: One list of every asset and the team that owns it.
+    partitioned_by: [owning_team]
+  - id: ownership-api
+    name: Ownership feed
+    kind: service
+    system: inventory
+    zone: records
+    owner: dev-platform
+    description: Answers which team owns an asset. Findings intake reads it to route findings.
+  - id: alert-enrichment
+    name: Alert enrichment
+    kind: service
+    system: inventory
+    zone: records
+    owner: detection-response
+    description: Adds the owning team to every security alert.
+  - id: audit-export
+    name: Audit evidence export
+    kind: service
+    system: inventory
+    zone: records
+    owner: governance-risk
+    description: "Writes the asset list's ownership evidence for each audit."
+    rests_on: [IV-2]
+  - id: asset-steward
+    name: Asset stewards
+    kind: person
+    system: people
+    zone: records
+    owner: governance-risk
+    description: "People in each team who confirm their team's assets."
+    role_class: human
+relationships:
+  - { id: v01, from: code-host, to: repo-crawler, kind: data, label: Repository settings and readme text, carries: [RepoMetadata], content: untrusted }
+  - { id: v02, from: repo-crawler, to: reconciler, kind: data, label: Repositories and declared owners, carries: [AssetRecord], content: structured }
+  - { id: v03, from: cloud-accounts, to: reconciler, kind: data, label: Accounts and tags, carries: [AccountRecord] }
+  - { id: v04, from: reconciler, to: asset-list, kind: data, label: One owner per asset, carries: [AssetRecord] }
+  - { id: v05, from: asset-steward, to: asset-list, kind: control, label: Confirms or corrects owners, carries: [OwnershipConfirmation] }
+  - { id: v06, from: asset-list, to: ownership-api, kind: data, label: Owners to serve, carries: [AssetRecord] }
+  - { id: v07, from: asset-list, to: alert-enrichment, kind: data, label: Owners for alerts, carries: [AssetRecord] }
+  - { id: v08, from: asset-list, to: audit-export, kind: data, label: Owners for the audit, carries: [AssetRecord] }
+  - { id: v09, from: audit-export, to: asset-steward, kind: feedback, label: Assets with no confirmed owner, carries: [OwnershipGaps] }
+contracts:
+  - name: RepoMetadata
+    description: "A repository's settings, topics and readme text as the code host holds them. Anyone with commit access can write the topics and the readme."
+    untrusted_fields: [topics, readme]
+    produced_by: [code-host]
+    consumed_by: [repo-crawler]
+  - { name: AssetRecord, description: "One asset: its kind, where it lives and the team that owns it.", produced_by: [repo-crawler, reconciler, asset-list], consumed_by: [reconciler, asset-list, ownership-api, alert-enrichment, audit-export] }
+  - { name: AccountRecord, description: One cloud account with its tags., produced_by: [cloud-accounts], consumed_by: [reconciler] }
+  - { name: OwnershipConfirmation, description: "A steward's confirmation or correction of one asset's owner.", produced_by: [asset-steward], consumed_by: [asset-list] }
+  - { name: OwnershipGaps, description: Assets with no confirmed owner, per team., measures: "assets with no confirmed owner, per team", produced_by: [audit-export], consumed_by: [asset-steward] }
+claims:
+  - id: IV-1
+    kind: premise
+    statement: Every asset has one team that can be named as its owner.
+    grade: judgment
+    source: The governance and risk lead, from last year's audit sample.
+    fallback: An asset two teams share goes to a lead named per asset.
+  - id: IV-2
+    kind: premise
+    statement: Audit evidence of asset ownership can be exported from the list instead of gathered by hand for each audit.
+    grade: inference
+    source: "The last audit asked for ownership evidence in three forms, all of which the list holds."
+    fallback: Keep gathering by hand the evidence the export cannot produce.
+views:
+  - id: inventory-flow
+    title: From crawler to owned list
+    description: How repositories and accounts become one owned asset list, and what reads it.
+    elements: [repo-crawler, cloud-accounts, reconciler, asset-list, asset-steward, ownership-api, alert-enrichment, audit-export]

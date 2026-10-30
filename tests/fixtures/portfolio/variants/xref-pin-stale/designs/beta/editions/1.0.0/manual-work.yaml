@@ -1,0 +1,5 @@
+namespace: shared
+version: "1.0.0"
+schema: { model: 5, design_engine: "0.4" }
+manual_work:
+  - { id: chore-work, name: Manual chores, description: Work a person does by hand that a unit can take away., flow_item: debt }

@@ -1,0 +1,12 @@
+elements:
+  - { id: a-in, name: Alpha in, kind: service, system: work, zone: inner, owner: team-a, description: Takes hub events in. }
+  - { id: a-out, name: Alpha out, kind: service, system: work, zone: inner, owner: team-a, description: Sends the spec to beta and tasks to the sandbox. }
+  - { id: a-vault, name: Alpha vault, kind: service, system: work, zone: inner, owner: team-a, description: "Keeps alpha's secret." }
+relationships:
+  - { id: a1, from: a-in, to: a-out, kind: data, carries: [AlphaWork] }
+  - { id: a2, from: a-out, to: a-vault, kind: data, carries: [Secret] }
+contracts:
+  - { name: AlphaWork, description: Work alpha passes along., produced_by: [a-in], consumed_by: [a-out] }
+  - { name: Secret, description: What must never leave alpha., produced_by: [a-out], consumed_by: [a-vault] }
+claims:
+  - { id: AP-1, kind: premise, statement: Keeping the secret in the vault ends the chores., grade: judgment, source: The team A lead. }

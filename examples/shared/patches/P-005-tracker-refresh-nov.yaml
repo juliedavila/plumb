@@ -1,0 +1,42 @@
+# The latest tracker refresh, proposed and waiting for the approver: one refresh, one patch. Its
+# values are what a measure of ./tracker/export gives over the 90 days to 1 November (examples/README.md lists them).
+id: P-005
+title: Tracker refresh, 90 days to 1 November
+status: proposed
+provenance:
+  author: agent
+  agent: { name: org-scout, tool: Claude Code }
+  requested_by: the program lead
+  created: "2026-11-02"
+why: Measured from the tracker over the 90 days to 1 November, from 121 issues, 116 of them with a team, with nine tenths of each team's time classified. Each share keeps the figure a person stated beside the measured one.
+ops:
+  - op: modify
+    kind: activity
+    id: vuln-triage
+    set:
+      share: { value: 0.38, source: tracker, by: "tracker:activity/vuln-triage", as_of: "2026-11-01", confidence: high, stated: { value: 0.25, by: the vulnerability management lead, as_of: "2026-09-14" } }
+  - op: modify
+    kind: activity
+    id: pentest-coordination
+    set:
+      share: { value: 0.12, source: tracker, by: "tracker:activity/pentest-coordination", as_of: "2026-11-01", confidence: medium, stated: { value: 0.10, by: the AppSec platform lead, as_of: "2026-09-28" } }
+  - op: modify
+    kind: activity
+    id: incident-oncall
+    set:
+      share: { value: 0.52, source: tracker, by: "tracker:activity/incident-oncall", as_of: "2026-11-01", confidence: medium, stated: { value: 0.30, by: the detection and response lead, as_of: "2026-09-21" } }
+  - op: modify
+    kind: activity
+    id: audit-evidence
+    set:
+      share: { value: 0.24, source: tracker, by: "tracker:activity/audit-evidence", as_of: "2026-11-01", confidence: medium, stated: { value: 0.25, by: the governance and risk lead, as_of: "2026-09-07" } }
+  - op: modify
+    kind: activity
+    id: scanner-rule-upkeep
+    set:
+      share: { value: 0.20, source: tracker, by: "tracker:activity/scanner-rule-upkeep", as_of: "2026-11-01", confidence: medium, stated: { value: 0.17, by: the AppSec platform lead, as_of: "2026-09-28" } }
+  - op: modify
+    kind: activity
+    id: questionnaires
+    set:
+      share: { value: 0.28, source: tracker, by: "tracker:activity/questionnaires", as_of: "2026-11-01", confidence: medium, stated: { value: 0.20, by: the governance and risk lead, as_of: "2026-10-12" } }

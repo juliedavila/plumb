@@ -1,0 +1,4 @@
+breaks: Alpha declares the team team-a in its own model while its root has an org layer that holds the teams.
+expect:
+  - { rule: core/one-home, severity: error, subject: "alpha (teams)" }
+note: Alpha's parts still resolve owner team-a, to its own record first, so no reference fails.

@@ -1,0 +1,13 @@
+# Pre-merge checks: a fictional design for the example portfolio, the module of the pair. Rooted
+# at the example shared root. It pins nothing: intake pins it, in one direction only.
+name: premerge
+title: Pre-merge checks
+description: >-
+  Checks built from proven classes of finding run on every change before it merges. A coding agent proposes a fix for
+  what fails, an engineer approves each fix, every merge carries a signed stamp, and the checks' yield goes back to
+  findings intake.
+schema: "0.4"
+namespace: premerge
+root: ../../shared
+packs: [generic, plan, security]
+ladder: [none, stand-in, existing-tool, built]

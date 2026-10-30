@@ -1,0 +1,2917 @@
+{
+  "issues": [
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20001",
+      "self": "https://tracker.example.test/rest/api/3/issue/20001",
+      "key": "NOTE-1",
+      "fields": {
+        "summary": "Shorten the delivery stream",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10005",
+          "id": "10005",
+          "name": "Initiative",
+          "subtask": false,
+          "hierarchyLevel": 2
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/3",
+          "id": "3",
+          "name": "In Progress",
+          "statusCategory": {
+            "id": 4,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "colorName": "yellow"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pm",
+          "displayName": "Product lead",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [],
+        "components": [],
+        "fixVersions": [],
+        "issuelinks": [],
+        "description": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Cut the time from an accepted idea to a change in production, and keep it down."
+                }
+              ]
+            }
+          ]
+        },
+        "updated": "2026-10-01T10:00:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": null,
+        "customfield_10026": null,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-01T10:00:00.000+0000"
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20002",
+      "self": "https://tracker.example.test/rest/api/3/issue/20002",
+      "key": "NOTE-2",
+      "fields": {
+        "summary": "See the delivery stream",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10000",
+          "id": "10000",
+          "name": "Epic",
+          "subtask": false,
+          "hierarchyLevel": 1
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/3",
+          "id": "3",
+          "name": "In Progress",
+          "statusCategory": {
+            "id": 4,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "colorName": "yellow"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pm",
+          "displayName": "Product lead",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [],
+        "components": [],
+        "fixVersions": [],
+        "issuelinks": [],
+        "description": null,
+        "updated": "2026-10-02T10:01:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": null,
+        "customfield_10026": null,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-02T10:01:00.000+0000",
+        "parent": {
+          "id": "20001",
+          "key": "NOTE-1",
+          "self": "https://tracker.example.test/rest/api/3/issue/20001",
+          "fields": {
+            "summary": "Shorten the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10005",
+              "name": "Initiative",
+              "subtask": false,
+              "hierarchyLevel": 2
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20003",
+      "self": "https://tracker.example.test/rest/api/3/issue/20003",
+      "key": "NOTE-3",
+      "fields": {
+        "summary": "Shorten the stream",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10000",
+          "id": "10000",
+          "name": "Epic",
+          "subtask": false,
+          "hierarchyLevel": 1
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10001",
+          "id": "10001",
+          "name": "To Do",
+          "statusCategory": {
+            "id": 2,
+            "key": "new",
+            "name": "To Do",
+            "colorName": "blue-gray"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pm",
+          "displayName": "Product lead",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [],
+        "components": [],
+        "fixVersions": [],
+        "issuelinks": [],
+        "description": null,
+        "updated": "2026-10-03T10:02:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": null,
+        "customfield_10026": null,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-03T10:02:00.000+0000",
+        "parent": {
+          "id": "20001",
+          "key": "NOTE-1",
+          "self": "https://tracker.example.test/rest/api/3/issue/20001",
+          "fields": {
+            "summary": "Shorten the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10005",
+              "name": "Initiative",
+              "subtask": false,
+              "hierarchyLevel": 2
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20004",
+      "self": "https://tracker.example.test/rest/api/3/issue/20004",
+      "key": "NOTE-4",
+      "fields": {
+        "summary": "Keep the stream short",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10000",
+          "id": "10000",
+          "name": "Epic",
+          "subtask": false,
+          "hierarchyLevel": 1
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10000",
+          "id": "10000",
+          "name": "Backlog",
+          "statusCategory": {
+            "id": 2,
+            "key": "new",
+            "name": "To Do",
+            "colorName": "blue-gray"
+          }
+        },
+        "assignee": null,
+        "labels": [],
+        "components": [],
+        "fixVersions": [],
+        "issuelinks": [],
+        "description": null,
+        "updated": "2026-10-04T10:03:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": null,
+        "customfield_10026": null,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-04T10:03:00.000+0000",
+        "parent": {
+          "id": "20001",
+          "key": "NOTE-1",
+          "self": "https://tracker.example.test/rest/api/3/issue/20001",
+          "fields": {
+            "summary": "Shorten the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10005",
+              "name": "Initiative",
+              "subtask": false,
+              "hierarchyLevel": 2
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20010",
+      "self": "https://tracker.example.test/rest/api/3/issue/20010",
+      "key": "NOTE-10",
+      "fields": {
+        "summary": "Name an owner for every step",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10005",
+          "id": "10005",
+          "name": "Done",
+          "statusCategory": {
+            "id": 3,
+            "key": "done",
+            "name": "Done",
+            "colorName": "green"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pm",
+          "displayName": "Product lead",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [
+          "de-unit:U-01",
+          "stream"
+        ],
+        "components": [],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10700",
+            "id": "10700",
+            "name": "2026.09",
+            "archived": false,
+            "released": true
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20000",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20000",
+            "type": {
+              "id": "10000",
+              "name": "Blocks",
+              "inward": "is blocked by",
+              "outward": "blocks",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10000"
+            },
+            "outwardIssue": {
+              "id": "20012",
+              "key": "NOTE-12",
+              "self": "https://tracker.example.test/rest/api/3/issue/20012",
+              "fields": {
+                "summary": "WIP limits on every queue",
+                "status": {
+                  "id": "3",
+                  "name": "In Progress",
+                  "statusCategory": {
+                    "id": 4,
+                    "key": "indeterminate",
+                    "name": "In Progress",
+                    "colorName": "yellow"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20001",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20001",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20011",
+              "key": "NOTE-11",
+              "self": "https://tracker.example.test/rest/api/3/issue/20011",
+              "fields": {
+                "summary": "Record the wait at each step",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20002",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20002",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20012",
+              "key": "NOTE-12",
+              "self": "https://tracker.example.test/rest/api/3/issue/20012",
+              "fields": {
+                "summary": "WIP limits on every queue",
+                "status": {
+                  "id": "3",
+                  "name": "In Progress",
+                  "statusCategory": {
+                    "id": 4,
+                    "key": "indeterminate",
+                    "name": "In Progress",
+                    "colorName": "yellow"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20003",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20003",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20013",
+              "key": "NOTE-13",
+              "self": "https://tracker.example.test/rest/api/3/issue/20013",
+              "fields": {
+                "summary": "Add stream stage labels to tracker tickets",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-05T10:04:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 141,
+            "name": "NOTE Sprint 41",
+            "state": "closed",
+            "boardId": 7,
+            "startDate": "2026-09-21T09:00:00.000Z",
+            "endDate": "2026-10-05T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 2,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The stream map lists one owning team per step."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Each team lead has confirmed their steps."
+                }
+              ]
+            }
+          ]
+        },
+        "customfield_10400": null,
+        "created": "2026-09-14T08:04:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 7,
+        "total": 7,
+        "histories": [
+          {
+            "id": "200100",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-17T08:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200101",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-18T20:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          },
+          {
+            "id": "200102",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-21T08:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "3",
+                "fromString": "In Progress",
+                "to": "10003",
+                "toString": "In Review"
+              }
+            ]
+          },
+          {
+            "id": "200103",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-24T08:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10003",
+                "fromString": "In Review",
+                "to": "10007",
+                "toString": "Ready for Test"
+              }
+            ]
+          },
+          {
+            "id": "200104",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-28T08:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10007",
+                "fromString": "Ready for Test",
+                "to": "10008",
+                "toString": "In Test"
+              }
+            ]
+          },
+          {
+            "id": "200105",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-29T08:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10008",
+                "fromString": "In Test",
+                "to": "10004",
+                "toString": "Ready for Release"
+              }
+            ]
+          },
+          {
+            "id": "200106",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-05T08:04:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10004",
+                "fromString": "Ready for Release",
+                "to": "10005",
+                "toString": "Done"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20011",
+      "self": "https://tracker.example.test/rest/api/3/issue/20011",
+      "key": "NOTE-11",
+      "fields": {
+        "summary": "Record the wait at each step",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10005",
+          "id": "10005",
+          "name": "Done",
+          "statusCategory": {
+            "id": 3,
+            "key": "done",
+            "name": "Done",
+            "colorName": "green"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pdev",
+          "displayName": "Platform engineer 1",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [
+          "de-unit:U-02",
+          "stream"
+        ],
+        "components": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/component/10602",
+            "id": "10602",
+            "name": "Flow metrics"
+          }
+        ],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10700",
+            "id": "10700",
+            "name": "2026.09",
+            "archived": false,
+            "released": true
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20001",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20001",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20010",
+              "key": "NOTE-10",
+              "self": "https://tracker.example.test/rest/api/3/issue/20010",
+              "fields": {
+                "summary": "Name an owner for every step",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20004",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20004",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20014",
+              "key": "NOTE-14",
+              "self": "https://tracker.example.test/rest/api/3/issue/20014",
+              "fields": {
+                "summary": "Walk one change end to end",
+                "status": {
+                  "id": "3",
+                  "name": "In Progress",
+                  "statusCategory": {
+                    "id": 4,
+                    "key": "indeterminate",
+                    "name": "In Progress",
+                    "colorName": "yellow"
+                  }
+                },
+                "issuetype": {
+                  "id": "10002",
+                  "name": "Task",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-06T10:05:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 141,
+            "name": "NOTE Sprint 41",
+            "state": "closed",
+            "boardId": 7,
+            "startDate": "2026-09-21T09:00:00.000Z",
+            "endDate": "2026-10-05T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 3,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10503",
+          "value": "Platform",
+          "id": "10503"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-14T20:05:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 7,
+        "total": 7,
+        "histories": [
+          {
+            "id": "200110",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-16T20:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200111",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-18T20:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          },
+          {
+            "id": "200112",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-22T08:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "3",
+                "fromString": "In Progress",
+                "to": "10003",
+                "toString": "In Review"
+              }
+            ]
+          },
+          {
+            "id": "200113",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-24T20:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10003",
+                "fromString": "In Review",
+                "to": "10007",
+                "toString": "Ready for Test"
+              }
+            ]
+          },
+          {
+            "id": "200114",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-29T20:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10007",
+                "fromString": "Ready for Test",
+                "to": "10008",
+                "toString": "In Test"
+              }
+            ]
+          },
+          {
+            "id": "200115",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-01T08:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10008",
+                "fromString": "In Test",
+                "to": "10004",
+                "toString": "Ready for Release"
+              }
+            ]
+          },
+          {
+            "id": "200116",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-06T08:05:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10004",
+                "fromString": "Ready for Release",
+                "to": "10005",
+                "toString": "Done"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20012",
+      "self": "https://tracker.example.test/rest/api/3/issue/20012",
+      "key": "NOTE-12",
+      "fields": {
+        "summary": "WIP limits on every queue",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/3",
+          "id": "3",
+          "name": "In Progress",
+          "statusCategory": {
+            "id": 4,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "colorName": "yellow"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pm",
+          "displayName": "Product lead",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [
+          "de-unit:U-03",
+          "stream"
+        ],
+        "components": [],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10701",
+            "id": "10701",
+            "name": "2026.10",
+            "archived": false,
+            "released": false
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20000",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20000",
+            "type": {
+              "id": "10000",
+              "name": "Blocks",
+              "inward": "is blocked by",
+              "outward": "blocks",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10000"
+            },
+            "inwardIssue": {
+              "id": "20010",
+              "key": "NOTE-10",
+              "self": "https://tracker.example.test/rest/api/3/issue/20010",
+              "fields": {
+                "summary": "Name an owner for every step",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20002",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20002",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20010",
+              "key": "NOTE-10",
+              "self": "https://tracker.example.test/rest/api/3/issue/20010",
+              "fields": {
+                "summary": "Name an owner for every step",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20007",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20007",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20020",
+              "key": "NOTE-20",
+              "self": "https://tracker.example.test/rest/api/3/issue/20020",
+              "fields": {
+                "summary": "Automate the release checklist",
+                "status": {
+                  "id": "10002",
+                  "name": "Selected for Development",
+                  "statusCategory": {
+                    "id": 2,
+                    "key": "new",
+                    "name": "To Do",
+                    "colorName": "blue-gray"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-07T10:06:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 141,
+            "name": "NOTE Sprint 41",
+            "state": "closed",
+            "boardId": 7,
+            "startDate": "2026-09-21T09:00:00.000Z",
+            "endDate": "2026-10-05T17:00:00.000Z"
+          },
+          {
+            "id": 142,
+            "name": "NOTE Sprint 42",
+            "state": "active",
+            "boardId": 7,
+            "startDate": "2026-10-05T09:00:00.000Z",
+            "endDate": "2026-10-19T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 2,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-10-03T08:06:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 2,
+        "total": 2,
+        "histories": [
+          {
+            "id": "200120",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-05T08:06:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200121",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-07T08:06:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20013",
+      "self": "https://tracker.example.test/rest/api/3/issue/20013",
+      "key": "NOTE-13",
+      "fields": {
+        "summary": "Add stream stage labels to tracker tickets",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10005",
+          "id": "10005",
+          "name": "Done",
+          "statusCategory": {
+            "id": 3,
+            "key": "done",
+            "name": "Done",
+            "colorName": "green"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-app",
+          "displayName": "App engineer 1",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [],
+        "components": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/component/10600",
+            "id": "10600",
+            "name": "Web editor"
+          }
+        ],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10700",
+            "id": "10700",
+            "name": "2026.09",
+            "archived": false,
+            "released": true
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20003",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20003",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20010",
+              "key": "NOTE-10",
+              "self": "https://tracker.example.test/rest/api/3/issue/20010",
+              "fields": {
+                "summary": "Name an owner for every step",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20005",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20005",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20015",
+              "key": "NOTE-15",
+              "self": "https://tracker.example.test/rest/api/3/issue/20015",
+              "fields": {
+                "summary": "Export stage timestamps to flow metrics",
+                "status": {
+                  "id": "10003",
+                  "name": "In Review",
+                  "statusCategory": {
+                    "id": 4,
+                    "key": "indeterminate",
+                    "name": "In Progress",
+                    "colorName": "yellow"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20009",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20009",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20028",
+              "key": "NOTE-28",
+              "self": "https://tracker.example.test/rest/api/3/issue/20028",
+              "fields": {
+                "summary": "Route support tickets to the idea inbox",
+                "status": {
+                  "id": "10001",
+                  "name": "To Do",
+                  "statusCategory": {
+                    "id": 2,
+                    "key": "new",
+                    "name": "To Do",
+                    "colorName": "blue-gray"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-08T10:07:00.000+0000",
+        "customfield_10001": {
+          "id": "team-web-squad",
+          "name": "Web squad",
+          "title": "Web squad",
+          "isShared": true
+        },
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 141,
+            "name": "NOTE Sprint 41",
+            "state": "closed",
+            "boardId": 7,
+            "startDate": "2026-09-21T09:00:00.000Z",
+            "endDate": "2026-10-05T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 3,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10502",
+          "value": "App engineering",
+          "id": "10502"
+        },
+        "customfield_10300": null,
+        "customfield_10400": {
+          "value": "Delivery",
+          "id": "10800"
+        },
+        "created": "2026-09-17T20:07:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 7,
+        "total": 7,
+        "histories": [
+          {
+            "id": "200130",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-21T20:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10000",
+                "fromString": "Backlog",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200131",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-22T20:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          },
+          {
+            "id": "200132",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-26T20:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "3",
+                "fromString": "In Progress",
+                "to": "10003",
+                "toString": "In Review"
+              }
+            ]
+          },
+          {
+            "id": "200133",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-09-30T08:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10003",
+                "fromString": "In Review",
+                "to": "10007",
+                "toString": "Ready for Test"
+              }
+            ]
+          },
+          {
+            "id": "200134",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-03T08:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10007",
+                "fromString": "Ready for Test",
+                "to": "10008",
+                "toString": "In Test"
+              }
+            ]
+          },
+          {
+            "id": "200135",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-03T20:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10008",
+                "fromString": "In Test",
+                "to": "10004",
+                "toString": "Ready for Release"
+              }
+            ]
+          },
+          {
+            "id": "200136",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-08T08:07:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10004",
+                "fromString": "Ready for Release",
+                "to": "10005",
+                "toString": "Done"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20014",
+      "self": "https://tracker.example.test/rest/api/3/issue/20014",
+      "key": "NOTE-14",
+      "fields": {
+        "summary": "Walk one change end to end",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10002",
+          "id": "10002",
+          "name": "Task",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/3",
+          "id": "3",
+          "name": "In Progress",
+          "statusCategory": {
+            "id": 4,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "colorName": "yellow"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pm",
+          "displayName": "Product lead",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [
+          "de-unit:U-05"
+        ],
+        "components": [],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10701",
+            "id": "10701",
+            "name": "2026.10",
+            "archived": false,
+            "released": false
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20004",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20004",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20011",
+              "key": "NOTE-11",
+              "self": "https://tracker.example.test/rest/api/3/issue/20011",
+              "fields": {
+                "summary": "Record the wait at each step",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-09T10:08:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 142,
+            "name": "NOTE Sprint 42",
+            "state": "active",
+            "boardId": 7,
+            "startDate": "2026-10-05T09:00:00.000Z",
+            "endDate": "2026-10-19T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 5,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-10-07T08:08:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 2,
+        "total": 2,
+        "histories": [
+          {
+            "id": "200140",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-08T08:08:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200141",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-09T08:08:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20015",
+      "self": "https://tracker.example.test/rest/api/3/issue/20015",
+      "key": "NOTE-15",
+      "fields": {
+        "summary": "Export stage timestamps to flow metrics",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10003",
+          "id": "10003",
+          "name": "In Review",
+          "statusCategory": {
+            "id": 4,
+            "key": "indeterminate",
+            "name": "In Progress",
+            "colorName": "yellow"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pdev2",
+          "displayName": "Platform engineer 2",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [],
+        "components": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/component/10602",
+            "id": "10602",
+            "name": "Flow metrics"
+          },
+          {
+            "self": "https://tracker.example.test/rest/api/3/component/10601",
+            "id": "10601",
+            "name": "Pipeline"
+          }
+        ],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10701",
+            "id": "10701",
+            "name": "2026.10",
+            "archived": false,
+            "released": false
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20005",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20005",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20013",
+              "key": "NOTE-13",
+              "self": "https://tracker.example.test/rest/api/3/issue/20013",
+              "fields": {
+                "summary": "Add stream stage labels to tracker tickets",
+                "status": {
+                  "id": "10005",
+                  "name": "Done",
+                  "statusCategory": {
+                    "id": 3,
+                    "key": "done",
+                    "name": "Done",
+                    "colorName": "green"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20006",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20006",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20019",
+              "key": "NOTE-19",
+              "self": "https://tracker.example.test/rest/api/3/issue/20019",
+              "fields": {
+                "summary": "Track hours from PR opened to first review",
+                "status": {
+                  "id": "10001",
+                  "name": "To Do",
+                  "statusCategory": {
+                    "id": 2,
+                    "key": "new",
+                    "name": "To Do",
+                    "colorName": "blue-gray"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          },
+          {
+            "id": "20008",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20008",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "inwardIssue": {
+              "id": "20025",
+              "key": "NOTE-25",
+              "self": "https://tracker.example.test/rest/api/3/issue/20025",
+              "fields": {
+                "summary": "Put lead time on the team dashboard",
+                "status": {
+                  "id": "10001",
+                  "name": "To Do",
+                  "statusCategory": {
+                    "id": 2,
+                    "key": "new",
+                    "name": "To Do",
+                    "colorName": "blue-gray"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-10T10:09:00.000+0000",
+        "customfield_10001": {
+          "id": "team-platform-squad",
+          "name": "Platform squad",
+          "title": "Platform squad",
+          "isShared": true
+        },
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 142,
+            "name": "NOTE Sprint 42",
+            "state": "active",
+            "boardId": 7,
+            "startDate": "2026-10-05T09:00:00.000Z",
+            "endDate": "2026-10-19T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 5,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10503",
+          "value": "Platform",
+          "id": "10503"
+        },
+        "customfield_10300": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Lead time per change on the flow metrics page matches the sheet for the last ten changes."
+                }
+              ]
+            }
+          ]
+        },
+        "customfield_10400": null,
+        "created": "2026-10-02T08:09:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 3,
+        "total": 3,
+        "histories": [
+          {
+            "id": "200150",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-04T08:09:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200151",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-05T20:09:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          },
+          {
+            "id": "200152",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-10T08:09:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "3",
+                "fromString": "In Progress",
+                "to": "10003",
+                "toString": "In Review"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20016",
+      "self": "https://tracker.example.test/rest/api/3/issue/20016",
+      "key": "NOTE-16",
+      "fields": {
+        "summary": "Agree on the lead time target",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10001",
+          "id": "10001",
+          "name": "To Do",
+          "statusCategory": {
+            "id": 2,
+            "key": "new",
+            "name": "To Do",
+            "colorName": "blue-gray"
+          }
+        },
+        "assignee": null,
+        "labels": [],
+        "components": [],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10701",
+            "id": "10701",
+            "name": "2026.10",
+            "archived": false,
+            "released": false
+          }
+        ],
+        "issuelinks": [],
+        "description": null,
+        "updated": "2026-10-11T10:10:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 143,
+            "name": "NOTE Sprint 43",
+            "state": "future",
+            "boardId": 7
+          }
+        ],
+        "customfield_10026": 1,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10500",
+          "value": "Product",
+          "id": "10500"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-11T10:10:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20017",
+      "self": "https://tracker.example.test/rest/api/3/issue/20017",
+      "key": "NOTE-17",
+      "fields": {
+        "summary": "Archive stale tracker dashboards",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10002",
+          "id": "10002",
+          "name": "Task",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10005",
+          "id": "10005",
+          "name": "Done",
+          "statusCategory": {
+            "id": 3,
+            "key": "done",
+            "name": "Done",
+            "colorName": "green"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-pdev",
+          "displayName": "Platform engineer 1",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [
+          "tech-debt"
+        ],
+        "components": [],
+        "fixVersions": [],
+        "issuelinks": [],
+        "description": null,
+        "updated": "2026-10-12T10:11:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 141,
+            "name": "NOTE Sprint 41",
+            "state": "closed",
+            "boardId": 7,
+            "startDate": "2026-09-21T09:00:00.000Z",
+            "endDate": "2026-10-05T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 1,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10503",
+          "value": "Platform",
+          "id": "10503"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-10-02T08:11:00.000+0000",
+        "parent": {
+          "id": "20002",
+          "key": "NOTE-2",
+          "self": "https://tracker.example.test/rest/api/3/issue/20002",
+          "fields": {
+            "summary": "See the delivery stream",
+            "status": {
+              "id": "3",
+              "name": "In Progress",
+              "statusCategory": {
+                "id": 4,
+                "key": "indeterminate",
+                "name": "In Progress",
+                "colorName": "yellow"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 7,
+        "total": 7,
+        "histories": [
+          {
+            "id": "200170",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-03T08:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          },
+          {
+            "id": "200171",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-03T20:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10002",
+                "fromString": "Selected for Development",
+                "to": "3",
+                "toString": "In Progress"
+              }
+            ]
+          },
+          {
+            "id": "200172",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-04T20:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "3",
+                "fromString": "In Progress",
+                "to": "10003",
+                "toString": "In Review"
+              }
+            ]
+          },
+          {
+            "id": "200173",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-06T08:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10003",
+                "fromString": "In Review",
+                "to": "10007",
+                "toString": "Ready for Test"
+              }
+            ]
+          },
+          {
+            "id": "200174",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-08T08:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10007",
+                "fromString": "Ready for Test",
+                "to": "10008",
+                "toString": "In Test"
+              }
+            ]
+          },
+          {
+            "id": "200175",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-08T20:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10008",
+                "fromString": "In Test",
+                "to": "10004",
+                "toString": "Ready for Release"
+              }
+            ]
+          },
+          {
+            "id": "200176",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-12T08:11:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10004",
+                "fromString": "Ready for Release",
+                "to": "10005",
+                "toString": "Done"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20019",
+      "self": "https://tracker.example.test/rest/api/3/issue/20019",
+      "key": "NOTE-19",
+      "fields": {
+        "summary": "Track hours from PR opened to first review",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10001",
+          "id": "10001",
+          "name": "To Do",
+          "statusCategory": {
+            "id": 2,
+            "key": "new",
+            "name": "To Do",
+            "colorName": "blue-gray"
+          }
+        },
+        "assignee": null,
+        "labels": [],
+        "components": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/component/10602",
+            "id": "10602",
+            "name": "Flow metrics"
+          }
+        ],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10702",
+            "id": "10702",
+            "name": "2026.11",
+            "archived": false,
+            "released": false
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20006",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20006",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20015",
+              "key": "NOTE-15",
+              "self": "https://tracker.example.test/rest/api/3/issue/20015",
+              "fields": {
+                "summary": "Export stage timestamps to flow metrics",
+                "status": {
+                  "id": "10003",
+                  "name": "In Review",
+                  "statusCategory": {
+                    "id": 4,
+                    "key": "indeterminate",
+                    "name": "In Progress",
+                    "colorName": "yellow"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-13T10:12:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": null,
+        "customfield_10026": 3,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10502",
+          "value": "App engineering",
+          "id": "10502"
+        },
+        "customfield_10300": null,
+        "customfield_10400": null,
+        "created": "2026-09-13T10:12:00.000+0000",
+        "parent": {
+          "id": "20003",
+          "key": "NOTE-3",
+          "self": "https://tracker.example.test/rest/api/3/issue/20003",
+          "fields": {
+            "summary": "Shorten the stream",
+            "status": {
+              "id": "10001",
+              "name": "To Do",
+              "statusCategory": {
+                "id": 2,
+                "key": "new",
+                "name": "To Do",
+                "colorName": "blue-gray"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 0,
+        "total": 0,
+        "histories": []
+      }
+    },
+    {
+      "expand": "renderedFields,names,schema,operations,editmeta,changelog,versionedRepresentations",
+      "id": "20020",
+      "self": "https://tracker.example.test/rest/api/3/issue/20020",
+      "key": "NOTE-20",
+      "fields": {
+        "summary": "Automate the release checklist",
+        "issuetype": {
+          "self": "https://tracker.example.test/rest/api/3/issuetype/10001",
+          "id": "10001",
+          "name": "Story",
+          "subtask": false,
+          "hierarchyLevel": 0
+        },
+        "project": {
+          "self": "https://tracker.example.test/rest/api/3/project/10000",
+          "id": "10000",
+          "key": "NOTE",
+          "name": "Notebook app",
+          "projectTypeKey": "software",
+          "simplified": false
+        },
+        "status": {
+          "self": "https://tracker.example.test/rest/api/3/status/10002",
+          "id": "10002",
+          "name": "Selected for Development",
+          "statusCategory": {
+            "id": 2,
+            "key": "new",
+            "name": "To Do",
+            "colorName": "blue-gray"
+          }
+        },
+        "assignee": {
+          "accountId": "acct-qa",
+          "displayName": "Test engineer 1",
+          "active": true,
+          "accountType": "atlassian"
+        },
+        "labels": [
+          "de-unit:U-08"
+        ],
+        "components": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/component/10601",
+            "id": "10601",
+            "name": "Pipeline"
+          }
+        ],
+        "fixVersions": [
+          {
+            "self": "https://tracker.example.test/rest/api/3/version/10702",
+            "id": "10702",
+            "name": "2026.11",
+            "archived": false,
+            "released": false
+          }
+        ],
+        "issuelinks": [
+          {
+            "id": "20007",
+            "self": "https://tracker.example.test/rest/api/3/issueLink/20007",
+            "type": {
+              "id": "10100",
+              "name": "Depends on",
+              "inward": "is a dependency of",
+              "outward": "depends on",
+              "self": "https://tracker.example.test/rest/api/3/issueLinkType/10100"
+            },
+            "outwardIssue": {
+              "id": "20012",
+              "key": "NOTE-12",
+              "self": "https://tracker.example.test/rest/api/3/issue/20012",
+              "fields": {
+                "summary": "WIP limits on every queue",
+                "status": {
+                  "id": "3",
+                  "name": "In Progress",
+                  "statusCategory": {
+                    "id": 4,
+                    "key": "indeterminate",
+                    "name": "In Progress",
+                    "colorName": "yellow"
+                  }
+                },
+                "issuetype": {
+                  "id": "10001",
+                  "name": "Story",
+                  "subtask": false,
+                  "hierarchyLevel": 0
+                }
+              }
+            }
+          }
+        ],
+        "description": null,
+        "updated": "2026-10-14T10:13:00.000+0000",
+        "customfield_10001": null,
+        "customfield_10011": null,
+        "customfield_10014": null,
+        "customfield_10015": null,
+        "customfield_10016": null,
+        "customfield_10020": [
+          {
+            "id": 142,
+            "name": "NOTE Sprint 42",
+            "state": "active",
+            "boardId": 7,
+            "startDate": "2026-10-05T09:00:00.000Z",
+            "endDate": "2026-10-19T17:00:00.000Z"
+          }
+        ],
+        "customfield_10026": 8,
+        "customfield_10201": {
+          "self": "https://tracker.example.test/rest/api/3/customFieldOption/10504",
+          "value": "QA",
+          "id": "10504"
+        },
+        "customfield_10300": {
+          "type": "doc",
+          "version": 1,
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Every manual checklist item has an automated test."
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "The suite runs on each build in under 20 minutes."
+                }
+              ]
+            }
+          ]
+        },
+        "customfield_10400": null,
+        "created": "2026-10-10T08:13:00.000+0000",
+        "parent": {
+          "id": "20003",
+          "key": "NOTE-3",
+          "self": "https://tracker.example.test/rest/api/3/issue/20003",
+          "fields": {
+            "summary": "Shorten the stream",
+            "status": {
+              "id": "10001",
+              "name": "To Do",
+              "statusCategory": {
+                "id": 2,
+                "key": "new",
+                "name": "To Do",
+                "colorName": "blue-gray"
+              }
+            },
+            "issuetype": {
+              "id": "10000",
+              "name": "Epic",
+              "subtask": false,
+              "hierarchyLevel": 1
+            }
+          }
+        }
+      },
+      "changelog": {
+        "startAt": 0,
+        "maxResults": 1,
+        "total": 1,
+        "histories": [
+          {
+            "id": "200200",
+            "author": {
+              "accountId": "acct-board",
+              "displayName": "Board automation",
+              "active": true
+            },
+            "created": "2026-10-14T08:13:00.000+0000",
+            "items": [
+              {
+                "field": "status",
+                "fieldtype": "jira",
+                "fieldId": "status",
+                "from": "10001",
+                "fromString": "To Do",
+                "to": "10002",
+                "toString": "Selected for Development"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "nextPageToken": "page-2",
+  "isLast": false
+}

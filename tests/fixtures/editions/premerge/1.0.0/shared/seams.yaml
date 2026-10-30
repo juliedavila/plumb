@@ -1,0 +1,16 @@
+namespace: shared
+version: 1.0.0
+systems:
+  []
+zones:
+  []
+parts:
+  []
+contracts:
+  []
+crossings:
+  []
+capabilities:
+  []
+seams:
+  []

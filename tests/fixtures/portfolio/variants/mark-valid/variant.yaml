@@ -1,0 +1,4 @@
+breaks: "An accepted root patch marks the contract Task not security-relevant, while its shipped floor (agent-input: s3 carries it into the agent sandbox, which coding agents reach) marks it relevant."
+expect:
+  - { rule: shared/mark-valid, severity: error, subject: "shared:Task (contract)" }
+note: "The lowered mark is ignored and Task stays relevant."

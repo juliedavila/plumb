@@ -1,0 +1,30 @@
+phases:
+  - { id: A1, order: 1, name: Alpha takes in and sends, exit_test: Hub events reach alpha and the spec reaches beta., target: "2026-12-15" }
+  - { id: A2, order: 2, name: Alpha keeps its secret, exit_test: The secret stays in the vault., target: "2027-03-15" }
+units:
+  - id: AU-1
+    title: Take hub events in
+    kind: code
+    phase: A1
+    elements: [{ id: a-in, from: none, to: built }]
+    provides: [cap.a-in]
+    check: Hub events arrive.
+    flow_item: feature
+  - id: AU-2
+    title: Send the spec to beta
+    kind: code
+    phase: A1
+    elements: [{ id: a-out, from: none, to: built }]
+    requires: [cap.a-in, cap.loop]
+    provides: [cap.spec]
+    check: Beta receives the spec.
+    flow_item: feature
+  - id: AU-3
+    title: Keep the secret in the vault
+    kind: code
+    phase: A2
+    elements: [{ id: a-vault, from: none, to: built }]
+    requires: [cap.a-in]
+    check: The secret is only in the vault.
+    flow_item: risk
+    relieves: [{ manual_work: chore-work, effect: retire, rests_on: AP-1 }]

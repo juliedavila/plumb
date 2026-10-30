@@ -1,0 +1,8 @@
+# Today's status of Pre-merge checks' units. Live state: it applies to the working copy and to the released edition
+# 1.0.0 alike, so the presenting page shows today's progress on the released design.
+units:
+  U-01: { status: done, date: "2026-10-23", by: the developer platform lead }
+  U-02: { status: doing, date: "2026-10-26", by: the developer platform lead }
+  U-04: { status: doing, date: "2026-11-02", by: the product engineering lead }
+  U-05: { status: doing, date: "2026-11-09", by: the product engineering lead }
+  U-06: { status: doing, date: "2026-11-09", by: the product engineering lead }

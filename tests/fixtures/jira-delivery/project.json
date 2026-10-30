@@ -1,0 +1,31 @@
+{
+  "self": "https://tracker.example.test/rest/api/3/project/search?maxResults=50&startAt=0",
+  "maxResults": 50,
+  "startAt": 0,
+  "total": 2,
+  "isLast": true,
+  "values": [
+    {
+      "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+      "self": "https://tracker.example.test/rest/api/3/project/10000",
+      "id": "10000",
+      "key": "NOTE",
+      "name": "Notebook app",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "style": "classic",
+      "isPrivate": false
+    },
+    {
+      "expand": "description,lead,issueTypes,url,projectKeys,permissions,insight",
+      "self": "https://tracker.example.test/rest/api/3/project/10001",
+      "id": "10001",
+      "key": "HELP",
+      "name": "Help desk",
+      "projectTypeKey": "service_desk",
+      "simplified": true,
+      "style": "next-gen",
+      "isPrivate": false
+    }
+  ]
+}

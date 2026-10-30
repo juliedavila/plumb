@@ -1,0 +1,4 @@
+manual_work:
+  - id: ticket-triage
+    name: Ticket triage
+    description: Sort repair tickets by requested service.

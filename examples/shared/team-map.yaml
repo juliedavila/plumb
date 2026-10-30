@@ -1,0 +1,21 @@
+# One map from the roles the shared layer and the designs write to the organization's teams. The
+# teams themselves live in org.yaml; this file only says which team holds each role.
+#
+# Each entry under `owners` turns one owner string or role, exactly as written, into teams (the same shape as a design
+# instance's team-map.yaml): teams, and optionally verifier, decider, not and roles.
+owners:
+  # Roles the shared layer writes (seams.yaml), resolved when the root loads.
+  "the developer platform owner": { teams: [dev-platform] }       # owner of the shared part code-host
+  "the pre-merge checks owner": { teams: [appsec-platform] }      # owner_role of the seam intake-premerge
+  # Roles the organization's patches and intake's own module seam write.
+  "the asset inventory owner": { teams: [governance-risk] }       # owner_role of the seam inventory-intake (patches/P-002)
+  "the triage automation owner": { teams: [vuln-mgmt] }           # owner_role of intake's module seam, autotriage
+  # The design roles that intake's and premerge's parts keep in attrs.design_role. Those parts already name these
+  # teams as owners, the way an importer writes a shipped design's parts; the lines record the mapping it applied.
+  "intake engineering": { teams: [appsec-platform] }
+  "finding operations": { teams: [vuln-mgmt] }
+  "class authoring": { teams: [appsec-platform] }
+  "evidence records": { teams: [governance-risk] }
+  "merge path engineering": { teams: [dev-platform] }
+  "check engineering": { teams: [appsec-platform] }
+  "fix automation": { teams: [product-eng] }

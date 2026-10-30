@@ -1,0 +1,4 @@
+breaks: "Team B's capacity has no confidence."
+expect:
+  - { rule: org/estimate-valid, severity: error, subject: "org:team-b (team), its capacity" }
+note: "The estimate counts as not stated, so team B gets no capacity finding and the page says its capacity is not stated."

@@ -1,0 +1,19 @@
+# Written by tests/fixtures/portfolio/rehash.ts in the shape bun plumb.ts release writes: every frozen file but this
+# one with its sha256, the digest over them, and the shared files this edition was checked with.
+line: premerge
+namespace: premerge
+version: "1.0.0"
+released: true
+date: "2026-10-28"
+build: example-1.0.0
+schema: { design_engine: "0.4" }
+pins: []
+shared: { namespace: shared, version: "1.0.0", path: seams.yaml, sha256: ac0edcff9920853c13132a367121a70c51d92c767463d2bf496c3dfd9e4e432a }
+manual_work: { path: manual-work.yaml, sha256: f7625ff082634ab625637cb99bb2092868b1c278d3b666ef6e63e54aa78e33f6 }
+files:
+  - { path: engine.yaml, sha256: 6c0439c410e98cbd86ac3b5e44314e83034018acc117c10c8a0eca479afe704a }
+  - { path: manual-work.yaml, sha256: f7625ff082634ab625637cb99bb2092868b1c278d3b666ef6e63e54aa78e33f6 }
+  - { path: model.yaml, sha256: 255eaa5ddb7863f8d241748878e555fa574065183f476b41c70a32f235243ae4 }
+  - { path: plan.yaml, sha256: c48add3960eeefa23e9fdbf2cb141eaf69e1006035ee910091393b2c0be5f538 }
+  - { path: seams.yaml, sha256: ac0edcff9920853c13132a367121a70c51d92c767463d2bf496c3dfd9e4e432a }
+digest: 3a45df23719c3c09b136912563b9fca9366ef746085443670c9120f514e37f69

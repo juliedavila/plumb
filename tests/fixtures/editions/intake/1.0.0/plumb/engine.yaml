@@ -1,0 +1,13 @@
+name: intake
+title: Repair intake
+description: A tiny value stream used by the core tests.
+packs:
+  - generic
+  - plan
+flow:
+  max_handoffs: 4
+  source: declared
+  as_of: 2026-10-01
+  max_age_days: 36500
+schema: "0.4"
+namespace: intake

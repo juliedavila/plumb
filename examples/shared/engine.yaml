@@ -1,0 +1,18 @@
+# The shared root of the example portfolio: the root of the import graph. Each design in
+# ../designs/ names it as its root, and it names no root and no pins itself. It holds two namespaces in sibling files:
+# shared (seams.yaml and manual-work.yaml, the shared layer as the editions ship it) and org (org.yaml, the
+# organization's own records), with one team map, one patch log and one notes file for both.
+kind: root
+name: example-root
+title: Example shared root
+schema: "0.4"
+approver: the program lead   # one person accepts changes to either namespace
+estimates:
+  stale_after_days: 90
+tracker:
+  export: tracker/export
+# The shipped shared file and its sha256 when it was put here; shared/file-intact compares the file with it. Written
+# by hand for the examples, so no edition shipped it. tests/fixtures/portfolio/rehash.ts rewrites the hash.
+shared_from:
+  editions: []
+  sha256: ac0edcff9920853c13132a367121a70c51d92c767463d2bf496c3dfd9e4e432a

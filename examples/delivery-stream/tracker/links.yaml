@@ -1,0 +1,16 @@
+# Confirmed matches between units and tracker issues: unit id -> issue, with who confirmed it and when.
+# Reconciliation proposes likely matches in reconcile.json; a person adds the ones they confirm here.
+
+U-04:
+  issue: NOTE-13
+  confirmed_by: delivery lead
+  confirmed_at: "2026-10-20"
+U-06:
+  issue: NOTE-15
+  confirmed_by: delivery lead
+  confirmed_at: "2026-10-20"
+U-13:
+  issue: NOTE-19
+  confirmed_by: engineering lead
+  confirmed_at: "2026-10-21"
+  note: "The issue says PR review hours; same unit."

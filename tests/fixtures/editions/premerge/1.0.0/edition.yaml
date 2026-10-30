@@ -1,0 +1,35 @@
+line: premerge
+namespace: premerge
+version: 1.0.0
+released: true
+date: 2026-10-28
+build: fictional-1
+schema:
+  design_engine: "0.4"
+plumb:
+  interface: 1
+  engine: plumb/engine.yaml
+  model: plumb/model.yaml
+  plan: plumb/plan.yaml
+shared:
+  path: shared/seams.yaml
+  sha256: 52e8c7629d7120903d422e04fd5569a2d13c0d7d911da1827ef15aa3ef5c09fb
+manual_work:
+  path: shared/manual-work.yaml
+  sha256: fbf71a96ca6a41f51934970d8546eed17a0210964ce8c474bfe926e6ec880477
+pins:
+  - namespace: intake
+    version: 1.0.0
+    sha256: 2f58320809cafef53e1f14dec9b70ab7afbd9bffb6692887574934ff49e2ecaf
+files:
+  - path: plumb/engine.yaml
+    sha256: 116cc221675dbb01e3bdcb09ef540dca728303b63487e8facc9243f2a833914d
+  - path: plumb/model.yaml
+    sha256: 6a8833ba2e8ff9d0b7ca710831effaafa1125e7a711ff8846e826d62e3b03a95
+  - path: plumb/plan.yaml
+    sha256: a07ac933aee90dd1461b2b613d7b0f988ae0ff427e0b366f6498377d5b210b88
+  - path: shared/manual-work.yaml
+    sha256: fbf71a96ca6a41f51934970d8546eed17a0210964ce8c474bfe926e6ec880477
+  - path: shared/seams.yaml
+    sha256: 52e8c7629d7120903d422e04fd5569a2d13c0d7d911da1827ef15aa3ef5c09fb
+digest: 4f5c551864a2fd20a798f54f1d66c8cc4ef3a243b085cb73f78f87f79cc7cc19

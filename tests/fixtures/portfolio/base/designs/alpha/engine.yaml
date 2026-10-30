@@ -1,0 +1,7 @@
+name: alpha
+title: Alpha
+description: The base fixture's providing design. It sends beta the spec.
+schema: "0.4"
+namespace: alpha
+root: ../../shared
+packs: [generic, plan, security]

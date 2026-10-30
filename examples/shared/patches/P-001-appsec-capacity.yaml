@@ -1,0 +1,15 @@
+id: P-001
+title: AppSec platform holds five pieces of work at once
+status: accepted
+provenance:
+  author: person
+  requested_by: the AppSec platform lead
+  created: "2026-09-14"
+why: Two of the team's engineers moved to the scanner migration full time, so the team now holds five pieces of work in progress at once, not six.
+ops:
+  - op: modify
+    kind: team
+    id: appsec-platform
+    set:
+      capacity: { value: 5, source: person, by: the AppSec platform lead, as_of: "2026-09-14", confidence: medium }
+decision: { by: the program lead, at: "2026-09-15", reason: "Stated by the team's lead, who owns the row." }

@@ -1,0 +1,143 @@
+# Pre-merge checks, the module of the example pair. Fictional. It runs checks built from intake's
+# proven classes on every change before merge; a coding agent fixes what fails and a person approves each fix.
+# Its crossings with intake and with the code hosting system live in the shared layer, except one: p12 below is this
+# design's own edge to the shared code hosting system, which nothing declares (the seam rule reports it).
+#
+# Working copy. The released edition 1.0.0 (editions/1.0.0/) differs in one place: the check runner kept one
+# workspace per repository, and this copy gives each run its own (attrs.workspace). The check runner is a part the
+# shared layer names, so intake's pin of 1.0.0 is stale in the working view.
+systems:
+  - { id: checks, name: Pre-merge checks, description: Runs checks on every change and fixes what fails before merge. }
+zones:
+  - { id: merge-path, name: Merge path, description: The path a change takes from merge request to merge. }
+  - { id: agent-loop, name: Agent loop, description: "Where coding agents work: they read failing checks and propose fixes." }
+elements:
+  - id: merge-hook
+    name: Merge request hook
+    kind: service
+    system: checks
+    zone: merge-path
+    owner: dev-platform
+    design_role: merge path engineering
+    description: Receives each merge request from the code host and hands the change to the check runner.
+  - id: check-runner
+    name: Check runner
+    kind: service
+    system: checks
+    zone: agent-loop
+    owner: dev-platform
+    verifier: appsec-platform
+    design_role: merge path engineering
+    description: Runs the checks built from proven classes on every change. Coding agents read its failing checks.
+    agent_reachable: true
+    workspace: per-run
+    rests_on: [shared:SH-1]
+  - id: check-catalog
+    name: Check catalog
+    kind: store
+    system: checks
+    zone: merge-path
+    owner: appsec-platform
+    design_role: check engineering
+    description: Which checks run in which repositories, at which rule versions.
+    partitioned_by: [repository]
+  - id: fix-agent
+    name: Fix agent
+    kind: agent
+    system: checks
+    zone: agent-loop
+    owner: product-eng
+    design_role: fix automation
+    description: A coding agent that reads a failing check and proposes a fix in the same merge request.
+    agent_reachable: true
+    rests_on: [PM-1]
+  - id: review-gate
+    name: Fix review
+    kind: person
+    system: checks
+    zone: merge-path
+    owner: product-eng
+    design_role: fix automation
+    description: An engineer from the owning team approves or rejects each fix the agent proposes.
+    role_class: human
+  - id: merge-queue
+    name: Merge queue
+    kind: queue
+    system: checks
+    zone: merge-path
+    owner: dev-platform
+    design_role: merge path engineering
+    description: Holds changes whose checks passed until they merge.
+  - id: stamp-signer
+    name: Stamp signer
+    kind: service
+    system: checks
+    zone: merge-path
+    owner: dev-platform
+    verifier: governance-risk
+    design_role: merge path engineering
+    description: Signs a stamp on each merge naming the classes checked and their rule versions.
+  - id: yield-reporter
+    name: Yield reporter
+    kind: service
+    system: checks
+    zone: merge-path
+    owner: appsec-platform
+    design_role: check engineering
+    description: Counts how often each class's check fired, was overridden and was switched off, per week.
+    rests_on: [PM-2]
+  - id: override-log
+    name: Override log
+    kind: store
+    system: checks
+    zone: merge-path
+    owner: governance-risk
+    design_role: check engineering
+    description: Every failing check a team overrode, with who and why.
+    partitioned_by: [repository]
+relationships:
+  - { id: p01, from: merge-hook, to: check-runner, kind: data, label: The change to check, carries: [ChangeToCheck], content: structured }
+  - { id: p02, from: check-catalog, to: check-runner, kind: data, label: Checks for this repository, carries: [CheckSet] }
+  - { id: p03, from: check-runner, to: fix-agent, kind: data, label: Failing checks, carries: [FailingCheck], content: structured }
+  - { id: p04, from: fix-agent, to: review-gate, kind: proposal, label: Proposed fix, carries: [FixProposal] }
+  - { id: p05, from: review-gate, to: merge-queue, kind: authorization, label: Approved fix, carries: [FixApproval] }
+  - { id: p06, from: check-runner, to: merge-queue, kind: data, label: Passed checks, carries: [CheckRun] }
+  - { id: p07, from: check-runner, to: stamp-signer, kind: data, label: What was checked, carries: [CheckRun] }
+  - { id: p08, from: review-gate, to: override-log, kind: data, label: Overrides with reasons, carries: [Override] }
+  - { id: p09, from: override-log, to: yield-reporter, kind: data, label: Overrides per class, carries: [Override] }
+  - { id: p10, from: check-runner, to: yield-reporter, kind: data, label: Runs per class, carries: [CheckRun] }
+  - { id: p11, from: yield-reporter, to: review-gate, kind: feedback, label: How approved fixes held up, carries: [FixOutcome] }
+  - { id: p12, from: yield-reporter, to: shared:code-host, kind: data, label: Weekly check badge per repository, carries: [YieldBadge] }
+  - { id: p13, from: check-runner, to: check-catalog, kind: data, label: Checks built from proven classes, carries: [CheckSet] }
+contracts:
+  - { name: ChangeToCheck, description: "The change's repository, commit and changed paths. Never its text.", produced_by: [merge-hook], consumed_by: [check-runner] }
+  - { name: CheckSet, description: The checks to run in one repository and their rule versions., produced_by: [check-runner, check-catalog], consumed_by: [check-catalog, check-runner] }
+  - { name: FailingCheck, description: "A failing check's id, file and line. Never the code text.", produced_by: [check-runner], consumed_by: [fix-agent] }
+  - { name: FixProposal, description: "The agent's fix as a commit on the merge request, with the check it answers.", produced_by: [fix-agent], consumed_by: [review-gate] }
+  - { name: FixApproval, description: "An engineer's approval of one fix, bound to its commit.", produced_by: [review-gate], consumed_by: [merge-queue] }
+  - { name: CheckRun, description: "Which checks ran on a change, which passed and which failed.", produced_by: [check-runner], consumed_by: [merge-queue, stamp-signer, yield-reporter] }
+  - { name: Override, description: "A failing check a team overrode, with who and why.", produced_by: [review-gate, override-log], consumed_by: [override-log, yield-reporter] }
+  - { name: FixOutcome, description: "How the fixes an engineer approved held up over the next month.", measures: "share of approved fixes reverted within a month", produced_by: [yield-reporter], consumed_by: [review-gate] }
+  - { name: YieldBadge, description: "A weekly badge per repository: checks run and checks passed.", produced_by: [yield-reporter], consumed_by: [shared:code-host] }
+claims:
+  - id: PM-1
+    kind: premise
+    statement: A coding agent fixes most failing checks of a proven class without help, given only the check and the file.
+    grade: inference
+    source: A trial on three classes in two repositories, where the agent fixed 31 of 40 failing checks.
+    fallback: Send the failing check to the owning team as a finding, and keep the agent for the classes it fixes well.
+  - id: PM-2
+    kind: assumption
+    statement: Teams keep a check switched on once they trust it.
+    grade: judgment
+    source: The product engineering lead, from how teams treated the linters last year.
+    fallback: Make switching a check off need the security risk owner's sign-off.
+views:
+  - id: merge-path
+    title: From merge request to merge
+    description: Every change's path through the checks, the agent's fix and the approval, to the merge queue.
+    elements: [merge-hook, check-runner, check-catalog, fix-agent, review-gate, merge-queue, stamp-signer]
+  - id: yield
+    title: What the checks report back
+    description: How check runs and overrides become the yield intake reads.
+    elements: [check-runner, review-gate, override-log, yield-reporter]

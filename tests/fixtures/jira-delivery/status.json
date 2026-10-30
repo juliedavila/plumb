@@ -1,0 +1,215 @@
+[
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10000",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Backlog",
+    "id": "10000",
+    "name": "Backlog",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/2",
+      "id": 2,
+      "key": "new",
+      "name": "To Do",
+      "colorName": "blue-gray"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10001",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "To Do",
+    "id": "10001",
+    "name": "To Do",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/2",
+      "id": 2,
+      "key": "new",
+      "name": "To Do",
+      "colorName": "blue-gray"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10002",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Selected for Development",
+    "id": "10002",
+    "name": "Selected for Development",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/2",
+      "id": 2,
+      "key": "new",
+      "name": "To Do",
+      "colorName": "blue-gray"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/3",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "In Progress",
+    "id": "3",
+    "name": "In Progress",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/4",
+      "id": 4,
+      "key": "indeterminate",
+      "name": "In Progress",
+      "colorName": "yellow"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10003",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "In Review",
+    "id": "10003",
+    "name": "In Review",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/4",
+      "id": 4,
+      "key": "indeterminate",
+      "name": "In Progress",
+      "colorName": "yellow"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10007",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Ready for Test",
+    "id": "10007",
+    "name": "Ready for Test",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/4",
+      "id": 4,
+      "key": "indeterminate",
+      "name": "In Progress",
+      "colorName": "yellow"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10008",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "In Test",
+    "id": "10008",
+    "name": "In Test",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/4",
+      "id": 4,
+      "key": "indeterminate",
+      "name": "In Progress",
+      "colorName": "yellow"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10004",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Ready for Release",
+    "id": "10004",
+    "name": "Ready for Release",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/3",
+      "id": 3,
+      "key": "done",
+      "name": "Done",
+      "colorName": "green"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10005",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Done",
+    "id": "10005",
+    "name": "Done",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/3",
+      "id": 3,
+      "key": "done",
+      "name": "Done",
+      "colorName": "green"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10006",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Won't Do",
+    "id": "10006",
+    "name": "Won't Do",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/3",
+      "id": 3,
+      "key": "done",
+      "name": "Done",
+      "colorName": "green"
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10100",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Open",
+    "id": "10100",
+    "name": "Open",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/2",
+      "id": 2,
+      "key": "new",
+      "name": "To Do",
+      "colorName": "blue-gray"
+    },
+    "scope": {
+      "type": "PROJECT",
+      "project": {
+        "id": "10001"
+      }
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10101",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Waiting for customer",
+    "id": "10101",
+    "name": "Waiting for customer",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/4",
+      "id": 4,
+      "key": "indeterminate",
+      "name": "In Progress",
+      "colorName": "yellow"
+    },
+    "scope": {
+      "type": "PROJECT",
+      "project": {
+        "id": "10001"
+      }
+    }
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/status/10102",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/statuses/generic.png",
+    "untranslatedName": "Resolved",
+    "id": "10102",
+    "name": "Resolved",
+    "statusCategory": {
+      "self": "https://tracker.example.test/rest/api/3/statuscategory/3",
+      "id": 3,
+      "key": "done",
+      "name": "Done",
+      "colorName": "green"
+    },
+    "scope": {
+      "type": "PROJECT",
+      "project": {
+        "id": "10001"
+      }
+    }
+  }
+]

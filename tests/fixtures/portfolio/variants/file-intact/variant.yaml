@@ -1,0 +1,4 @@
+breaks: "The root's seams.yaml was edited by hand, so its sha256 no longer matches the one engine.yaml recorded under shared_from."
+expect:
+  - { rule: shared/file-intact, severity: error, subject: "shared (seams.yaml)" }
+note: "The edit changes a description only, so nothing else moves. tests/fixtures/portfolio/rehash.ts never rehashes this variant."

@@ -1,0 +1,2568 @@
+{
+  "engine": {
+    "version": "0.1.0",
+    "built": "2026-10-21T12:00:00.000Z",
+    "hash": "sample-0000000000000000"
+  },
+  "instance": {
+    "name": "release-provenance",
+    "title": "Release provenance",
+    "description": "A software release pipeline that signs what it builds and admits to production only what it can prove.",
+    "packs": [
+      {
+        "name": "generic",
+        "title": "Model integrity",
+        "description": "References resolve, everything has an owner, and contracts connect a producer to a consumer.",
+        "rules": [
+          {
+            "id": "refs-resolve",
+            "title": "Every reference resolves",
+            "why": "A dangling id means a diagram or plan points at something that does not exist.",
+            "severity": "error"
+          },
+          {
+            "id": "element-owner",
+            "title": "Every element has an owner team",
+            "why": "Unowned parts of a system are where fixes stall.",
+            "severity": "error"
+          },
+          {
+            "id": "contract-ends",
+            "title": "Contracts have a producer and a consumer",
+            "why": "A contract nobody reads is a promise nobody checks.",
+            "severity": "error"
+          },
+          {
+            "id": "carries-connects",
+            "title": "Carried contracts connect producer to consumer",
+            "why": "A relationship that carries a contract should join someone who makes it to someone who uses it.",
+            "severity": "error"
+          },
+          {
+            "id": "view-ids",
+            "title": "Views name existing elements",
+            "why": "A view that names a missing element silently drops it from the picture.",
+            "severity": "error"
+          }
+        ]
+      },
+      {
+        "name": "plan",
+        "title": "Plan soundness",
+        "description": "Every capability the plan needs is provided, in an order that can actually run.",
+        "rules": [
+          {
+            "id": "requires-provided",
+            "title": "Every required capability is provided",
+            "why": "A unit waiting on a capability nobody builds can never start.",
+            "severity": "error"
+          },
+          {
+            "id": "no-cycles",
+            "title": "No dependency cycles",
+            "why": "A cycle means none of its units can go first.",
+            "severity": "error"
+          },
+          {
+            "id": "phase-exit-test",
+            "title": "Every phase has an exit test",
+            "why": "Without a checkable exit, a phase ends when someone gets tired of it.",
+            "severity": "error"
+          },
+          {
+            "id": "ladder-upward",
+            "title": "Fidelity moves go up the ladder",
+            "why": "A unit should leave an element more real than it found it.",
+            "severity": "error"
+          },
+          {
+            "id": "unit-owner",
+            "title": "Unit owners exist",
+            "why": "Work assigned to a team that does not exist is unassigned work.",
+            "severity": "error"
+          },
+          {
+            "id": "phase-order",
+            "title": "Earlier phases do not wait on later ones",
+            "why": "If phase one needs something phase two builds, the phases are in the wrong order.",
+            "severity": "warning"
+          }
+        ]
+      },
+      {
+        "name": "flow",
+        "title": "Value stream",
+        "description": "Handoffs, queues and waiting time along the paths work takes.",
+        "rules": [
+          {
+            "id": "max-handoffs",
+            "title": "Paths stay under the handoff limit",
+            "why": "Each handoff between teams adds waiting and loses context.",
+            "severity": "warning"
+          },
+          {
+            "id": "queue-wip",
+            "title": "Queues declare a WIP limit",
+            "why": "A queue with no limit grows until someone notices.",
+            "severity": "warning"
+          },
+          {
+            "id": "person-wait",
+            "title": "Person steps declare wait time",
+            "why": "Lead time is mostly waiting; if it is not recorded it cannot be summed.",
+            "severity": "warning"
+          }
+        ]
+      }
+    ],
+    "ladder": [
+      "none",
+      "stand-in",
+      "existing-tool",
+      "built"
+    ]
+  },
+  "model": {
+    "teams": [
+      {
+        "id": "t-platform",
+        "name": "Platform engineering",
+        "description": "Owns source control, CI and developer tooling."
+      },
+      {
+        "id": "t-security",
+        "name": "Product security",
+        "description": "Owns supply-chain controls and admission policy."
+      },
+      {
+        "id": "t-release",
+        "name": "Release engineering",
+        "description": "Owns the artifact store, approvals and deploys."
+      },
+      {
+        "id": "t-sre",
+        "name": "Site reliability",
+        "description": "Owns the clusters, monitoring and on-call."
+      }
+    ],
+    "systems": [
+      {
+        "id": "s-source",
+        "name": "Source control"
+      },
+      {
+        "id": "s-build",
+        "name": "Build system"
+      },
+      {
+        "id": "s-release",
+        "name": "Release system"
+      },
+      {
+        "id": "s-runtime",
+        "name": "Runtime"
+      }
+    ],
+    "zones": [
+      {
+        "id": "z-dev",
+        "name": "Developer workspace",
+        "description": "Laptops and the tools engineers touch directly."
+      },
+      {
+        "id": "z-build",
+        "name": "Build zone",
+        "description": "Isolated build and signing infrastructure."
+      },
+      {
+        "id": "z-prod",
+        "name": "Production",
+        "description": "Clusters serving customers, and what admits code into them."
+      },
+      {
+        "id": "z-ext",
+        "name": "Outside the organization",
+        "description": "Third parties we do not control."
+      }
+    ],
+    "elements": [
+      {
+        "id": "engineer",
+        "name": "Engineer",
+        "kind": "person",
+        "zone": "z-dev",
+        "description": "Writes and reviews code.",
+        "owner": "t-platform"
+      },
+      {
+        "id": "workstation",
+        "name": "Developer workstation",
+        "kind": "device",
+        "zone": "z-dev",
+        "description": "Managed laptop with the build toolchain.",
+        "system": "s-source",
+        "owner": "t-platform"
+      },
+      {
+        "id": "repo",
+        "name": "Source repository",
+        "kind": "store",
+        "zone": "z-build",
+        "description": "Protected branches and required reviews.",
+        "system": "s-source",
+        "owner": "t-platform"
+      },
+      {
+        "id": "review",
+        "name": "Code review",
+        "kind": "process",
+        "zone": "z-build",
+        "description": "Two-person review before merge.",
+        "system": "s-source",
+        "owner": "t-platform"
+      },
+      {
+        "id": "ci",
+        "name": "CI runner",
+        "kind": "service",
+        "zone": "z-build",
+        "description": "Ephemeral runners that build every merge.",
+        "system": "s-build",
+        "owner": "t-platform"
+      },
+      {
+        "id": "cache",
+        "name": "Build cache",
+        "kind": "store",
+        "zone": "z-build",
+        "description": "Shared layer cache across runners.",
+        "system": "s-build",
+        "owner": "t-platform"
+      },
+      {
+        "id": "mirror",
+        "name": "Dependency mirror",
+        "kind": "service",
+        "zone": "z-build",
+        "description": "Pinned, scanned copies of third-party packages.",
+        "system": "s-build",
+        "owner": "t-security"
+      },
+      {
+        "id": "registry",
+        "name": "Public package registry",
+        "kind": "external-system",
+        "zone": "z-ext",
+        "description": "Upstream source of open-source packages."
+      },
+      {
+        "id": "sbom-gen",
+        "name": "SBOM generator",
+        "kind": "service",
+        "zone": "z-build",
+        "description": "Produces a software bill of materials per build.",
+        "system": "s-build",
+        "owner": "t-security"
+      },
+      {
+        "id": "scanner",
+        "name": "Vulnerability scanner",
+        "kind": "service",
+        "zone": "z-build",
+        "description": "Scans images for known vulnerabilities.",
+        "system": "s-build",
+        "owner": "t-security"
+      },
+      {
+        "id": "signer",
+        "name": "Signing service",
+        "kind": "service",
+        "zone": "z-build",
+        "description": "Signs artifacts and provenance with a managed key.",
+        "system": "s-release",
+        "owner": "t-security"
+      },
+      {
+        "id": "kms",
+        "name": "Key management",
+        "kind": "store",
+        "zone": "z-build",
+        "description": "Holds signing keys; keys never leave it.",
+        "system": "s-release",
+        "owner": "t-security",
+        "attrs": {
+          "hsm_backed": true
+        }
+      },
+      {
+        "id": "artifacts",
+        "name": "Artifact store",
+        "kind": "store",
+        "zone": "z-build",
+        "description": "Immutable store of signed release artifacts.",
+        "system": "s-release",
+        "owner": "t-release"
+      },
+      {
+        "id": "attest",
+        "name": "Attestation store",
+        "kind": "store",
+        "zone": "z-build",
+        "description": "Provenance, SBOM and scan attestations by digest.",
+        "system": "s-release",
+        "owner": "t-security"
+      },
+      {
+        "id": "policy",
+        "name": "Admission policy",
+        "kind": "service",
+        "zone": "z-prod",
+        "description": "Decides whether an artifact may run.",
+        "system": "s-release",
+        "owner": "t-security"
+      },
+      {
+        "id": "approval",
+        "name": "Change approval",
+        "kind": "process",
+        "zone": "z-build",
+        "description": "Release sign-off for production changes.",
+        "system": "s-release",
+        "owner": "t-release"
+      },
+      {
+        "id": "deployer",
+        "name": "Deploy controller",
+        "kind": "service",
+        "zone": "z-prod",
+        "description": "Rolls artifacts out to staging and production.",
+        "system": "s-release",
+        "owner": "t-release"
+      },
+      {
+        "id": "staging",
+        "name": "Staging cluster",
+        "kind": "service",
+        "zone": "z-prod",
+        "description": "Pre-production copy of the runtime.",
+        "system": "s-runtime",
+        "owner": "t-sre"
+      },
+      {
+        "id": "prod",
+        "name": "Production cluster",
+        "kind": "service",
+        "zone": "z-prod",
+        "description": "Serves customer traffic.",
+        "system": "s-runtime",
+        "owner": "t-sre"
+      },
+      {
+        "id": "flags",
+        "name": "Feature flag service",
+        "kind": "service",
+        "zone": "z-prod",
+        "description": "Turns features on and off without a deploy.",
+        "system": "s-runtime",
+        "owner": "t-release"
+      },
+      {
+        "id": "monitor",
+        "name": "Runtime monitor",
+        "kind": "service",
+        "zone": "z-prod",
+        "description": "Collects telemetry and raises alerts.",
+        "system": "s-runtime",
+        "owner": "t-sre"
+      },
+      {
+        "id": "alerts",
+        "name": "Alert queue",
+        "kind": "queue",
+        "zone": "z-prod",
+        "description": "Alerts waiting for a person.",
+        "system": "s-runtime",
+        "owner": "t-sre"
+      },
+      {
+        "id": "oncall",
+        "name": "On-call engineer",
+        "kind": "person",
+        "zone": "z-prod",
+        "description": "Responds to pages.",
+        "owner": "t-sre",
+        "attrs": {
+          "rotation": "weekly"
+        }
+      },
+      {
+        "id": "tracker",
+        "name": "Work tracker",
+        "kind": "ui",
+        "zone": "z-dev",
+        "description": "Where fixes are queued and assigned.",
+        "owner": "t-platform"
+      },
+      {
+        "id": "dashboard",
+        "name": "Release dashboard",
+        "kind": "ui",
+        "zone": "z-dev",
+        "description": "Shows what is released where.",
+        "system": "s-release",
+        "owner": "t-release"
+      },
+      {
+        "id": "audit",
+        "name": "Audit log",
+        "kind": "store",
+        "zone": "z-prod",
+        "description": "Append-only record of deploys and policy decisions.",
+        "system": "s-runtime",
+        "owner": "t-security"
+      },
+      {
+        "id": "prov-verify",
+        "name": "Provenance verifier",
+        "kind": "service",
+        "zone": "z-build",
+        "description": "Checks upstream provenance before a package enters the mirror.",
+        "system": "s-build"
+      }
+    ],
+    "relationships": [
+      {
+        "id": "r1",
+        "from": "engineer",
+        "to": "workstation",
+        "kind": "control",
+        "label": "writes code"
+      },
+      {
+        "id": "r2",
+        "from": "workstation",
+        "to": "repo",
+        "kind": "data",
+        "label": "pushes commits"
+      },
+      {
+        "id": "r3",
+        "from": "repo",
+        "to": "review",
+        "kind": "handoff",
+        "label": "opens change"
+      },
+      {
+        "id": "r4",
+        "from": "review",
+        "to": "repo",
+        "kind": "control",
+        "label": "merges"
+      },
+      {
+        "id": "r5",
+        "from": "repo",
+        "to": "ci",
+        "kind": "control",
+        "label": "triggers build"
+      },
+      {
+        "id": "r6",
+        "from": "ci",
+        "to": "cache",
+        "kind": "data",
+        "label": "reads and writes layers"
+      },
+      {
+        "id": "r7",
+        "from": "ci",
+        "to": "mirror",
+        "kind": "data",
+        "label": "fetches dependencies"
+      },
+      {
+        "id": "r8",
+        "from": "mirror",
+        "to": "registry",
+        "kind": "data",
+        "label": "proxies upstream"
+      },
+      {
+        "id": "r9",
+        "from": "ci",
+        "to": "sbom-gen",
+        "kind": "data",
+        "label": "build outputs"
+      },
+      {
+        "id": "r10",
+        "from": "sbom-gen",
+        "to": "attest",
+        "kind": "data",
+        "label": "stores SBOM",
+        "carries": [
+          "sbom"
+        ]
+      },
+      {
+        "id": "r11",
+        "from": "ci",
+        "to": "scanner",
+        "kind": "data",
+        "label": "image to scan"
+      },
+      {
+        "id": "r12",
+        "from": "scanner",
+        "to": "attest",
+        "kind": "data",
+        "label": "stores scan",
+        "carries": [
+          "scan-report"
+        ]
+      },
+      {
+        "id": "r13",
+        "from": "ci",
+        "to": "signer",
+        "kind": "control",
+        "label": "requests signature"
+      },
+      {
+        "id": "r14",
+        "from": "signer",
+        "to": "kms",
+        "kind": "control",
+        "label": "uses key"
+      },
+      {
+        "id": "r15",
+        "from": "signer",
+        "to": "artifacts",
+        "kind": "data",
+        "label": "publishes",
+        "carries": [
+          "signed-artifact"
+        ]
+      },
+      {
+        "id": "r16",
+        "from": "signer",
+        "to": "attest",
+        "kind": "data",
+        "label": "stores provenance",
+        "carries": [
+          "build-provenance"
+        ]
+      },
+      {
+        "id": "r17",
+        "from": "artifacts",
+        "to": "approval",
+        "kind": "handoff",
+        "label": "release candidate"
+      },
+      {
+        "id": "r18",
+        "from": "approval",
+        "to": "deployer",
+        "kind": "control",
+        "label": "approved change",
+        "carries": [
+          "deploy-request"
+        ]
+      },
+      {
+        "id": "r19",
+        "from": "deployer",
+        "to": "policy",
+        "kind": "control",
+        "label": "admission check",
+        "carries": [
+          "deploy-request"
+        ]
+      },
+      {
+        "id": "r20",
+        "from": "policy",
+        "to": "attest",
+        "kind": "data",
+        "label": "reads attestations",
+        "carries": [
+          "build-provenance",
+          "sbom"
+        ]
+      },
+      {
+        "id": "r21",
+        "from": "deployer",
+        "to": "staging",
+        "kind": "control",
+        "label": "deploys"
+      },
+      {
+        "id": "r22",
+        "from": "deployer",
+        "to": "prod",
+        "kind": "control",
+        "label": "promotes"
+      },
+      {
+        "id": "r23",
+        "from": "artifacts",
+        "to": "staging",
+        "kind": "data",
+        "label": "pulls image",
+        "carries": [
+          "signed-artifact"
+        ]
+      },
+      {
+        "id": "r24",
+        "from": "artifacts",
+        "to": "prod",
+        "kind": "data",
+        "label": "pulls image",
+        "carries": [
+          "signed-artifact"
+        ]
+      },
+      {
+        "id": "r25",
+        "from": "prod",
+        "to": "monitor",
+        "kind": "data",
+        "label": "telemetry"
+      },
+      {
+        "id": "r26",
+        "from": "staging",
+        "to": "monitor",
+        "kind": "data",
+        "label": "telemetry"
+      },
+      {
+        "id": "r27",
+        "from": "monitor",
+        "to": "alerts",
+        "kind": "data",
+        "label": "raises",
+        "carries": [
+          "alert"
+        ]
+      },
+      {
+        "id": "r28",
+        "from": "alerts",
+        "to": "oncall",
+        "kind": "handoff",
+        "label": "pages"
+      },
+      {
+        "id": "r29",
+        "from": "oncall",
+        "to": "tracker",
+        "kind": "handoff",
+        "label": "files ticket"
+      },
+      {
+        "id": "r30",
+        "from": "tracker",
+        "to": "engineer",
+        "kind": "feedback",
+        "label": "assigns fix"
+      },
+      {
+        "id": "r31",
+        "from": "flags",
+        "to": "prod",
+        "kind": "control",
+        "label": "toggles"
+      },
+      {
+        "id": "r32",
+        "from": "policy",
+        "to": "audit",
+        "kind": "data",
+        "label": "records decision",
+        "carries": [
+          "policy-decision"
+        ]
+      },
+      {
+        "id": "r33",
+        "from": "deployer",
+        "to": "audit",
+        "kind": "data",
+        "label": "deploy record"
+      },
+      {
+        "id": "r34",
+        "from": "artifacts",
+        "to": "dashboard",
+        "kind": "data",
+        "label": "release status",
+        "optional": true
+      },
+      {
+        "id": "r35",
+        "from": "scanner",
+        "to": "tracker",
+        "kind": "feedback",
+        "label": "files findings",
+        "optional": true
+      },
+      {
+        "id": "r36",
+        "from": "oncall",
+        "to": "flags",
+        "kind": "control",
+        "label": "kills feature",
+        "optional": true
+      },
+      {
+        "id": "r37",
+        "from": "mirror",
+        "to": "prov-verify",
+        "kind": "control",
+        "label": "verify before admit"
+      }
+    ],
+    "contracts": [
+      {
+        "name": "build-provenance",
+        "description": "Signed statement of what was built, from which source, on which runner.",
+        "produced_by": [
+          "signer"
+        ],
+        "consumed_by": [
+          "attest",
+          "policy"
+        ]
+      },
+      {
+        "name": "sbom",
+        "description": "Software bill of materials in a standard format.",
+        "produced_by": [
+          "sbom-gen"
+        ],
+        "consumed_by": [
+          "attest",
+          "policy"
+        ]
+      },
+      {
+        "name": "scan-report",
+        "description": "Vulnerability scan result bound to an image digest.",
+        "produced_by": [
+          "scanner"
+        ],
+        "consumed_by": [
+          "attest",
+          "policy"
+        ]
+      },
+      {
+        "name": "signed-artifact",
+        "description": "Release artifact with a detached signature.",
+        "produced_by": [
+          "signer",
+          "artifacts"
+        ],
+        "consumed_by": [
+          "artifacts",
+          "staging",
+          "prod"
+        ]
+      },
+      {
+        "name": "deploy-request",
+        "description": "Approved change naming an artifact digest and a target.",
+        "produced_by": [
+          "approval",
+          "deployer"
+        ],
+        "consumed_by": [
+          "deployer",
+          "policy"
+        ]
+      },
+      {
+        "name": "alert",
+        "description": "A condition that needs a person.",
+        "produced_by": [
+          "monitor"
+        ],
+        "consumed_by": [
+          "alerts"
+        ]
+      },
+      {
+        "name": "policy-decision",
+        "description": "Allow or deny, with the reasons, for one admission request.",
+        "produced_by": [
+          "policy"
+        ]
+      }
+    ],
+    "views": [
+      {
+        "id": "v-context",
+        "title": "End to end",
+        "elements": [
+          "engineer",
+          "workstation",
+          "repo",
+          "ci",
+          "artifacts",
+          "approval",
+          "deployer",
+          "prod",
+          "monitor",
+          "alerts",
+          "oncall",
+          "tracker"
+        ]
+      },
+      {
+        "id": "v-build",
+        "title": "Build and sign",
+        "elements": [
+          "repo",
+          "review",
+          "ci",
+          "cache",
+          "mirror",
+          "registry",
+          "sbom-gen",
+          "scanner",
+          "signer",
+          "kms",
+          "artifacts",
+          "attest"
+        ]
+      },
+      {
+        "id": "v-deploy",
+        "title": "Deploy and run",
+        "elements": [
+          "artifacts",
+          "approval",
+          "deployer",
+          "policy",
+          "attest",
+          "staging",
+          "prod",
+          "flags",
+          "monitor",
+          "alerts",
+          "oncall",
+          "audit"
+        ]
+      }
+    ]
+  },
+  "plan": {
+    "phases": [
+      {
+        "id": "p1",
+        "name": "Build provenance",
+        "order": 1,
+        "exit_test": "Every artifact in the store has a signed provenance attestation that a reviewer can verify from the digest alone."
+      },
+      {
+        "id": "p2",
+        "name": "Enforce at deploy",
+        "order": 2,
+        "exit_test": "Production admits only artifacts whose attestations pass policy, and every denial is logged with its reason."
+      }
+    ],
+    "units": [
+      {
+        "id": "u01",
+        "title": "Pin dependencies through the mirror",
+        "kind": "code",
+        "phase": "p1",
+        "owner": "t-security",
+        "status": "done",
+        "feedback": "minutes",
+        "elements": [
+          {
+            "id": "mirror",
+            "from": "none",
+            "to": "existing-tool"
+          }
+        ],
+        "provides": [
+          "pinned-deps"
+        ],
+        "check": "A build with the public registry blocked at the firewall still succeeds, and the provenance verifier ran on every package."
+      },
+      {
+        "id": "u02",
+        "title": "Generate an SBOM for every build",
+        "kind": "code",
+        "phase": "p1",
+        "owner": "t-security",
+        "status": "done",
+        "feedback": "next-run",
+        "elements": [
+          {
+            "id": "sbom-gen",
+            "from": "none",
+            "to": "stand-in"
+          }
+        ],
+        "requires": [
+          "pinned-deps"
+        ],
+        "provides": [
+          "sbom"
+        ],
+        "check": "The last ten builds each have an SBOM attestation keyed by image digest."
+      },
+      {
+        "id": "u03",
+        "title": "Stand up the attestation store",
+        "kind": "code",
+        "phase": "p1",
+        "owner": "t-security",
+        "status": "done",
+        "feedback": "minutes",
+        "elements": [
+          {
+            "id": "attest",
+            "from": "none",
+            "to": "existing-tool"
+          }
+        ],
+        "provides": [
+          "attestation-store"
+        ],
+        "check": "An attestation written by CI can be read back by digest from a production node."
+      },
+      {
+        "id": "u04",
+        "title": "Sign artifacts with a managed key",
+        "kind": "code",
+        "phase": "p1",
+        "owner": "t-security",
+        "status": "doing",
+        "feedback": "minutes",
+        "elements": [
+          {
+            "id": "signer",
+            "from": "none",
+            "to": "built"
+          },
+          {
+            "id": "kms",
+            "from": "none",
+            "to": "existing-tool"
+          }
+        ],
+        "provides": [
+          "signing"
+        ],
+        "check": "A new artifact verifies against the published public key, and the private key cannot be exported."
+      },
+      {
+        "id": "u05",
+        "title": "Emit build provenance from CI",
+        "kind": "code",
+        "phase": "p1",
+        "owner": "t-platform",
+        "status": "todo",
+        "feedback": "next-run",
+        "elements": [
+          {
+            "id": "ci",
+            "from": "existing-tool",
+            "to": "built"
+          },
+          {
+            "id": "cache",
+            "from": "existing-tool",
+            "to": "built"
+          }
+        ],
+        "requires": [
+          "signing",
+          "attestation-store",
+          "provenance-format"
+        ],
+        "provides": [
+          "provenance"
+        ],
+        "check": "Every build on the main branch writes a signed provenance attestation naming source commit and runner."
+      },
+      {
+        "id": "u06",
+        "title": "Agree on the provenance format",
+        "kind": "agreement",
+        "phase": "p1",
+        "owner": "t-release",
+        "status": "done",
+        "feedback": "weeks",
+        "provides": [
+          "provenance-format"
+        ],
+        "check": "Platform, security and release have signed off one format document, and it is linked from the repository."
+      },
+      {
+        "id": "u07",
+        "title": "Scan images and record results",
+        "kind": "code",
+        "phase": "p1",
+        "owner": "t-security",
+        "status": "doing",
+        "feedback": "next-run",
+        "elements": [
+          {
+            "id": "scanner",
+            "from": "existing-tool",
+            "to": "built"
+          }
+        ],
+        "requires": [
+          "attestation-store"
+        ],
+        "provides": [
+          "scan-results"
+        ],
+        "check": "Each image in the store has a scan attestation no older than 24 hours."
+      },
+      {
+        "id": "u08",
+        "title": "Measure unsigned artifacts in the store",
+        "kind": "measurement",
+        "phase": "p1",
+        "owner": "t-release",
+        "status": "todo",
+        "feedback": "next-run",
+        "requires": [
+          "signing",
+          "decision-log"
+        ],
+        "provides": [
+          "unsigned-baseline"
+        ],
+        "check": "A weekly count of unsigned artifacts by team is published, with last week's number beside it."
+      },
+      {
+        "id": "u09",
+        "title": "Write the admission policy",
+        "kind": "code",
+        "phase": "p2",
+        "owner": "t-security",
+        "status": "todo",
+        "feedback": "minutes",
+        "elements": [
+          {
+            "id": "policy",
+            "from": "none",
+            "to": "stand-in"
+          }
+        ],
+        "requires": [
+          "provenance",
+          "sbom",
+          "provenance-format"
+        ],
+        "provides": [
+          "admission-policy"
+        ],
+        "check": "The policy denies a test artifact with no provenance and admits one with valid provenance and SBOM."
+      },
+      {
+        "id": "u10",
+        "title": "Run policy in audit-only mode",
+        "kind": "code",
+        "phase": "p2",
+        "owner": "t-security",
+        "status": "todo",
+        "feedback": "several-runs",
+        "requires": [
+          "admission-policy"
+        ],
+        "provides": [
+          "audit-mode"
+        ],
+        "check": "Two weeks of production deploys evaluated with zero blocked deploys and every would-deny recorded."
+      },
+      {
+        "id": "u11",
+        "title": "Log every policy decision",
+        "kind": "code",
+        "phase": "p2",
+        "owner": "t-sre",
+        "status": "todo",
+        "feedback": "minutes",
+        "elements": [
+          {
+            "id": "audit",
+            "from": "stand-in",
+            "to": "existing-tool"
+          }
+        ],
+        "requires": [
+          "admission-policy"
+        ],
+        "provides": [
+          "decision-log"
+        ],
+        "check": "Each admission request has exactly one audit record with the decision and its reasons."
+      },
+      {
+        "id": "u12",
+        "title": "Agree the enforcement date with release",
+        "kind": "agreement",
+        "phase": "p2",
+        "owner": "t-release",
+        "status": "todo",
+        "feedback": "weeks",
+        "requires": [
+          "audit-mode",
+          "unsigned-baseline"
+        ],
+        "provides": [
+          "enforcement-date"
+        ],
+        "check": "A dated enforcement plan is approved by release and security, with the exception process named."
+      },
+      {
+        "id": "u13",
+        "title": "Turn on enforcement in production",
+        "kind": "code",
+        "phase": "p2",
+        "owner": "t-security",
+        "status": "todo",
+        "feedback": "next-run",
+        "elements": [
+          {
+            "id": "policy",
+            "from": "stand-in",
+            "to": "built"
+          }
+        ],
+        "requires": [
+          "enforcement-date",
+          "decision-log"
+        ],
+        "provides": [
+          "enforcement"
+        ],
+        "check": "An unsigned test artifact is denied in production and the denial appears in the audit log."
+      },
+      {
+        "id": "u14",
+        "title": "Route policy denials to on-call",
+        "kind": "code",
+        "phase": "p2",
+        "owner": "t-sre",
+        "status": "todo",
+        "feedback": "minutes",
+        "elements": [
+          {
+            "id": "alerts",
+            "from": "none",
+            "to": "existing-tool"
+          }
+        ],
+        "requires": [
+          "enforcement",
+          "exception-workflow"
+        ],
+        "provides": [
+          "denial-routing"
+        ],
+        "check": "A production denial pages on-call within five minutes with the artifact digest and the failing rule."
+      },
+      {
+        "id": "u15",
+        "title": "Measure deploy lead time before and after",
+        "kind": "measurement",
+        "phase": "p2",
+        "owner": "t-release",
+        "status": "todo",
+        "feedback": "weeks",
+        "requires": [
+          "decision-log"
+        ],
+        "provides": [
+          "lead-time-report"
+        ],
+        "check": "Median merge-to-production time for the month before and after enforcement is published side by side."
+      }
+    ]
+  },
+  "findings": [
+    {
+      "pack": "generic",
+      "rule": "element-owner",
+      "severity": "error",
+      "at": "registry",
+      "atKind": "element",
+      "message": "Public package registry has no owner team."
+    },
+    {
+      "pack": "generic",
+      "rule": "element-owner",
+      "severity": "error",
+      "at": "prov-verify",
+      "atKind": "element",
+      "message": "Provenance verifier has no owner team."
+    },
+    {
+      "pack": "generic",
+      "rule": "contract-ends",
+      "severity": "error",
+      "at": "policy-decision",
+      "atKind": "contract",
+      "message": "Contract policy-decision has a producer but no consumer."
+    },
+    {
+      "pack": "plan",
+      "rule": "requires-provided",
+      "severity": "error",
+      "at": "u14",
+      "atKind": "unit",
+      "message": "Unit u14 requires exception-workflow, which no unit provides."
+    },
+    {
+      "pack": "plan",
+      "rule": "phase-order",
+      "severity": "warning",
+      "at": "u08",
+      "atKind": "unit",
+      "message": "Unit u08 (Build provenance) depends on decision-log, which is only provided in Enforce at deploy."
+    },
+    {
+      "pack": "flow",
+      "rule": "queue-wip",
+      "severity": "warning",
+      "at": "alerts",
+      "atKind": "element",
+      "message": "Queue Alert queue does not declare attrs.wip_limit."
+    },
+    {
+      "pack": "flow",
+      "rule": "person-wait",
+      "severity": "warning",
+      "at": "oncall",
+      "atKind": "element",
+      "message": "Person step On-call engineer does not declare attrs.wait_days, so lead time cannot be summed."
+    },
+    {
+      "pack": "flow",
+      "rule": "max-handoffs",
+      "severity": "warning",
+      "at": "r28",
+      "atKind": "relationship",
+      "message": "The path from Source repository to Engineer crosses 5 team handoffs; the limit is 4."
+    }
+  ],
+  "analysis": {
+    "deps": {
+      "u01": [],
+      "u02": [
+        "u01"
+      ],
+      "u03": [],
+      "u04": [],
+      "u05": [
+        "u03",
+        "u04",
+        "u06"
+      ],
+      "u06": [],
+      "u07": [
+        "u03"
+      ],
+      "u08": [
+        "u04",
+        "u11"
+      ],
+      "u09": [
+        "u02",
+        "u05",
+        "u06"
+      ],
+      "u10": [
+        "u09"
+      ],
+      "u11": [
+        "u09"
+      ],
+      "u12": [
+        "u08",
+        "u10"
+      ],
+      "u13": [
+        "u11",
+        "u12"
+      ],
+      "u14": [
+        "u13"
+      ],
+      "u15": [
+        "u11"
+      ]
+    },
+    "unblocks": {
+      "u01": [
+        "u02"
+      ],
+      "u02": [
+        "u09"
+      ],
+      "u03": [
+        "u05",
+        "u07"
+      ],
+      "u04": [
+        "u05",
+        "u08"
+      ],
+      "u05": [
+        "u09"
+      ],
+      "u06": [
+        "u05",
+        "u09"
+      ],
+      "u07": [],
+      "u08": [
+        "u12"
+      ],
+      "u09": [
+        "u10",
+        "u11"
+      ],
+      "u10": [
+        "u12"
+      ],
+      "u11": [
+        "u08",
+        "u13",
+        "u15"
+      ],
+      "u12": [
+        "u13"
+      ],
+      "u13": [
+        "u14"
+      ],
+      "u14": [],
+      "u15": []
+    },
+    "layers": [
+      [
+        "u04",
+        "u07"
+      ],
+      [
+        "u05"
+      ],
+      [
+        "u09"
+      ],
+      [
+        "u10",
+        "u11"
+      ],
+      [
+        "u08",
+        "u15"
+      ],
+      [
+        "u12"
+      ],
+      [
+        "u13"
+      ],
+      [
+        "u14"
+      ]
+    ],
+    "frontier": [
+      "u04",
+      "u07"
+    ],
+    "blocked": {
+      "u05": {
+        "missing": [
+          "signing"
+        ],
+        "waitingOn": [
+          "u04"
+        ]
+      },
+      "u08": {
+        "missing": [
+          "signing",
+          "decision-log"
+        ],
+        "waitingOn": [
+          "u04",
+          "u11"
+        ]
+      },
+      "u09": {
+        "missing": [
+          "provenance"
+        ],
+        "waitingOn": [
+          "u05"
+        ]
+      },
+      "u10": {
+        "missing": [
+          "admission-policy"
+        ],
+        "waitingOn": [
+          "u09"
+        ]
+      },
+      "u11": {
+        "missing": [
+          "admission-policy"
+        ],
+        "waitingOn": [
+          "u09"
+        ]
+      },
+      "u12": {
+        "missing": [
+          "audit-mode",
+          "unsigned-baseline"
+        ],
+        "waitingOn": [
+          "u08",
+          "u10"
+        ]
+      },
+      "u13": {
+        "missing": [
+          "enforcement-date",
+          "decision-log"
+        ],
+        "waitingOn": [
+          "u11",
+          "u12"
+        ]
+      },
+      "u14": {
+        "missing": [
+          "enforcement",
+          "exception-workflow"
+        ],
+        "waitingOn": [
+          "u13"
+        ]
+      },
+      "u15": {
+        "missing": [
+          "decision-log"
+        ],
+        "waitingOn": [
+          "u11"
+        ]
+      }
+    },
+    "critical_path": [
+      "u01",
+      "u02",
+      "u09",
+      "u11",
+      "u08",
+      "u12",
+      "u13",
+      "u14"
+    ],
+    "phases": [
+      {
+        "id": "p1",
+        "total": 8,
+        "done": 4,
+        "complete": false
+      },
+      {
+        "id": "p2",
+        "total": 7,
+        "done": 0,
+        "complete": false
+      }
+    ],
+    "unprovided": [
+      "exception-workflow"
+    ]
+  },
+  "patches": [
+    {
+      "id": "patch-001",
+      "title": "Verify provenance at the mirror",
+      "status": "accepted",
+      "file": "patches/patch-001.yaml",
+      "why": "Pinning dependencies stops surprise upgrades but not a poisoned upstream. Checking upstream provenance before a package enters the mirror closes that gap.",
+      "ops": [
+        {
+          "op": "add",
+          "kind": "element",
+          "value": {
+            "id": "prov-verify",
+            "name": "Provenance verifier",
+            "kind": "service",
+            "zone": "z-build",
+            "system": "s-build"
+          }
+        },
+        {
+          "op": "add",
+          "kind": "relationship",
+          "value": {
+            "id": "r37",
+            "from": "mirror",
+            "to": "prov-verify",
+            "kind": "control"
+          }
+        },
+        {
+          "op": "modify",
+          "kind": "unit",
+          "id": "u01",
+          "set": {
+            "check": "A build with the public registry blocked at the firewall still succeeds, and the provenance verifier ran on every package."
+          }
+        }
+      ],
+      "impact": {
+        "patch": "patch-001",
+        "status": "accepted",
+        "added": [
+          {
+            "kind": "element",
+            "id": "prov-verify"
+          },
+          {
+            "kind": "relationship",
+            "id": "r37"
+          }
+        ],
+        "removed": [],
+        "modified": [
+          {
+            "kind": "unit",
+            "id": "u01",
+            "fields": [
+              "check"
+            ]
+          }
+        ],
+        "cascade": [],
+        "findingsIntroduced": [
+          {
+            "pack": "generic",
+            "rule": "element-owner",
+            "severity": "error",
+            "at": "prov-verify",
+            "atKind": "element",
+            "message": "Provenance verifier has no owner team."
+          }
+        ],
+        "findingsResolved": [],
+        "unitsAffected": [
+          "u01"
+        ],
+        "errors": []
+      }
+    },
+    {
+      "id": "patch-002",
+      "title": "Retire the build cache and give policy decisions a reader",
+      "status": "proposed",
+      "file": "patches/patch-002.yaml",
+      "why": "The shared cache lets one build poison another, and nothing reads policy decisions today. Removing the cache trades build time for isolation; the audit log becomes the decision reader.",
+      "ops": [
+        {
+          "op": "remove",
+          "kind": "element",
+          "id": "cache"
+        },
+        {
+          "op": "modify",
+          "kind": "contract",
+          "id": "policy-decision",
+          "set": {
+            "consumed_by": [
+              "audit"
+            ]
+          }
+        }
+      ],
+      "impact": {
+        "patch": "patch-002",
+        "status": "proposed",
+        "added": [],
+        "removed": [
+          {
+            "kind": "element",
+            "id": "cache"
+          }
+        ],
+        "modified": [
+          {
+            "kind": "contract",
+            "id": "policy-decision",
+            "fields": [
+              "consumed_by"
+            ]
+          }
+        ],
+        "cascade": [
+          {
+            "kind": "relationship",
+            "id": "r6",
+            "because": "touches removed element cache"
+          },
+          {
+            "kind": "view",
+            "id": "v-build",
+            "because": "listed removed element cache"
+          },
+          {
+            "kind": "unit",
+            "id": "u05",
+            "because": "its element moves named removed element cache"
+          }
+        ],
+        "findingsIntroduced": [],
+        "findingsResolved": [
+          {
+            "pack": "generic",
+            "rule": "contract-ends",
+            "severity": "error",
+            "at": "policy-decision",
+            "atKind": "contract",
+            "message": "Contract policy-decision has a producer but no consumer."
+          }
+        ],
+        "unitsAffected": [
+          "u05"
+        ],
+        "errors": []
+      }
+    }
+  ],
+  "layouts": [
+    {
+      "view": "v-context",
+      "width": 932,
+      "height": 362,
+      "nodes": [
+        {
+          "id": "engineer",
+          "x": 32,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "workstation",
+          "x": 264,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "repo",
+          "x": 496,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "ci",
+          "x": 728,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "artifacts",
+          "x": 728,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "approval",
+          "x": 496,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "deployer",
+          "x": 264,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "prod",
+          "x": 728,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "monitor",
+          "x": 496,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "alerts",
+          "x": 264,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "oncall",
+          "x": 32,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "tracker",
+          "x": 32,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        }
+      ],
+      "edges": [
+        {
+          "id": "r1",
+          "from": "engineer",
+          "to": "workstation",
+          "points": [
+            [
+              204,
+              61
+            ],
+            [
+              264,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r2",
+          "from": "workstation",
+          "to": "repo",
+          "points": [
+            [
+              436,
+              61
+            ],
+            [
+              496,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r5",
+          "from": "repo",
+          "to": "ci",
+          "points": [
+            [
+              668,
+              61
+            ],
+            [
+              728,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r17",
+          "from": "artifacts",
+          "to": "approval",
+          "points": [
+            [
+              728,
+              181
+            ],
+            [
+              668,
+              181
+            ]
+          ]
+        },
+        {
+          "id": "r18",
+          "from": "approval",
+          "to": "deployer",
+          "points": [
+            [
+              496,
+              181
+            ],
+            [
+              436,
+              181
+            ]
+          ]
+        },
+        {
+          "id": "r22",
+          "from": "deployer",
+          "to": "prod",
+          "points": [
+            [
+              436,
+              203
+            ],
+            [
+              728,
+              279
+            ]
+          ]
+        },
+        {
+          "id": "r24",
+          "from": "artifacts",
+          "to": "prod",
+          "points": [
+            [
+              814,
+              210
+            ],
+            [
+              814,
+              272
+            ]
+          ]
+        },
+        {
+          "id": "r25",
+          "from": "prod",
+          "to": "monitor",
+          "points": [
+            [
+              728,
+              301
+            ],
+            [
+              668,
+              301
+            ]
+          ]
+        },
+        {
+          "id": "r27",
+          "from": "monitor",
+          "to": "alerts",
+          "points": [
+            [
+              496,
+              301
+            ],
+            [
+              436,
+              301
+            ]
+          ]
+        },
+        {
+          "id": "r28",
+          "from": "alerts",
+          "to": "oncall",
+          "points": [
+            [
+              264,
+              301
+            ],
+            [
+              204,
+              301
+            ]
+          ]
+        },
+        {
+          "id": "r29",
+          "from": "oncall",
+          "to": "tracker",
+          "points": [
+            [
+              118,
+              272
+            ],
+            [
+              118,
+              210
+            ]
+          ]
+        },
+        {
+          "id": "r30",
+          "from": "tracker",
+          "to": "engineer",
+          "points": [
+            [
+              118,
+              152
+            ],
+            [
+              118,
+              90
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "view": "v-build",
+      "width": 932,
+      "height": 362,
+      "nodes": [
+        {
+          "id": "repo",
+          "x": 32,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "review",
+          "x": 32,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "ci",
+          "x": 264,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "cache",
+          "x": 264,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "mirror",
+          "x": 496,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "registry",
+          "x": 728,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "sbom-gen",
+          "x": 496,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "scanner",
+          "x": 496,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "signer",
+          "x": 264,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "kms",
+          "x": 32,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "artifacts",
+          "x": 728,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "attest",
+          "x": 728,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        }
+      ],
+      "edges": [
+        {
+          "id": "r3",
+          "from": "repo",
+          "to": "review",
+          "points": [
+            [
+              110,
+              90
+            ],
+            [
+              110,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r4",
+          "from": "review",
+          "to": "repo",
+          "points": [
+            [
+              126,
+              152
+            ],
+            [
+              126,
+              90
+            ]
+          ]
+        },
+        {
+          "id": "r5",
+          "from": "repo",
+          "to": "ci",
+          "points": [
+            [
+              204,
+              61
+            ],
+            [
+              264,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r6",
+          "from": "ci",
+          "to": "cache",
+          "points": [
+            [
+              350,
+              90
+            ],
+            [
+              350,
+              272
+            ]
+          ]
+        },
+        {
+          "id": "r7",
+          "from": "ci",
+          "to": "mirror",
+          "points": [
+            [
+              378,
+              90
+            ],
+            [
+              554,
+              272
+            ]
+          ]
+        },
+        {
+          "id": "r8",
+          "from": "mirror",
+          "to": "registry",
+          "points": [
+            [
+              668,
+              301
+            ],
+            [
+              728,
+              301
+            ]
+          ]
+        },
+        {
+          "id": "r9",
+          "from": "ci",
+          "to": "sbom-gen",
+          "points": [
+            [
+              436,
+              61
+            ],
+            [
+              496,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r10",
+          "from": "sbom-gen",
+          "to": "attest",
+          "points": [
+            [
+              638,
+              90
+            ],
+            [
+              758,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r11",
+          "from": "ci",
+          "to": "scanner",
+          "points": [
+            [
+              406,
+              90
+            ],
+            [
+              526,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r12",
+          "from": "scanner",
+          "to": "attest",
+          "points": [
+            [
+              668,
+              181
+            ],
+            [
+              728,
+              181
+            ]
+          ]
+        },
+        {
+          "id": "r13",
+          "from": "ci",
+          "to": "signer",
+          "points": [
+            [
+              350,
+              90
+            ],
+            [
+              350,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r14",
+          "from": "signer",
+          "to": "kms",
+          "points": [
+            [
+              294,
+              210
+            ],
+            [
+              174,
+              272
+            ]
+          ]
+        },
+        {
+          "id": "r15",
+          "from": "signer",
+          "to": "artifacts",
+          "points": [
+            [
+              436,
+              159
+            ],
+            [
+              728,
+              83
+            ]
+          ]
+        },
+        {
+          "id": "r16",
+          "from": "signer",
+          "to": "attest",
+          "points": [
+            [
+              436,
+              181
+            ],
+            [
+              728,
+              181
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "view": "v-deploy",
+      "width": 1164,
+      "height": 362,
+      "nodes": [
+        {
+          "id": "artifacts",
+          "x": 32,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "approval",
+          "x": 264,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "deployer",
+          "x": 496,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "policy",
+          "x": 728,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "attest",
+          "x": 960,
+          "y": 32,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "staging",
+          "x": 264,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "prod",
+          "x": 496,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "flags",
+          "x": 728,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "monitor",
+          "x": 264,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "alerts",
+          "x": 496,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "oncall",
+          "x": 728,
+          "y": 272,
+          "w": 172,
+          "h": 58
+        },
+        {
+          "id": "audit",
+          "x": 960,
+          "y": 152,
+          "w": 172,
+          "h": 58
+        }
+      ],
+      "edges": [
+        {
+          "id": "r17",
+          "from": "artifacts",
+          "to": "approval",
+          "points": [
+            [
+              204,
+              61
+            ],
+            [
+              264,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r18",
+          "from": "approval",
+          "to": "deployer",
+          "points": [
+            [
+              436,
+              61
+            ],
+            [
+              496,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r19",
+          "from": "deployer",
+          "to": "policy",
+          "points": [
+            [
+              668,
+              61
+            ],
+            [
+              728,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r20",
+          "from": "policy",
+          "to": "attest",
+          "points": [
+            [
+              900,
+              61
+            ],
+            [
+              960,
+              61
+            ]
+          ]
+        },
+        {
+          "id": "r21",
+          "from": "deployer",
+          "to": "staging",
+          "points": [
+            [
+              526,
+              90
+            ],
+            [
+              406,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r22",
+          "from": "deployer",
+          "to": "prod",
+          "points": [
+            [
+              582,
+              90
+            ],
+            [
+              582,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r23",
+          "from": "artifacts",
+          "to": "staging",
+          "points": [
+            [
+              174,
+              90
+            ],
+            [
+              294,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r24",
+          "from": "artifacts",
+          "to": "prod",
+          "points": [
+            [
+              204,
+              83
+            ],
+            [
+              496,
+              159
+            ]
+          ]
+        },
+        {
+          "id": "r25",
+          "from": "prod",
+          "to": "monitor",
+          "points": [
+            [
+              526,
+              210
+            ],
+            [
+              406,
+              272
+            ]
+          ]
+        },
+        {
+          "id": "r26",
+          "from": "staging",
+          "to": "monitor",
+          "points": [
+            [
+              350,
+              210
+            ],
+            [
+              350,
+              272
+            ]
+          ]
+        },
+        {
+          "id": "r27",
+          "from": "monitor",
+          "to": "alerts",
+          "points": [
+            [
+              436,
+              301
+            ],
+            [
+              496,
+              301
+            ]
+          ]
+        },
+        {
+          "id": "r28",
+          "from": "alerts",
+          "to": "oncall",
+          "points": [
+            [
+              668,
+              301
+            ],
+            [
+              728,
+              301
+            ]
+          ]
+        },
+        {
+          "id": "r31",
+          "from": "flags",
+          "to": "prod",
+          "points": [
+            [
+              728,
+              181
+            ],
+            [
+              668,
+              181
+            ]
+          ]
+        },
+        {
+          "id": "r32",
+          "from": "policy",
+          "to": "audit",
+          "points": [
+            [
+              870,
+              90
+            ],
+            [
+              990,
+              152
+            ]
+          ]
+        },
+        {
+          "id": "r33",
+          "from": "deployer",
+          "to": "audit",
+          "points": [
+            [
+              668,
+              83
+            ],
+            [
+              960,
+              159
+            ]
+          ]
+        },
+        {
+          "id": "r36",
+          "from": "oncall",
+          "to": "flags",
+          "points": [
+            [
+              814,
+              272
+            ],
+            [
+              814,
+              210
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

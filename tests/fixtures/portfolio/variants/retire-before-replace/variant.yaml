@@ -1,0 +1,4 @@
+breaks: "Beta's today-only part Old intake job is confirmed as replaced by b-in, and no unit moves it to retired."
+expect:
+  - { rule: plan/retire-before-replace, severity: error, subject: "beta:old-intake (part)" }
+note: "An error because the disposition and replaced_by rest on a confirmed record."

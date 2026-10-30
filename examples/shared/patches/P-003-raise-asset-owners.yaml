@@ -1,0 +1,17 @@
+# An organization raises a mark by a patch in its root. No check marks AssetOwnership relevant;
+# this raise does, and a raise only adds.
+id: P-003
+title: Mark the asset owner feed security-relevant
+status: accepted
+provenance:
+  author: person
+  requested_by: the head of security engineering
+  created: "2026-09-21"
+why: A wrong owner sends a finding to a queue nobody reads, so a fault in the asset owner feed hides findings without a trace, though no check reads the feed today.
+ops:
+  - op: modify
+    kind: contract
+    id: AssetOwnership
+    set:
+      security: { raised: { by: the head of security engineering, why: A wrong owner sends a finding to a queue nobody reads. } }
+decision: { by: the program lead, at: "2026-09-22", reason: A raise only adds to the floor. }

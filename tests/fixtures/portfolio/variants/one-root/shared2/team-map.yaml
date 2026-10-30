@@ -1,0 +1,3 @@
+owners:
+  "the seam owner": { teams: [team-a] }
+  "the hub owner": { teams: [team-b] }

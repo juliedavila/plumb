@@ -1,0 +1,4 @@
+breaks: "Beta's current-state record for b-in names an agent as the one who confirmed it."
+expect:
+  - { rule: core/current-valid, severity: error, subject: "beta:b-in (current state)" }
+note: "The record stays discovered. Its disposition, transition, retires and replaces nothing, so no other rule reads it."

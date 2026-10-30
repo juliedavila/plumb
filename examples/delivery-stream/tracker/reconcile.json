@@ -1,0 +1,329 @@
+{
+  "adapter": "jira",
+  "counts": {
+    "linked": 11,
+    "proposed": 4,
+    "unitsWithoutIssue": 6,
+    "issuesWithoutUnit": 2,
+    "statusDisagreements": 3,
+    "dependencyOneSided": 2,
+    "phaseDisagreements": 1
+  },
+  "linked": [
+    {
+      "unit": "U-01",
+      "issue": "NOTE-10",
+      "how": "label"
+    },
+    {
+      "unit": "U-02",
+      "issue": "NOTE-11",
+      "how": "label"
+    },
+    {
+      "unit": "U-03",
+      "issue": "NOTE-12",
+      "how": "label"
+    },
+    {
+      "unit": "U-04",
+      "issue": "NOTE-13",
+      "how": "confirmed",
+      "confirmed_by": "delivery lead",
+      "confirmed_at": "2026-10-20"
+    },
+    {
+      "unit": "U-05",
+      "issue": "NOTE-14",
+      "how": "label"
+    },
+    {
+      "unit": "U-06",
+      "issue": "NOTE-15",
+      "how": "confirmed",
+      "confirmed_by": "delivery lead",
+      "confirmed_at": "2026-10-20"
+    },
+    {
+      "unit": "U-08",
+      "issue": "NOTE-20",
+      "how": "label"
+    },
+    {
+      "unit": "U-13",
+      "issue": "NOTE-19",
+      "how": "confirmed",
+      "confirmed_by": "engineering lead",
+      "confirmed_at": "2026-10-21"
+    },
+    {
+      "unit": "U-15",
+      "issue": "NOTE-24",
+      "how": "label"
+    },
+    {
+      "unit": "U-16",
+      "issue": "NOTE-25",
+      "how": "label"
+    },
+    {
+      "unit": "U-19",
+      "issue": "NOTE-28",
+      "how": "label"
+    }
+  ],
+  "proposed": [
+    {
+      "unit": "U-07",
+      "issue": "NOTE-16",
+      "score": 1,
+      "reasons": [
+        "title 100% alike",
+        "same phase (SEE)",
+        "same team (product)"
+      ]
+    },
+    {
+      "unit": "U-09",
+      "issue": "NOTE-21",
+      "score": 0.91,
+      "reasons": [
+        "title 89% alike",
+        "same phase (SHORTEN)",
+        "same team (platform)"
+      ]
+    },
+    {
+      "unit": "U-10",
+      "issue": "NOTE-29",
+      "score": 1,
+      "reasons": [
+        "title 100% alike",
+        "same phase (SHORTEN)",
+        "same team (release)"
+      ]
+    },
+    {
+      "unit": "U-12",
+      "issue": "NOTE-22",
+      "score": 0.9,
+      "reasons": [
+        "title 100% alike",
+        "same phase (SHORTEN)",
+        "team engineering, not platform"
+      ]
+    }
+  ],
+  "unitsWithoutIssue": [
+    "U-11",
+    "U-14",
+    "U-17",
+    "U-18",
+    "U-20",
+    "U-21"
+  ],
+  "issuesWithoutUnit": [
+    {
+      "issue": "NOTE-17",
+      "summary": "Archive stale tracker dashboards",
+      "phase": "SEE",
+      "type": "Task"
+    },
+    {
+      "issue": "NOTE-23",
+      "summary": "Try trunk-based development for a sprint",
+      "phase": "SHORTEN",
+      "type": "Spike"
+    }
+  ],
+  "statusDisagreements": [
+    {
+      "unit": "U-03",
+      "issue": "NOTE-12",
+      "unitStatus": "done",
+      "trackerStatus": "In Progress",
+      "mapped": "doing"
+    },
+    {
+      "unit": "U-06",
+      "issue": "NOTE-15",
+      "unitStatus": "todo",
+      "trackerStatus": "In Review",
+      "mapped": "doing"
+    },
+    {
+      "unit": "U-15",
+      "issue": "NOTE-24",
+      "unitStatus": "todo",
+      "trackerStatus": "Ready for Release",
+      "mapped": "doing"
+    }
+  ],
+  "dependencyOneSided": [
+    {
+      "unit": "U-06",
+      "dependsOn": "U-02",
+      "issue": "NOTE-15",
+      "dependsOnIssue": "NOTE-11",
+      "side": "model"
+    },
+    {
+      "unit": "U-08",
+      "dependsOn": "U-03",
+      "issue": "NOTE-20",
+      "dependsOnIssue": "NOTE-12",
+      "side": "tracker"
+    }
+  ],
+  "phaseDisagreements": [
+    {
+      "unit": "U-15",
+      "issue": "NOTE-24",
+      "unitPhase": "SHORTEN",
+      "issuePhase": "KEEP"
+    }
+  ],
+  "state": {
+    "U-01": {
+      "unit": "U-01",
+      "issue": "NOTE-10",
+      "how": "label",
+      "status": "Done",
+      "statusCategory": "done",
+      "mapped": "done",
+      "summary": "Name an owner for every step",
+      "assignee": "Product lead",
+      "sprint": "NOTE Sprint 41",
+      "parent": "NOTE-2",
+      "team": "product"
+    },
+    "U-02": {
+      "unit": "U-02",
+      "issue": "NOTE-11",
+      "how": "label",
+      "status": "Done",
+      "statusCategory": "done",
+      "mapped": "done",
+      "summary": "Record the wait at each step",
+      "assignee": "Platform engineer 1",
+      "sprint": "NOTE Sprint 41",
+      "parent": "NOTE-2",
+      "team": "platform"
+    },
+    "U-03": {
+      "unit": "U-03",
+      "issue": "NOTE-12",
+      "how": "label",
+      "status": "In Progress",
+      "statusCategory": "doing",
+      "mapped": "doing",
+      "summary": "WIP limits on every queue",
+      "assignee": "Product lead",
+      "sprint": "NOTE Sprint 42",
+      "parent": "NOTE-2",
+      "team": "product"
+    },
+    "U-04": {
+      "unit": "U-04",
+      "issue": "NOTE-13",
+      "how": "confirmed",
+      "status": "Done",
+      "statusCategory": "done",
+      "mapped": "done",
+      "summary": "Add stream stage labels to tracker tickets",
+      "assignee": "App engineer 1",
+      "sprint": "NOTE Sprint 41",
+      "parent": "NOTE-2",
+      "team": "engineering"
+    },
+    "U-05": {
+      "unit": "U-05",
+      "issue": "NOTE-14",
+      "how": "label",
+      "status": "In Progress",
+      "statusCategory": "doing",
+      "mapped": "doing",
+      "summary": "Walk one change end to end",
+      "assignee": "Product lead",
+      "sprint": "NOTE Sprint 42",
+      "parent": "NOTE-2",
+      "team": "product"
+    },
+    "U-06": {
+      "unit": "U-06",
+      "issue": "NOTE-15",
+      "how": "confirmed",
+      "status": "In Review",
+      "statusCategory": "doing",
+      "mapped": "doing",
+      "summary": "Export stage timestamps to flow metrics",
+      "assignee": "Platform engineer 2",
+      "sprint": "NOTE Sprint 42",
+      "parent": "NOTE-2",
+      "team": "platform"
+    },
+    "U-08": {
+      "unit": "U-08",
+      "issue": "NOTE-20",
+      "how": "label",
+      "status": "Selected for Development",
+      "statusCategory": "todo",
+      "mapped": "todo",
+      "summary": "Automate the release checklist",
+      "assignee": "Test engineer 1",
+      "sprint": "NOTE Sprint 42",
+      "parent": "NOTE-3",
+      "team": "quality"
+    },
+    "U-13": {
+      "unit": "U-13",
+      "issue": "NOTE-19",
+      "how": "confirmed",
+      "status": "To Do",
+      "statusCategory": "todo",
+      "mapped": "todo",
+      "summary": "Track hours from PR opened to first review",
+      "parent": "NOTE-3",
+      "team": "engineering"
+    },
+    "U-15": {
+      "unit": "U-15",
+      "issue": "NOTE-24",
+      "how": "label",
+      "status": "Ready for Release",
+      "statusCategory": "done",
+      "mapped": "doing",
+      "summary": "Release notes drafted from merged changes",
+      "assignee": "Release manager",
+      "sprint": "NOTE Sprint 42",
+      "parent": "NOTE-4",
+      "team": "release"
+    },
+    "U-16": {
+      "unit": "U-16",
+      "issue": "NOTE-25",
+      "how": "label",
+      "status": "To Do",
+      "statusCategory": "todo",
+      "mapped": "todo",
+      "summary": "Put lead time on the team dashboard",
+      "parent": "NOTE-4",
+      "team": "platform"
+    },
+    "U-19": {
+      "unit": "U-19",
+      "issue": "NOTE-28",
+      "how": "label",
+      "status": "To Do",
+      "statusCategory": "todo",
+      "mapped": "todo",
+      "summary": "Route support tickets to the idea inbox",
+      "assignee": "Support lead",
+      "parent": "NOTE-4",
+      "team": "support"
+    }
+  },
+  "problems": [
+    "NOTE-29 carries the label de-unit:U-99, but there is no unit U-99"
+  ]
+}

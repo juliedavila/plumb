@@ -1,0 +1,21 @@
+# Every finding a portfolio check of examples/portfolio should report, and nothing else: the working view, built on
+# 2026-11-16. README.md says why each one fires. Subjects are written as namespace:id; a test may compare rule and
+# severity exactly and the subject by its id.
+built: "2026-11-16T10:00:00Z"
+view: working
+findings:
+  - { rule: core/xref-pin-stale, severity: warning, subject: "intake (its pin on premerge 1.0.0)", lists: [premerge:check-runner] }
+  - { rule: portfolio/seam-crossing-declared, severity: error, subject: "inventory:v01" }
+  - { rule: portfolio/seam-crossing-declared, severity: warning, subject: "intake:r08", excepted_by: "org exception on intake:autotriage" }
+  - { rule: portfolio/seam-crossing-declared, severity: warning, subject: "premerge:p12" }
+  - { rule: portfolio/team-over-capacity, severity: error, subject: "org:vuln-mgmt" }
+  - { rule: portfolio/team-over-capacity, severity: warning, subject: "org:product-eng" }
+  - { rule: org/estimate-stale, severity: warning, subject: "org:dev-platform (capacity)" }
+  - { rule: plan/retire-before-replace, severity: error, subject: "inventory:ownership-spreadsheet" }
+  - { rule: plan/retire-before-replace, severity: warning, subject: "inventory:tag-sync-job", clause: order }
+  - { rule: plan/retire-before-replace, severity: warning, subject: "inventory:ownership-macros", clause: dependency }
+# The presenting view composes premerge 1.0.0, so the pin finding is gone there and the other nine stay.
+presenting_drops: [core/xref-pin-stale]
+# The proposed root patch P-005, if accepted, adds exactly this finding, so its verdict is caution.
+P-005_adds:
+  - { rule: portfolio/team-over-capacity, severity: warning, subject: "org:detection-response" }

@@ -1,0 +1,24 @@
+teams:
+  - { id: counter, name: Front counter }
+  - { id: shop, name: Workshop }
+systems:
+  - { id: shopsys, name: Shop }
+zones:
+  - { id: floor, name: Shop floor }
+elements:
+  - { id: customer, name: Customer, kind: person, owner: counter, wait_days: 0, start: true }
+  - { id: intake, name: Intake desk, kind: person, owner: counter, system: shopsys, zone: floor, wait_days: 1 }
+  - { id: queue1, name: Repair queue, kind: queue, owner: shop, wip_limit: 5 }
+  - { id: mechanic, name: Mechanic, kind: person, owner: shop, wait_days: 2 }
+  - { id: pickup, name: Pickup shelf, kind: store, owner: counter, end: true }
+relationships:
+  - { id: r1, from: customer, to: intake, kind: data, carries: [ticket] }
+  - { id: r2, from: intake, to: queue1, kind: handoff }
+  - { id: r3, from: queue1, to: mechanic, kind: control }
+  - { id: r4, from: mechanic, to: pickup, kind: handoff }
+  - { id: r10, from: mechanic, to: intake, kind: feedback, label: questions }
+contracts:
+  - { name: ticket, produced_by: [customer], consumed_by: [intake] }
+views:
+  - { id: v1, title: Whole shop, elements: [customer, intake, queue1, mechanic, pickup] }
+  - { id: v2, title: Counter, elements: [customer, intake], relationships: [r1] }

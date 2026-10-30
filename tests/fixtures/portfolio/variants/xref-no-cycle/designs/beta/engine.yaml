@@ -1,0 +1,9 @@
+name: beta
+title: Beta
+description: The base fixture's waiting design. It takes the spec from alpha.
+schema: "0.4"
+namespace: beta
+root: ../../shared
+packs: [generic, plan, security]
+pins:
+  - { namespace: alpha, version: "1.0.0", sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa }

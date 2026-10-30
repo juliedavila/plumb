@@ -1,0 +1,4 @@
+breaks: "An accepted root patch puts Spec on the never-cross list of the seam alpha-beta, and the crossing s1 still carries Spec across it."
+expect:
+  - { rule: shared/crossing-valid, severity: error, subject: "shared:s1 (crossing)" }
+note: "Spec's producers and consumers are unchanged, so no generic rule reports s1."

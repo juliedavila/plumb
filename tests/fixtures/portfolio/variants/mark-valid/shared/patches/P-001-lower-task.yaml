@@ -1,0 +1,11 @@
+id: P-001
+title: Mark the task feed not security-relevant
+status: accepted
+provenance: { author: person, requested_by: the team A lead, created: "2026-11-03" }
+why: The tasks carry no secrets.
+ops:
+  - op: modify
+    kind: contract
+    id: Task
+    set: { security: { relevant: false } }
+decision: { by: the fixture approver, at: "2026-11-04", reason: Accepted to show the refusal. }

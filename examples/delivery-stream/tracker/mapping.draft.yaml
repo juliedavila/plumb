@@ -1,0 +1,72 @@
+# How this organization's Jira holds the Plumb's concepts. Drafted by `bun plumb.ts tracker draft-mapping`
+# from tracker/inventory.json; every choice below is a proposal with the reason for it. Edit it until it is right:
+# the tracker rule pack checks that everything named here exists in the inventory.
+#
+# The model owns structure (units, phases, dependencies); Jira owns live state (status, assignee, sprint).
+
+adapter: jira
+
+# Projects in the export: NOTE (Notebook app, 24 issues, company-managed); HELP (Help desk, 3 issues, team-managed).
+# NOTE holds the most issues, so units live there.
+project: "NOTE"
+
+# An issue carrying this label plus a unit id (for example de-unit:U-05) is that unit's issue, no confirmation needed.
+unit_label_prefix: "de-unit:"
+# 9 labels with this prefix are already in use.
+
+# phase -> epic | initiative | fix-version | label. `match` maps each phase id to an issue key (epic, initiative),
+# a fix version name, or a label.
+# Chose epic: 3 of 3 phases have an epic with a similar summary.
+# Above the epics sits NOTE-1 "Shorten the delivery stream" (Initiative); it holds the whole plan, so it is not a phase.
+phase:
+  as: epic
+  match:
+    SEE: "NOTE-2"   # "See the delivery stream" for "See the stream"
+    SHORTEN: "NOTE-3"   # "Shorten the stream" for "Shorten it"
+    KEEP: "NOTE-4"   # "Keep the stream short" for "Keep it short"
+
+# unit -> an issue type in the project. Standard-level types in use: Story (14), Task (3), Bug (1), Spike (1).
+# Story is the most used; exported units become Story issues. Existing issues of any standard type can still match.
+unit:
+  issue_type: "Story"
+  project: "NOTE"
+
+# dependency -> a link type and the side of the dependent issue: outward when the dependent issue's link reads
+# like "depends on", inward when it reads like "is blocked by".
+# Link types: Depends on (depends on / is a dependency of, 9 links); Blocks (blocks / is blocked by, 1 links); Relates (relates to / relates to, 1 links); Cloners (clones / is cloned by, 0 links); Duplicate (duplicates / is duplicated by, 0 links).
+# Chose Depends on: a dependency link type of its own, kept apart from Blocks, which teams also use for other reasons.
+dependency:
+  link_type: "Depends on"
+  direction: outward   # the dependent issue depends on the issue it waits on
+
+# owner team -> component | custom-field | project. `match` maps each model team id to the value Jira holds.
+# Candidates: the Delivery team field (customfield_10201), 5 of 7 teams matched; components, 2 of 7 teams matched; the Team field (customfield_10001), 1 of 7 teams matched; projects, 0 of 7 teams matched.
+# Chose the Delivery team field (customfield_10201).
+owner_team:
+  as: custom-field
+  field: "customfield_10201"
+  match:
+    # design: ""   # no value looks like "Design"; values: Product, Platform, App engineering, QA, Release management, Support
+    engineering: "App engineering"   # looks like "Engineering"
+    platform: "Platform"
+    product: "Product"
+    # quality: ""   # no value looks like "Quality"; values: Product, Platform, App engineering, QA, Release management, Support
+    release: "Release management"   # looks like "Release"
+    support: "Support"
+
+# done-condition -> the field that holds a unit's check (its acceptance criteria) on export.
+# Acceptance criteria (customfield_10300) is on 3 issues.
+done_condition:
+  field: "customfield_10300"
+
+# status -> by category or by name, to todo | doing | done. Statuses in use, by category:
+#   To Do: To Do (8), Backlog (3), Open (1), Selected for Development (1)
+#   In Progress: In Progress (5), In Review (1), Waiting for customer (1)
+#   Done: Done (4), Ready for Release (1), Resolved (1), Won't Do (1)
+# Check: "Ready for Release" is in the Done category. If the team does not mean finished by it, switch to by: name and list every status.
+status:
+  by: category
+  map:
+    "To Do": todo
+    "In Progress": doing
+    Done: done

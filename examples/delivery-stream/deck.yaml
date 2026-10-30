@@ -1,0 +1,29 @@
+# Present mode: `bun plumb.ts dev examples/delivery-stream`, then P (or open #present). One leadership template: every
+# slide below is a query over the build, and every status, reason and step on it is computed. Slides speak in outcomes,
+# names and consequences; ids, counts and rule names are in the speaker notes. Only the decisions are written by hand.
+# A query that names something the build does not hold still renders, and the build warns.
+title: "Delivery stream: where it stands"
+subtitle: From a customer's idea to a change in production, for the monthly delivery review
+slides:
+  - template: title
+    notes: Open on where we stand, not on the method. Every colour on the next slides comes with its reason.
+  - template: status
+    notes: Read the current milestone's one reason first. The next one shows the delivery lead's own call, flagged when what it waits on is red; the computed status is in the line above.
+  - template: milestones
+  - template: challenges
+  - template: path
+  - template: risks
+    notes: The suite bet is the one to dwell on. Nobody has compared what the suite catches with what the manual test catches.
+  - template: changes
+  - template: decisions
+    items:
+      - decision: Keep a sampled manual test before deploy until the suite's escaped-defect rate has been measured for a quarter
+        why: Gating deploys on the automated suite rests on the bet that it catches what the manual test catches, and nothing tests that yet.
+        refs: [PR-2, U-09]
+      - decision: Settle which team owns the work-in-progress limit on the sprint backlog
+        why: The plan gives it to Engineering, which owns the sprint backlog; the tracker gives it to Product.
+        refs: [U-03, sprint-backlog]
+      - decision: Accept or reject folding release approval into the deploy gate
+        why: It removes one hand-off and breaks no check, but its verdict asks for review first, because the checklist automation and the deploy gate it relies on are not done, and it moves release approval onto the suite.
+        refs: [P-001]
+    notes: Ask for an owner and a date on each decision before leaving the slide.

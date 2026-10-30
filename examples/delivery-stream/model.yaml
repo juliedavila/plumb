@@ -1,0 +1,319 @@
+# A fictional product team. Person-steps carry wait_days (median days a change waits before the step starts) and
+# work_days (days of work at the step); queues carry wip_limit. Every flow number says where it comes from:
+# flow_source is measured (counted from real changes: the shared sheet of the last ten changes), estimated (the team
+# leads' figure at the stream-mapping workshop) or declared (agreed or written down, no basis given), and flow_as_of is
+# the date. Moves between two teams are kind handoff; moves inside a team are kind work. Each team names its lead (who
+# runs it) by role title; a unit's lead is its owner team's unless the unit names its own.
+teams:
+  - { id: product, name: Product, description: Decides what to build and why., lead: the product lead }
+  - { id: design, name: Design, description: Shapes how a change looks and behaves., lead: the design lead }
+  - { id: engineering, name: Engineering, description: Builds and reviews changes., lead: the engineering manager }
+  - { id: platform, name: Platform, description: Runs the pipeline, the artifact registry and production., lead: the platform engineering lead }
+  - { id: quality, name: Quality, description: Tests changes before release., lead: the quality lead }
+  - { id: release, name: Release, description: Approves releases and publishes release notes., lead: the release manager }
+  - { id: support, name: Support, description: Answers customers and passes on what they report., lead: the support lead }
+systems:
+  - { id: discovery, name: Discovery, description: Turning ideas into agreed change requests. }
+  - { id: delivery, name: Delivery, description: Building, testing and shipping a change. }
+  - { id: operations, name: Operations, description: Running the product and listening to its users. }
+zones:
+  - { id: before-commit, name: Before commitment, description: Work the team has not yet agreed to build. }
+  - { id: committed, name: Committed, description: Work the team has agreed to build and ship. }
+  - { id: live, name: Live, description: What customers use and say. }
+elements:
+  - id: customers
+    name: Customers
+    kind: external-system
+    system: operations
+    zone: live
+    owner: product
+    description: People using the note-taking app. Their ideas start the stream and production is where it ends.
+    attrs: { start: true }
+  - id: idea-inbox
+    name: Idea inbox
+    kind: queue
+    system: discovery
+    zone: before-commit
+    owner: product
+    description: Every idea from customers, support and the team, waiting for triage.
+    rests_on: [PR-1]
+    attrs: { wip_limit: 30, flow_source: declared, flow_as_of: "2026-10-06" }
+  - id: product-triage
+    name: Product triage
+    kind: person
+    system: discovery
+    zone: before-commit
+    owner: product
+    description: The product manager reads new ideas weekly and decides which go on the roadmap.
+    attrs: { wait_days: 5, work_days: 0.5, flow_source: estimated, flow_as_of: "2026-10-01" }
+  - id: roadmap-backlog
+    name: Roadmap backlog
+    kind: queue
+    system: discovery
+    zone: before-commit
+    owner: product
+    description: Accepted ideas waiting for design. Nobody has set a limit, so it only grows.
+    rests_on: [PR-1]
+  - id: design-exploration
+    name: Design exploration
+    kind: person
+    system: discovery
+    zone: before-commit
+    owner: design
+    description: A designer sketches options and tests them with two or three customers.
+    attrs: { wait_days: 4, work_days: 3, flow_source: estimated, flow_as_of: "2026-10-01" }
+  - id: write-change-request
+    name: Write the change request
+    kind: person
+    system: discovery
+    zone: committed
+    owner: product
+    description: Product turns the chosen design into a change request with acceptance criteria.
+    attrs: { wait_days: 2, work_days: 1, flow_source: estimated, flow_as_of: "2026-10-01" }
+  - id: sprint-backlog
+    name: Sprint backlog
+    kind: queue
+    system: delivery
+    zone: committed
+    owner: engineering
+    description: Change requests the team has pulled into the current sprint.
+    rests_on: [PR-1]
+    attrs: { wip_limit: 12, flow_source: declared, flow_as_of: "2026-10-06" }
+  - id: build-change
+    name: Build the change
+    kind: person
+    system: delivery
+    zone: committed
+    owner: engineering
+    verifier: quality
+    description: An engineer writes the code and the tests for one change request.
+    attrs: { wait_days: 1, work_days: 3, flow_source: measured, flow_as_of: "2026-09-30" }
+  - id: code-review
+    name: Code review
+    kind: person
+    system: delivery
+    zone: committed
+    owner: engineering
+    verifier: engineering
+    description: A second engineer reviews the pull request.
+    attrs: { wait_days: 2, work_days: 0.5, flow_source: measured, flow_as_of: "2026-09-30" }
+  - id: ci-pipeline
+    name: CI pipeline
+    kind: service
+    system: delivery
+    zone: committed
+    owner: platform
+    verifier: engineering
+    description: Builds every merged change, runs the unit tests and publishes the build artifact.
+  - id: artifact-registry
+    name: Artifact registry
+    kind: store
+    system: delivery
+    zone: committed
+    owner: platform
+    verifier: engineering
+    description: Holds every build artifact by version.
+  - id: test-suite
+    name: Automated regression suite
+    kind: service
+    system: delivery
+    zone: committed
+    owner: quality
+    verifier: engineering
+    description: End-to-end tests run against each build. Today it covers about a third of the app.
+    rests_on: [PR-2]
+  - id: test-queue
+    name: Test queue
+    kind: queue
+    system: delivery
+    zone: committed
+    owner: quality
+    description: Builds waiting for a tester.
+    rests_on: [PR-1, PR-3]
+    attrs: { wip_limit: 6, flow_source: declared, flow_as_of: "2026-10-06" }
+  - id: manual-test
+    name: Manual regression test
+    kind: person
+    system: delivery
+    zone: committed
+    owner: quality
+    verifier: product
+    description: A tester walks the release checklist on a staging copy.
+    attrs: { wait_days: 3, work_days: 1, flow_source: measured, flow_as_of: "2026-09-30" }
+  - id: release-approval
+    name: Release approval
+    kind: person
+    system: delivery
+    zone: committed
+    owner: release
+    verifier: quality
+    description: The weekly release meeting reads the test report and approves the release.
+    attrs: { wait_days: 4, work_days: 0.5, flow_source: estimated, flow_as_of: "2026-10-01" }
+  - id: deploy-service
+    name: Deploy service
+    kind: service
+    system: delivery
+    zone: committed
+    owner: platform
+    verifier: release
+    description: Rolls an approved build out to production.
+    rests_on: [PR-2]
+  - id: production
+    name: Production
+    kind: service
+    system: operations
+    zone: live
+    owner: platform
+    verifier: release
+    description: The running app.
+    attrs: { end: true }
+  - id: release-notes
+    name: Release notes
+    kind: store
+    system: operations
+    zone: live
+    owner: release
+    description: The public page that says what changed in each release.
+  - id: usage-analytics
+    name: Usage analytics
+    kind: service
+    system: operations
+    zone: live
+    owner: product
+    verifier: platform
+    description: Counts how customers use each feature.
+  - id: ticket-queue
+    name: Support ticket queue
+    kind: queue
+    system: operations
+    zone: live
+    owner: support
+    description: Customer questions and bug reports waiting for an answer.
+    rests_on: [PR-1]
+    attrs: { wip_limit: 40, flow_source: declared, flow_as_of: "2026-10-06" }
+  - id: support-desk
+    name: Support desk
+    kind: person
+    system: operations
+    zone: live
+    owner: support
+    description: Support answers tickets and passes product ideas and bugs on to the idea inbox.
+    rests_on: [PR-5]
+    attrs: { wait_days: 1, flow_source: estimated, flow_as_of: "2026-03-02" }
+  - id: flow-metrics
+    name: Flow metrics
+    kind: service
+    system: operations
+    zone: committed
+    owner: platform
+    verifier: product
+    description: Records when each change enters and leaves each step, so lead time can be measured.
+    rests_on: [PR-4]
+relationships:
+  # the stream, idea to production
+  - { id: h01, from: customers, to: idea-inbox, kind: work, label: Suggests an idea, carries: [IdeaCard] }
+  - { id: h02, from: idea-inbox, to: product-triage, kind: work, label: Triaged weekly, carries: [IdeaCard] }
+  - { id: h03, from: product-triage, to: roadmap-backlog, kind: work, label: Accepted onto the roadmap, carries: [RoadmapItem] }
+  - { id: h04, from: roadmap-backlog, to: design-exploration, kind: handoff, label: Pulled into design, carries: [RoadmapItem] }
+  - { id: h05, from: design-exploration, to: write-change-request, kind: handoff, label: Chosen design, carries: [DesignSpec] }
+  - { id: h06, from: write-change-request, to: sprint-backlog, kind: handoff, label: Committed to a sprint, carries: [ChangeRequest] }
+  - { id: h07, from: sprint-backlog, to: build-change, kind: work, label: Picked up, carries: [ChangeRequest] }
+  - { id: h08, from: build-change, to: code-review, kind: work, label: Pull request, carries: [PullRequest] }
+  - { id: h09, from: code-review, to: ci-pipeline, kind: handoff, label: Merged, carries: [PullRequest] }
+  - { id: h10, from: ci-pipeline, to: artifact-registry, kind: data, label: Publishes the build, carries: [BuildArtifact] }
+  - { id: h11, from: ci-pipeline, to: test-queue, kind: handoff, label: Build ready for test, carries: [BuildArtifact] }
+  - { id: h12, from: test-queue, to: manual-test, kind: work, label: Picked up by a tester, carries: [BuildArtifact] }
+  - { id: h13, from: manual-test, to: release-approval, kind: handoff, label: Test report, carries: [TestReport] }
+  - { id: h14, from: release-approval, to: deploy-service, kind: handoff, label: Approved release, carries: [ReleaseApproval] }
+  - { id: h15, from: deploy-service, to: production, kind: work, label: Rolls out, carries: [BuildArtifact] }
+  - { id: d01, from: artifact-registry, to: deploy-service, kind: data, label: Fetches the approved build, carries: [BuildArtifact] }
+  - { id: d02, from: ci-pipeline, to: test-suite, kind: data, label: Runs end-to-end tests, carries: [BuildArtifact], rests_on: [PR-2] }
+  - { id: d03, from: test-suite, to: manual-test, kind: data, label: Automated results, carries: [TestReport], rests_on: [PR-2] }
+  - { id: d04, from: release-approval, to: release-notes, kind: data, label: Publishes what changed, carries: [ReleaseNote] }
+  - { id: d05, from: release-notes, to: support-desk, kind: data, label: Read before answering, carries: [ReleaseNote] }
+  - { id: d06, from: production, to: usage-analytics, kind: data, label: Usage events, carries: [UsageEvent] }
+  - { id: d07, from: sprint-backlog, to: flow-metrics, kind: data, label: Stage entered, carries: [StageEvent] }
+  - { id: d08, from: deploy-service, to: flow-metrics, kind: data, label: Deployed, carries: [StageEvent] }
+  # the feedback loops
+  - { id: f01, from: manual-test, to: build-change, kind: feedback, label: Defects found in test, carries: [DefectReport] }
+  - { id: f02, from: code-review, to: build-change, kind: feedback, label: Review comments, carries: [ReviewComment] }
+  - { id: f03, from: ci-pipeline, to: build-change, kind: feedback, label: Failing build, carries: [BuildResult] }
+  - { id: f04, from: usage-analytics, to: product-triage, kind: feedback, label: How features are used, carries: [UsageReport] }
+  - { id: f05, from: customers, to: ticket-queue, kind: feedback, label: Questions and bug reports, carries: [SupportTicket] }
+  - { id: f06, from: ticket-queue, to: support-desk, kind: feedback, label: Next ticket, carries: [SupportTicket] }
+  - { id: f07, from: support-desk, to: idea-inbox, kind: feedback, label: Ideas and bugs passed on, carries: [IdeaCard], rests_on: [PR-5] }
+  - { id: f08, from: flow-metrics, to: product-triage, kind: feedback, label: Lead time per change, carries: [LeadTimeReport] }
+contracts:
+  - { name: IdeaCard, description: "An idea: who asked, the problem in their words, how often it comes up.", produced_by: [customers, support-desk, idea-inbox], consumed_by: [idea-inbox, product-triage] }
+  - { name: RoadmapItem, description: An accepted idea with the outcome it should move., produced_by: [product-triage, roadmap-backlog], consumed_by: [roadmap-backlog, design-exploration] }
+  - { name: DesignSpec, description: The chosen design with its flows and the customer quotes behind it., produced_by: [design-exploration], consumed_by: [write-change-request] }
+  - { name: ChangeRequest, description: "What to change, the acceptance criteria and the outcome to measure.", produced_by: [write-change-request, sprint-backlog], consumed_by: [sprint-backlog, build-change] }
+  - { name: PullRequest, description: The code change with its tests and a link to the change request., produced_by: [build-change, code-review], consumed_by: [code-review, ci-pipeline] }
+  - { name: BuildArtifact, description: A versioned build of the app with its commit and test results., produced_by: [ci-pipeline, artifact-registry, test-queue, deploy-service], consumed_by: [artifact-registry, test-queue, test-suite, manual-test, deploy-service, production] }
+  - { name: TestReport, description: "What was tested, what passed, and the open defects.", produced_by: [test-suite, manual-test], consumed_by: [manual-test, release-approval] }
+  - { name: ReleaseApproval, description: The release meeting's go for one build version., produced_by: [release-approval], consumed_by: [deploy-service] }
+  - { name: ReleaseNote, description: What changed in a release, in customers' words., produced_by: [release-approval, release-notes], consumed_by: [release-notes, support-desk] }
+  - { name: UsageEvent, description: One use of one feature., produced_by: [production], consumed_by: [usage-analytics] }
+  - { name: UsageReport, description: Weekly use per feature against the outcome each change promised., produced_by: [usage-analytics], consumed_by: [product-triage] }
+  - { name: SupportTicket, description: A customer's question or bug report., produced_by: [customers, ticket-queue], consumed_by: [ticket-queue, support-desk] }
+  - { name: DefectReport, description: A defect found in test with the steps to reproduce it., produced_by: [manual-test], consumed_by: [build-change] }
+  - { name: ReviewComment, description: A reviewer's comments on a pull request., produced_by: [code-review], consumed_by: [build-change] }
+  - { name: BuildResult, description: A failed build or test run with its log., produced_by: [ci-pipeline], consumed_by: [build-change] }
+  - { name: StageEvent, description: A change entering or leaving a step, with a timestamp., produced_by: [sprint-backlog, deploy-service], consumed_by: [flow-metrics] }
+  - { name: LeadTimeReport, description: Lead time per change and the wait at each step., produced_by: [flow-metrics], consumed_by: [product-triage] }
+# What the design rests on. Each claim is graded: evidence (measured or published), inference (reasoned from evidence),
+# judgment (a person's call) or untested. Parts, relationships, units and gates name the claims they rest on in
+# rests_on; the Strategy page shows what would be in question if one were false (bun plumb.ts premise <instance> <id>).
+claims:
+  - id: PR-1
+    kind: premise
+    statement: Most of a change's lead time is waiting in queues and backlogs, not work being done on it.
+    grade: inference
+    source: "Value-stream mapping practice (flow efficiency in knowledge work is usually reported well under half), and this map's own numbers: 21 days of waiting at seven person-steps against about ten days of work, some measured and some estimated."
+    fallback: "If most of the time is work, shortening the stream means faster build and test: the plan moves weight to the preview environment (U-12) and test automation, and the queue limits matter less."
+    tested_by: [U-02, U-06]
+    measured_by: { metric: wait-share, above: 0.5 }   # the flow measure that can regrade it; a person makes the call
+  - id: PR-2
+    kind: premise
+    statement: The automated suite can catch the defects that the manual test and the release meeting catch today.
+    grade: untested
+    source: "The delivery lead's expectation. The suite covers about a third of the app today, and no one has compared what it catches with what the manual test catches."
+    fallback: Keep a sampled manual test before deploy until the suite's escaped-defect rate has been measured for a quarter.
+  - id: PR-3
+    kind: assumption
+    statement: Teams hold a work-in-progress limit once it is visible on the board.
+    grade: judgment
+    source: The team leads, at the stream-mapping workshop.
+    fallback: An alert pages the owning lead when a queue passes its limit (U-18).
+  - id: PR-4
+    kind: premise
+    statement: Lead time from an accepted idea to production is a fair measure of how well the stream works.
+    grade: judgment
+    source: The delivery lead and the product lead, agreed when the lead-time target was set.
+    fallback: Measure change failure rate beside lead time, so a faster stream that breaks more shows up.
+  - id: PR-5
+    kind: assumption
+    statement: Support tickets carry ideas worth triaging, not only bugs.
+    grade: untested
+    source: The support lead's impression from the last two quarters.
+    fallback: Route only feature requests to the idea inbox and keep bug reports with the support desk.
+  - id: PR-6
+    kind: claim
+    statement: Shortening the stream means removing hand-offs more than speeding up any one step.
+    grade: inference
+    source: "Follows from PR-1: if the time is in the waits, and the waits sit at hand-offs, fewer hand-offs remove the most time."
+    rests_on: [PR-1]
+views:
+  - id: stream
+    title: The stream, idea to production
+    description: Every step a change passes through, from a customer's idea to production, and the team that owns each hand-off.
+    elements: [customers, idea-inbox, product-triage, roadmap-backlog, design-exploration, write-change-request, sprint-backlog, build-change, code-review, ci-pipeline, artifact-registry, test-queue, manual-test, release-approval, deploy-service, production]
+  - id: feedback
+    title: The feedback loops
+    description: How what happens in production comes back to the people who decide what to build next.
+    elements: [customers, production, usage-analytics, ticket-queue, support-desk, idea-inbox, product-triage, flow-metrics, build-change, code-review, ci-pipeline, manual-test]
+    relationships: [d06, f01, f02, f03, f04, f05, f06, f07, f08]
+  - id: release
+    title: From merge to release
+    description: What happens to a merged change before customers have it, including the weekly release approval.
+    elements: [ci-pipeline, artifact-registry, test-suite, test-queue, manual-test, release-approval, deploy-service, production, release-notes, support-desk]

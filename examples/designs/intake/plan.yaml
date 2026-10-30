@@ -1,0 +1,162 @@
+# Findings intake's plan: three milestones with targets. Every unit carries a flow item; progress.yaml holds today's
+# status and one override. Capabilities that cross are named bare and resolve to the shared layer: cap.asset-owners
+# (provided by Asset inventory cleanup, declared by the organization in patches/P-002), cap.classes-published and
+# cap.stamps-accepted (provided here, required by Pre-merge checks). `relieves` marks the manual work a unit takes
+# away (a kind from manual-work.yaml), resting on a premise.
+phases:
+  - id: M1
+    order: 1
+    name: Every scanner reports into intake
+    exit_test: Every code scanner and every pen-test report lands in the finding queue as one record per finding, and each team sees its own findings there.
+    delivers: One queue for every finding, fed by every scanner and every pen test.
+    means: We can count open findings per team from one place instead of five.
+    target: "2026-12-11"
+    accountable: the head of security engineering
+    lead: the AppSec platform lead
+  - id: M2
+    order: 2
+    name: Findings flow into one queue
+    exit_test: Repeats fold into one finding, each finding reaches its owning team without a person routing it, and analysts work from the agent's drafts.
+    delivers: Findings routed to their owners with a drafted triage, and repeats folded away.
+    means: Analysts spend their time on new findings, not on repeats and routing.
+    target: "2027-01-29"
+    accountable: the head of security engineering
+    lead: the vulnerability management lead
+  - id: M3
+    order: 3
+    name: Proven classes stop repeats
+    exit_test: The first five proven classes run in pre-merge checks, their merge stamps land in the ledger, and no proven class has come back as a new finding for a month.
+    delivers: Classes of finding that keep coming back are proven and stopped at merge.
+    means: A finding fixed once stays fixed, and the triage of repeats can stop.
+    target: "2027-04-30"
+    accountable: the head of security engineering
+    lead: the AppSec platform lead
+units:
+  # ── Every scanner reports into intake ──
+  - id: U-01
+    title: Normalize the code scanners' output
+    kind: code
+    phase: M1
+    elements: [{ id: normalizer, from: none, to: built }]
+    provides: [cap.normalized]
+    check: Findings from every code scanner arrive in one record format, and a sample of 50 matches the scanners' own counts.
+    flow_item: feature
+  - id: U-02
+    title: Take pen-test reports in
+    kind: code
+    phase: M1
+    elements: [{ id: normalizer, from: built, to: built }]
+    requires: [cap.normalized]
+    provides: [cap.reports-in]
+    check: The last three pen-test reports appear in the queue as one finding per issue they list.
+    flow_item: feature
+  - id: U-03
+    title: Fold repeats into one finding
+    kind: code
+    phase: M1
+    elements: [{ id: dedup, from: none, to: stand-in }]
+    requires: [cap.normalized]
+    provides: [cap.deduplicated]
+    check: Two scanners reporting the same flaw in the same file make one finding, not two.
+    flow_item: feature
+  - id: U-04
+    title: Stand up the finding queue
+    kind: code
+    phase: M1
+    elements: [{ id: finding-queue, from: none, to: built }]
+    provides: [cap.queue]
+    check: The queue holds every open finding, split by owning team, and each team lead can open their part of it.
+    flow_item: feature
+  - id: U-05
+    title: Move open findings from the old trackers
+    kind: migration
+    phase: M1
+    elements: [{ id: finding-queue, from: built, to: built }]
+    requires: [cap.queue]
+    provides: [cap.history-moved]
+    check: Every finding open in the old trackers is in the queue with its first-seen date, and the old trackers are read-only.
+    flow_item: feature
+  - id: U-06
+    title: Agree severity rules for the queue
+    kind: agreement
+    phase: M1
+    owner: vuln-mgmt
+    provides: [cap.severity-rules]
+    check: One page of severity rules, signed by the vulnerability management lead and the security risk owner.
+    flow_item: risk
+  - id: U-07
+    title: Give each team a view of its queue
+    kind: code
+    phase: M1
+    elements: [{ id: finding-queue, from: built, to: built }]
+    requires: [cap.queue, cap.severity-rules]
+    check: Each team lead opens a view of their own findings, ordered by the agreed severity.
+    flow_item: feature
+  # ── Findings flow into one queue ──
+  - id: U-08
+    title: Route findings by asset owner
+    kind: code
+    phase: M2
+    elements: [{ id: dedup, from: stand-in, to: built }]
+    requires: [cap.deduplicated, cap.asset-owners]
+    provides: [cap.routed]
+    check: Nine findings in ten reach their owning team with no person routing them, by the asset inventory's owners.
+    flow_item: feature
+  - id: U-09
+    title: Triage agent drafts severity and owner
+    kind: code
+    phase: M2
+    rests_on: [IN-2]
+    elements: [{ id: triage-agent, from: none, to: built }, { id: triage-hints, from: none, to: built }]
+    requires: [cap.queue, cap.severity-rules]
+    provides: [cap.drafts]
+    check: Every new finding has a drafted severity and owner within an hour, and analysts accept or edit each draft.
+    flow_item: feature
+    relieves: [{ manual_work: finding-triage, effect: reduce, rests_on: IN-2 }]
+  - id: U-10
+    title: Drop per-scanner severity rules
+    kind: code
+    phase: M2
+    rests_on: [IN-3]
+    elements: [{ id: normalizer, from: built, to: built }]
+    requires: [cap.severity-rules]
+    check: The scanners run with their default severities, and the normalizer's one mapping sets every finding's severity.
+    flow_item: debt
+    relieves: [{ manual_work: rule-tuning, effect: reduce, rests_on: IN-3 }]
+  # ── Proven classes stop repeats ──
+  - id: U-11
+    title: Prove the first finding classes
+    kind: code
+    phase: M3
+    elements: [{ id: class-registry, from: none, to: built }, { id: class-oracle, from: none, to: built }]
+    requires: [cap.drafts]
+    provides: [cap.classes-proven]
+    check: Five classes each have a rule, fixtures and an expected outcome, and the security risk owner has accepted each one.
+    flow_item: risk
+  - id: U-12
+    title: Publish proven classes to pre-merge checks
+    kind: code
+    phase: M3
+    elements: [{ id: class-registry, from: built, to: built }]
+    requires: [cap.classes-proven]
+    provides: [cap.classes-published]
+    check: Pre-merge checks receives each accepted class within a day, without its expected outcome.
+    flow_item: risk
+  - id: U-13
+    title: Record signed merge stamps
+    kind: code
+    phase: M3
+    elements: [{ id: merge-ledger, from: none, to: built }]
+    provides: [cap.stamps-accepted]
+    check: The merge ledger keeps every stamp it receives and rejects one whose signature does not verify.
+    flow_item: risk
+  - id: U-14
+    title: Retire manual triage of repeat findings
+    kind: agreement
+    phase: M3
+    owner: vuln-mgmt
+    rests_on: [IN-4]
+    requires: [cap.classes-published]
+    check: The triage desk stops triaging findings of a proven class, and the vulnerability management lead signs the change.
+    flow_item: risk
+    relieves: [{ manual_work: finding-triage, effect: retire, rests_on: IN-4 }]

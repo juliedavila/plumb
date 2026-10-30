@@ -1,0 +1,10 @@
+kind: root
+name: fixture-root
+title: Fixture root
+schema: "0.4"
+approver: the fixture approver
+estimates:
+  stale_after_days: 90
+shared_from:
+  editions: []
+  sha256: 206c8040cd620a5152190a14e12f3168e73083af2c1eb0a5f3142083b252f0e3

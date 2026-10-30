@@ -1,0 +1,6 @@
+id: p3
+title: Remove the intake desk
+status: proposed
+why: Customers could hand bikes straight to the queue.
+ops:
+  - { op: remove, kind: element, id: intake }

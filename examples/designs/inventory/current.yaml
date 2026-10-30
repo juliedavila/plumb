@@ -1,0 +1,47 @@
+# Where Asset inventory cleanup's parts stand today, part by part. Local, like progress: never
+# written by an importer and never frozen into an edition. The investigation pod writes records with `found` alone,
+# which makes them discovered; a person confirms one with `confirmed`. Three records here are confirmed and four are
+# discovered. A part that exists only today is declared with `add:`, naming a system this design places parts in.
+parts:
+  # ── confirmed ──
+  alert-enrichment:
+    baseline: existing-tool
+    disposition: transition
+    found: { by: "agent:current-state-scout", from: "the alert pipeline's configuration", as_of: "2026-10-27", confidence: high }
+    confirmed: { by: the detection and response lead, at: "2026-11-03" }
+  legacy-cmdb-export:
+    add: { name: Legacy CMDB export, kind: export, system: inventory, owner: governance-risk }
+    baseline: existing-tool
+    disposition: replace
+    replaced_by: asset-list
+    found: { by: "agent:current-state-scout", from: "the scheduler's job list", as_of: "2026-10-27", confidence: high }
+    confirmed: { by: the governance and risk lead, at: "2026-11-04" }
+  ownership-spreadsheet:
+    add: { name: Ownership spreadsheet, kind: document, system: inventory, owner: governance-risk }
+    baseline: existing-tool
+    disposition: replace
+    replaced_by: ownership-api
+    found: { by: "agent:current-state-scout", from: the shared drive index, as_of: "2026-10-27", confidence: medium }
+    confirmed: { by: the governance and risk lead, at: "2026-11-04" }
+  # ── discovered, not yet confirmed ──
+  repo-crawler:
+    baseline: stand-in
+    disposition: transition
+    found: { by: "agent:current-state-scout", from: "the crawler's job definitions", as_of: "2026-10-27", confidence: medium }
+  scan-scripts:
+    add: { name: Nightly scan scripts, kind: job, system: inventory, owner: dev-platform }
+    baseline: built
+    disposition: retire
+    found: { by: "agent:current-state-scout", from: "the scheduler's job list", as_of: "2026-10-27", confidence: high }
+  tag-sync-job:
+    add: { name: Cloud tag sync job, kind: job, system: inventory, owner: dev-platform }
+    baseline: built
+    disposition: replace
+    replaced_by: reconciler
+    found: { by: "agent:current-state-scout", from: "the cloud account's automation list", as_of: "2026-11-03", confidence: medium }
+  ownership-macros:
+    add: { name: Ownership macros, kind: script, system: inventory, owner: governance-risk }
+    baseline: built
+    disposition: replace
+    replaced_by: reconciler
+    found: { by: "agent:current-state-scout", from: the shared workbook, as_of: "2026-11-03", confidence: low }

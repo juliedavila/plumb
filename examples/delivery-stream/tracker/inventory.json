@@ -1,0 +1,542 @@
+{
+  "adapter": "jira",
+  "flavor": "cloud",
+  "issues": 27,
+  "projects": [
+    {
+      "key": "HELP",
+      "name": "Help desk",
+      "style": "team-managed",
+      "issues": 3
+    },
+    {
+      "key": "NOTE",
+      "name": "Notebook app",
+      "style": "company-managed",
+      "issues": 24
+    }
+  ],
+  "issueTypes": [
+    {
+      "id": "10005",
+      "name": "Initiative",
+      "level": 2,
+      "subtask": false,
+      "count": 1
+    },
+    {
+      "id": "10000",
+      "name": "Epic",
+      "level": 1,
+      "subtask": false,
+      "count": 3
+    },
+    {
+      "id": "10101",
+      "name": "Epic",
+      "level": 1,
+      "subtask": false,
+      "project": "HELP",
+      "count": 0
+    },
+    {
+      "id": "10004",
+      "name": "Bug",
+      "level": 0,
+      "subtask": false,
+      "count": 1
+    },
+    {
+      "id": "10006",
+      "name": "Spike",
+      "level": 0,
+      "subtask": false,
+      "count": 1
+    },
+    {
+      "id": "10001",
+      "name": "Story",
+      "level": 0,
+      "subtask": false,
+      "count": 14
+    },
+    {
+      "id": "10002",
+      "name": "Task",
+      "level": 0,
+      "subtask": false,
+      "count": 3
+    },
+    {
+      "id": "10100",
+      "name": "Task",
+      "level": 0,
+      "subtask": false,
+      "project": "HELP",
+      "count": 3
+    },
+    {
+      "id": "10003",
+      "name": "Sub-task",
+      "level": -1,
+      "subtask": true,
+      "count": 1
+    }
+  ],
+  "hierarchy": [
+    {
+      "level": 2,
+      "types": [
+        "Initiative"
+      ],
+      "count": 1
+    },
+    {
+      "level": 1,
+      "types": [
+        "Epic"
+      ],
+      "count": 3
+    },
+    {
+      "level": 0,
+      "types": [
+        "Bug",
+        "Spike",
+        "Story",
+        "Task"
+      ],
+      "count": 22
+    },
+    {
+      "level": -1,
+      "types": [
+        "Sub-task"
+      ],
+      "count": 1
+    }
+  ],
+  "fields": [
+    {
+      "id": "customfield_10300",
+      "name": "Acceptance criteria",
+      "role": "acceptance",
+      "type": "string",
+      "custom": true,
+      "count": 3
+    },
+    {
+      "id": "description",
+      "name": "Description",
+      "role": "description",
+      "type": "string",
+      "custom": false,
+      "count": 1
+    },
+    {
+      "id": "customfield_10014",
+      "name": "Epic Link",
+      "role": "epic-link",
+      "type": "any",
+      "custom": true,
+      "count": 0
+    },
+    {
+      "id": "customfield_10011",
+      "name": "Epic Name",
+      "role": "epic-name",
+      "type": "string",
+      "custom": true,
+      "count": 0
+    },
+    {
+      "id": "customfield_10400",
+      "name": "Stream stage",
+      "role": "other",
+      "type": "option",
+      "custom": true,
+      "count": 1,
+      "values": [
+        {
+          "name": "Delivery",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "parent",
+      "name": "Parent",
+      "role": "parent",
+      "type": "issuelink",
+      "custom": false,
+      "count": 21
+    },
+    {
+      "id": "customfield_10020",
+      "name": "Sprint",
+      "role": "sprint",
+      "type": "array",
+      "custom": true,
+      "count": 11
+    },
+    {
+      "id": "customfield_10015",
+      "name": "Start date",
+      "role": "start-date",
+      "type": "date",
+      "custom": true,
+      "count": 0
+    },
+    {
+      "id": "customfield_10026",
+      "name": "Story Points",
+      "role": "story-points",
+      "type": "number",
+      "custom": true,
+      "count": 16
+    },
+    {
+      "id": "customfield_10016",
+      "name": "Story point estimate",
+      "role": "story-points",
+      "type": "number",
+      "custom": true,
+      "count": 3
+    },
+    {
+      "id": "customfield_10201",
+      "name": "Delivery team",
+      "role": "team",
+      "type": "option",
+      "custom": true,
+      "count": 24,
+      "values": [
+        {
+          "name": "Product",
+          "count": 8
+        },
+        {
+          "name": "Platform",
+          "count": 6
+        },
+        {
+          "name": "App engineering",
+          "count": 5
+        },
+        {
+          "name": "QA",
+          "count": 2
+        },
+        {
+          "name": "Release management",
+          "count": 2
+        },
+        {
+          "name": "Support",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "customfield_10001",
+      "name": "Team",
+      "role": "team",
+      "type": "team",
+      "custom": true,
+      "count": 2,
+      "values": [
+        {
+          "name": "Platform squad",
+          "count": 1
+        },
+        {
+          "name": "Web squad",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "linkTypes": [
+    {
+      "id": "10100",
+      "name": "Depends on",
+      "inward": "is a dependency of",
+      "outward": "depends on",
+      "count": 9
+    },
+    {
+      "id": "10000",
+      "name": "Blocks",
+      "inward": "is blocked by",
+      "outward": "blocks",
+      "count": 1
+    },
+    {
+      "id": "10003",
+      "name": "Relates",
+      "inward": "relates to",
+      "outward": "relates to",
+      "count": 1
+    },
+    {
+      "id": "10001",
+      "name": "Cloners",
+      "inward": "is cloned by",
+      "outward": "clones",
+      "count": 0
+    },
+    {
+      "id": "10002",
+      "name": "Duplicate",
+      "inward": "is duplicated by",
+      "outward": "duplicates",
+      "count": 0
+    }
+  ],
+  "statuses": [
+    {
+      "id": "10001",
+      "name": "To Do",
+      "category": "todo",
+      "categoryName": "To Do",
+      "count": 8
+    },
+    {
+      "id": "10000",
+      "name": "Backlog",
+      "category": "todo",
+      "categoryName": "To Do",
+      "count": 3
+    },
+    {
+      "id": "10100",
+      "name": "Open",
+      "category": "todo",
+      "categoryName": "To Do",
+      "count": 1
+    },
+    {
+      "id": "10002",
+      "name": "Selected for Development",
+      "category": "todo",
+      "categoryName": "To Do",
+      "count": 1
+    },
+    {
+      "id": "3",
+      "name": "In Progress",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 5
+    },
+    {
+      "id": "10003",
+      "name": "In Review",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 1
+    },
+    {
+      "id": "10101",
+      "name": "Waiting for customer",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 1
+    },
+    {
+      "id": "10008",
+      "name": "In Test",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 0
+    },
+    {
+      "id": "10007",
+      "name": "Ready for Test",
+      "category": "doing",
+      "categoryName": "In Progress",
+      "count": 0
+    },
+    {
+      "id": "10005",
+      "name": "Done",
+      "category": "done",
+      "categoryName": "Done",
+      "count": 4
+    },
+    {
+      "id": "10004",
+      "name": "Ready for Release",
+      "category": "done",
+      "categoryName": "Done",
+      "count": 1
+    },
+    {
+      "id": "10102",
+      "name": "Resolved",
+      "category": "done",
+      "categoryName": "Done",
+      "count": 1
+    },
+    {
+      "id": "10006",
+      "name": "Won't Do",
+      "category": "done",
+      "categoryName": "Done",
+      "count": 1
+    }
+  ],
+  "components": [
+    {
+      "name": "Flow metrics",
+      "count": 4,
+      "project": "NOTE"
+    },
+    {
+      "name": "Pipeline",
+      "count": 4,
+      "project": "NOTE"
+    },
+    {
+      "name": "Web editor",
+      "count": 2,
+      "project": "NOTE"
+    },
+    {
+      "name": "Release",
+      "count": 1,
+      "project": "NOTE"
+    },
+    {
+      "name": "Support tooling",
+      "count": 1,
+      "project": "NOTE"
+    }
+  ],
+  "labels": [
+    {
+      "name": "stream",
+      "count": 3
+    },
+    {
+      "name": "customer-request",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-01",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-02",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-03",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-05",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-08",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-15",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-16",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-19",
+      "count": 1
+    },
+    {
+      "name": "de-unit:U-99",
+      "count": 1
+    },
+    {
+      "name": "tech-debt",
+      "count": 1
+    }
+  ],
+  "fixVersions": [
+    {
+      "name": "2026.10",
+      "count": 5,
+      "released": false
+    },
+    {
+      "name": "2026.11",
+      "count": 4,
+      "released": false
+    },
+    {
+      "name": "2026.09",
+      "count": 3,
+      "released": true
+    },
+    {
+      "name": "2026.12",
+      "count": 3,
+      "released": false
+    }
+  ],
+  "containers": [
+    {
+      "key": "NOTE-1",
+      "type": "Initiative",
+      "level": 2,
+      "summary": "Shorten the delivery stream",
+      "children": 3
+    },
+    {
+      "key": "NOTE-2",
+      "type": "Epic",
+      "level": 1,
+      "summary": "See the delivery stream",
+      "parent": "NOTE-1",
+      "children": 8
+    },
+    {
+      "key": "NOTE-3",
+      "type": "Epic",
+      "level": 1,
+      "summary": "Shorten the stream",
+      "parent": "NOTE-1",
+      "children": 6
+    },
+    {
+      "key": "NOTE-4",
+      "type": "Epic",
+      "level": 1,
+      "summary": "Keep the stream short",
+      "parent": "NOTE-1",
+      "children": 3
+    }
+  ],
+  "notes": [
+    "HELP is a team-managed project: its issue types, statuses and fields are its own, and its estimate field is usually \"Story point estimate\", not \"Story Points\".",
+    "The hierarchy has a level above Epic: Initiative (level 2).",
+    "Epic Link (customfield_10014) is defined but no issue uses it: issues reach their epic through Parent, as on Jira Cloud.",
+    "2 fields look like a team: Delivery team (customfield_10201, on 24 issues), Team (customfield_10001, on 2 issues). The mapping must pick one.",
+    "Estimates live in 2 fields: Story Points (customfield_10026), Story point estimate (customfield_10016).",
+    "\"Ready for Release\" is in the Done category; if the team does not mean finished by it, map statuses by name."
+  ],
+  "source": {
+    "dir": "../../tests/fixtures/jira-delivery",
+    "files": [
+      "field.json",
+      "issueLinkType.json",
+      "issuetype.json",
+      "project.json",
+      "search-1.json",
+      "search-2.json",
+      "serverInfo.json",
+      "status.json"
+    ]
+  }
+}

@@ -1,0 +1,3 @@
+breaks: "Beta names the root shared2, a copy of the portfolio's root, so the two designs in one portfolio name different roots."
+expect:
+  - { rule: portfolio/one-root, severity: error, subject: "beta (root)" }

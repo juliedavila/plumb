@@ -1,0 +1,253 @@
+phases:
+  - id: SEE
+    order: 1
+    name: See the stream
+    accountable: the delivery lead
+    lead: the delivery lead   # who owns delivering it; accountable decides its status
+    exit_test: "Every step on the stream map names its owner, every person-step shows its wait in days and every queue its WIP limit, and the team has walked one real change from idea to production against the map."
+    delivers: A map of the stream that names every step's owner, wait and work-in-progress limit, checked against one real change.
+    means: We can say where a change's lead time goes, with numbers, instead of guessing.
+    target: "2026-10-30"
+  - id: SHORTEN
+    rests_on: [PR-6]
+    order: 2
+    name: Shorten it
+    accountable: the delivery lead
+    lead: the platform engineering lead
+    exit_test: "Median lead time from an accepted idea to production is under 15 days for four weeks in a row, and no change crosses more than five team handoffs."
+    delivers: Changes reach production in under 15 days at the median, crossing at most five team hand-offs.
+    means: Customers get what they asked for in weeks rather than quarters, and we can commit to a lead-time target.
+    target: "2027-01-29"
+    flow_target: { lead_days: 15, handoffs: 5 }   # the exit test's numbers, for the deck's flow line
+    # A person's call beside the computed status: shown as an override, and the speaker notes say when the computed one differs.
+    override:
+      status: green
+      reason: On course. Platform has committed to finish the timestamp export in the first week of November, before any of this milestone's work needs it.
+      date: "2026-10-20"
+      by: the delivery lead
+      review_by: "2026-11-06"   # the export is due in the first week of November: look again then
+  - id: KEEP
+    rests_on: [PR-4]
+    order: 3
+    name: Keep it short
+    accountable: the delivery lead
+    lead: the product lead
+    exit_test: "Lead time and handoff counts sit on the team dashboard, the retro reviews them every sprint, and both have stayed inside target for a full quarter."
+    delivers: Lead time and hand-offs on the team dashboard, reviewed every sprint and inside target for a full quarter.
+    means: The shorter stream holds without a project to defend it, so lead time can be promised as a standing service level.
+    target: "2027-04-30"
+units:
+  # ── See the stream ──
+  - id: U-01
+    title: Name an owner for every step
+    kind: agreement
+    phase: SEE
+    provides: [cap.owners-named]
+    check: "The stream map lists one owning team for each of its steps, and each team lead has confirmed their steps."
+    owner: product
+    feedback: minutes
+    status: done
+  - id: U-02
+    title: Record the wait at each step
+    kind: measurement
+    phase: SEE
+    elements: [{ id: flow-metrics, from: none, to: stand-in }]
+    requires: [cap.owners-named]
+    provides: [cap.wait-recorded]
+    check: "A shared sheet holds the date each of the last ten changes entered and left every step."
+    asserts: [{ every: person, has: wait_days }]
+    feedback: several-runs
+    status: done
+  - id: U-03
+    rests_on: [PR-1, PR-3]
+    title: Set a WIP limit on every queue
+    kind: agreement
+    phase: SEE
+    elements: [{ id: sprint-backlog, from: none, to: stand-in }]
+    requires: [cap.owners-named]
+    provides: [cap.wip-limits]
+    check: "Each queue on the map shows a number its owning team agreed, written on the board above it."
+    # what being done claims about the model: every queue carries a WIP limit (the plan pack checks it)
+    asserts: [{ every: queue, has: wip_limit }]
+    feedback: next-run
+    status: done
+  - id: U-04
+    title: Tag tickets with their stream stage
+    kind: code
+    phase: SEE
+    elements: [{ id: sprint-backlog, from: stand-in, to: existing-tool }]
+    requires: [cap.owners-named]
+    provides: [cap.stage-tags]
+    check: "Every ticket in the tracker carries a stage label, and a saved query shows zero tickets without one."
+    feedback: minutes
+    status: done
+  - id: U-05
+    title: Walk one change from idea to production
+    lead: the delivery lead   # over Product's lead: the walk crosses every team
+    kind: measurement
+    phase: SEE
+    requires: [cap.wait-recorded]
+    provides: [cap.baseline-lead-time]
+    check: "One change's journey is written up with the days it spent working and waiting at each step, and the whole team has read it."
+    owner: product
+    feedback: weeks
+    status: doing
+  - id: U-06
+    due: "2026-10-09"
+    title: Export stage timestamps to flow metrics
+    kind: code
+    phase: SEE
+    elements: [{ id: flow-metrics, from: stand-in, to: existing-tool }, { id: deploy-service, from: existing-tool, to: built }]
+    requires: [cap.stage-tags, cap.wait-recorded]
+    provides: [cap.live-lead-time]
+    check: "The flow metrics page shows lead time per change computed from tracker and deploy timestamps, matching the sheet for the last ten changes."
+    feedback: minutes
+  - id: U-07
+    rests_on: [PR-4]
+    title: Agree the lead-time target
+    kind: agreement
+    phase: SEE
+    requires: [cap.baseline-lead-time]
+    provides: [cap.lead-time-target]
+    check: "Product, engineering and release have signed one target lead time, written beside the baseline."
+    owner: product
+    feedback: next-run
+  # ── Shorten it ──
+  - id: U-08
+    rests_on: [PR-2]
+    title: Automate the release checklist
+    lead: the test automation engineer
+    kind: code
+    phase: SHORTEN
+    elements: [{ id: test-suite, from: existing-tool, to: built }]
+    requires: [cap.lead-time-target]
+    provides: [cap.automated-regression]
+    check: "Every item on the manual release checklist has an automated test, and the suite runs on each build in under 20 minutes."
+    feedback: minutes
+  - id: U-09
+    rests_on: [PR-2]
+    title: Gate deploys on the automated suite
+    kind: code
+    phase: SHORTEN
+    elements: [{ id: ci-pipeline, from: existing-tool, to: built }]
+    requires: [cap.automated-regression]
+    provides: [cap.deploy-gate]
+    check: "A build with a failing end-to-end test cannot be deployed; trying it in staging shows the refusal."
+    feedback: minutes
+    verifier: quality
+  - id: U-10
+    rests_on: [PR-2, PR-6]
+    title: Retire the weekly release meeting
+    kind: agreement
+    phase: SHORTEN
+    requires: [cap.deploy-gate]
+    provides: [cap.no-release-meeting]
+    check: "The release team agrees in writing that a green deploy gate replaces their approval, and the meeting is off the calendar."
+    owner: release
+    feedback: weeks
+  - id: U-11
+    rests_on: [PR-6]
+    title: Pair design and product on change requests
+    kind: agreement
+    phase: SHORTEN
+    requires: [cap.lead-time-target]
+    provides: [cap.joint-spec]
+    check: "The last five change requests were written by a designer and a product manager together, with no separate design handoff."
+    owner: design
+    feedback: several-runs
+  - id: U-12
+    title: Preview environment for each pull request
+    kind: code
+    phase: SHORTEN
+    elements: [{ id: ci-pipeline, from: built, to: built }]
+    requires: [cap.lead-time-target]
+    provides: [cap.preview-envs]
+    check: "Opening a pull request posts a link to a running copy of the app with that change."
+    feedback: minutes
+  - id: U-13
+    title: Measure review time per pull request
+    kind: measurement
+    phase: SHORTEN
+    requires: [cap.live-lead-time]
+    provides: [cap.review-time-measured]
+    check: "Flow metrics shows the hours from pull request opened to first review for every pull request this month."
+    owner: engineering
+    feedback: next-run
+  - id: U-14
+    title: Review within one working day
+    kind: agreement
+    phase: SHORTEN
+    requires: [cap.review-time-measured, cap.preview-envs]
+    provides: [cap.review-sla]
+    check: "Ninety percent of pull requests get a first review within one working day, for four weeks running."
+    owner: engineering
+    feedback: weeks
+  - id: U-15
+    title: Draft release notes from merged changes
+    lead: the technical writer
+    kind: code
+    phase: SHORTEN
+    elements: [{ id: release-notes, from: stand-in, to: built }]
+    requires: [cap.deploy-gate]
+    provides: [cap.auto-release-notes]
+    check: "Each deploy publishes a release note drafted from the merged change requests, and support reads it before the next shift."
+    feedback: next-run
+  # ── Keep it short ──
+  - id: U-16
+    rests_on: [PR-4]
+    title: Put lead time on the team dashboard
+    kind: measurement
+    phase: KEEP
+    elements: [{ id: flow-metrics, from: existing-tool, to: built }]
+    requires: [cap.live-lead-time, cap.no-release-meeting]
+    provides: [cap.lead-time-dashboard]
+    check: "The team dashboard shows lead time and handoffs per change, updated within an hour of each deploy."
+    feedback: minutes
+  - id: U-17
+    title: Review the stream in every retro
+    kind: agreement
+    phase: KEEP
+    requires: [cap.lead-time-dashboard]
+    provides: [cap.stream-review]
+    check: "The last six retro notes each record the lead-time trend and one action on the slowest step."
+    owner: product
+    feedback: weeks
+  - id: U-18
+    rests_on: [PR-1, PR-3]
+    title: Alert when a queue passes its WIP limit
+    kind: code
+    phase: KEEP
+    elements: [{ id: roadmap-backlog, from: none, to: existing-tool }]
+    requires: [cap.wip-limits, cap.lead-time-dashboard]
+    provides: [cap.wip-alerts]
+    check: "Pushing a queue past its limit in a test board posts an alert to the owning team's channel within five minutes."
+    owner: platform
+    feedback: minutes
+  - id: U-19
+    rests_on: [PR-5]
+    title: Route support tickets to the idea inbox
+    kind: code
+    phase: KEEP
+    elements: [{ id: ticket-queue, from: existing-tool, to: built }]
+    requires: [cap.stage-tags]
+    provides: [cap.support-feedback-loop]
+    check: "A ticket tagged as an idea or a bug appears in the idea inbox with a link back to the ticket, with no copying by hand."
+    feedback: minutes
+  - id: U-20
+    title: Feed usage into triage
+    kind: measurement
+    phase: KEEP
+    elements: [{ id: usage-analytics, from: stand-in, to: existing-tool }]
+    requires: [cap.support-feedback-loop]
+    provides: [cap.usage-feedback]
+    check: "Triage notes for the last four weeks cite the usage report for each accepted or rejected idea."
+    feedback: several-runs
+  - id: U-21
+    title: Quarterly stream health review
+    kind: agreement
+    phase: KEEP
+    requires: [cap.stream-review, cap.wip-alerts, cap.usage-feedback]
+    provides: [cap.stream-health]
+    check: "Once a quarter all seven team leads review lead time, handoffs and queue alerts together and record one decision."
+    owner: product
+    feedback: weeks

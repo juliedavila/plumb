@@ -1,0 +1,19 @@
+# Notes and questions pinned to records of either namespace of the root: org records (teams, activities, slowdowns,
+# exceptions) and shared records (parts, contracts, crossings, seams). Same shape as an instance's notes.yaml.
+notes:
+  - id: N-1
+    target: { kind: activity, id: vuln-triage }
+    kind: question
+    text: Does the measured triage share count the time analysts spend validating fixes again, or only the first triage?
+    status: open
+    author: person
+    created: "2026-11-03T09:00:00Z"
+    updated: "2026-11-03T09:00:00Z"
+  - id: N-2
+    target: { kind: contract, id: CheckYield }
+    kind: note
+    text: No check reads this feed yet, so the authors' raise is what keeps it security-relevant. Keep the raise when the yield rules land.
+    status: open
+    author: agent
+    created: "2026-11-04T14:20:00Z"
+    updated: "2026-11-04T14:20:00Z"

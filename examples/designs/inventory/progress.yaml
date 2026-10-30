@@ -1,0 +1,8 @@
+# Today's status of Asset inventory cleanup's units. The first milestone's three units are done, so it is reached.
+units:
+  U-01: { status: done, date: "2026-10-16", by: the developer platform lead }
+  U-02: { status: done, date: "2026-10-21", by: the governance and risk lead }
+  U-03: { status: done, date: "2026-10-28", by: the governance and risk lead }
+  U-04: { status: doing, date: "2026-11-02", by: the governance and risk lead }
+  U-10: { status: doing, date: "2026-11-05", by: the detection and response lead }
+  U-11: { status: doing, date: "2026-11-09", by: the detection and response lead }

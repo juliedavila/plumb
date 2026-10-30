@@ -1,0 +1,10 @@
+id: P-001
+title: Declare the loop capability
+status: accepted
+provenance: { author: person, requested_by: the team B lead, created: "2026-11-03" }
+why: Beta will hand alpha a confirmation.
+ops:
+  - op: add
+    kind: capability
+    value: { id: cap.loop, provided_by: [beta], required_by: [alpha] }
+decision: { by: the fixture approver, at: "2026-11-04", reason: Accepted to show the cycle. }

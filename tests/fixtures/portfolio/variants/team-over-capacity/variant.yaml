@@ -1,0 +1,4 @@
+breaks: "Team A's capacity is 1, so its allowance after chores is 0.75, while it has one unit in doing, alpha's Send the spec to beta, on the path to alpha's next milestone."
+expect:
+  - { rule: portfolio/team-over-capacity, severity: error, subject: "org:team-a (team)" }
+note: "An error, not a warning, because the unit in doing sits on the path to alpha's current milestone, Alpha takes in and sends."

@@ -1,0 +1,455 @@
+{
+ "v": 1,
+ "as_of": "2026-11-01",
+ "measured": "2026-11-02",
+ "window": {
+  "from": "2026-08-03T00:00:00Z",
+  "to": "2026-11-01T00:00:00Z",
+  "days": 90
+ },
+ "export": {
+  "dir": "tracker/export",
+  "files": [
+   "field.json",
+   "issueLinkType.json",
+   "issuetype.json",
+   "project.json",
+   "search-1.json",
+   "search-2.json",
+   "serverInfo.json",
+   "status.json"
+  ],
+  "at": "2026-11-01T00:00:00Z",
+  "at_from": "export"
+ },
+ "mapping": {
+  "sha256": "98d3232375dc8ed7a31fd12e30bb133a23eaa69b0bb176805abeec889f49fa50"
+ },
+ "mode": "time",
+ "doing": [
+  "In Progress",
+  "In Review"
+ ],
+ "totals": {
+  "issues": 121,
+  "counted": 116,
+  "left_out": {
+   "no_team": 5,
+   "other_team": 0,
+   "container": 0,
+   "subtask": 0,
+   "before_window": 0,
+   "after_window": 0
+  }
+ },
+ "designs": {
+  "label_prefix": "de-unit:",
+  "links": []
+ },
+ "notes": [],
+ "teams": [
+  {
+   "team": "appsec-platform",
+   "name": "AppSec platform",
+   "issues": 22,
+   "inDoing": 1,
+   "days": 200,
+   "design": {
+    "issues": 9,
+    "days": 116,
+    "share": 0.58,
+    "by": {
+     "intake": 103,
+     "premerge": 13
+    }
+   },
+   "activities": [
+    {
+     "activity": "pentest-coordination",
+     "name": "Penetration test coordination",
+     "issues": 4,
+     "days": 24,
+     "share": 0.12
+    },
+    {
+     "activity": "scanner-rule-upkeep",
+     "name": "Scanner rule upkeep",
+     "issues": 6,
+     "days": 40,
+     "share": 0.2
+    }
+   ],
+   "unclassified": {
+    "issues": 3,
+    "days": 20,
+    "share": 0.1
+   },
+   "coverage": 0.9,
+   "confidence": "medium",
+   "flow": {
+    "feature": 91,
+    "risk": 109
+   },
+   "calibration": {
+    "status": "too-little",
+    "finished": 18,
+    "historyDays": 94,
+    "needs": {
+     "finished": 20,
+     "days": 56
+    }
+   },
+   "notes": []
+  },
+  {
+   "team": "vuln-mgmt",
+   "name": "Vulnerability management",
+   "issues": 32,
+   "inDoing": 5,
+   "days": 400,
+   "design": {
+    "issues": 8,
+    "days": 208,
+    "share": 0.52,
+    "by": {
+     "intake": 208
+    }
+   },
+   "activities": [
+    {
+     "activity": "vuln-triage",
+     "name": "Manual vulnerability triage and validation",
+     "issues": 19,
+     "days": 152,
+     "share": 0.38
+    }
+   ],
+   "unclassified": {
+    "issues": 5,
+    "days": 40,
+    "share": 0.1
+   },
+   "coverage": 0.9,
+   "confidence": "high",
+   "flow": {
+    "feature": 208,
+    "risk": 192
+   },
+   "calibration": {
+    "status": "calibrated",
+    "finished": 26,
+    "historyDays": 94,
+    "needs": {
+     "finished": 20,
+     "days": 56
+    },
+    "wip": 4.444,
+    "throughput": 0.2889,
+    "cycle": 11.92,
+    "littles": 3.444,
+    "holds": false,
+    "wipStart": 1,
+    "wipEnd": 5
+   },
+   "notes": []
+  },
+  {
+   "team": "detection-response",
+   "name": "Detection and response",
+   "issues": 26,
+   "inDoing": 3,
+   "days": 200,
+   "design": {
+    "issues": 5,
+    "days": 76,
+    "share": 0.38,
+    "by": {
+     "inventory": 76
+    }
+   },
+   "activities": [
+    {
+     "activity": "incident-oncall",
+     "name": "Incident on-call",
+     "issues": 19,
+     "days": 104,
+     "share": 0.52
+    }
+   ],
+   "unclassified": {
+    "issues": 2,
+    "days": 20,
+    "share": 0.1
+   },
+   "coverage": 0.9,
+   "confidence": "medium",
+   "flow": {
+    "feature": 58,
+    "defect": 104,
+    "risk": 38
+   },
+   "calibration": {
+    "status": "calibrated",
+    "finished": 23,
+    "historyDays": 88,
+    "needs": {
+     "finished": 20,
+     "days": 56
+    },
+    "wip": 2.222,
+    "throughput": 0.2556,
+    "cycle": 7.61,
+    "littles": 1.944,
+    "holds": true,
+    "wipStart": 0,
+    "wipEnd": 3
+   },
+   "notes": []
+  },
+  {
+   "team": "product-eng",
+   "name": "Product engineering",
+   "issues": 8,
+   "inDoing": 3,
+   "days": 60,
+   "design": {
+    "issues": 6,
+    "days": 51,
+    "share": 0.85,
+    "by": {
+     "premerge": 51
+    }
+   },
+   "activities": [],
+   "unclassified": {
+    "issues": 2,
+    "days": 9,
+    "share": 0.15
+   },
+   "coverage": 0.85,
+   "confidence": "low",
+   "flow": {
+    "feature": 27,
+    "risk": 33
+   },
+   "calibration": {
+    "status": "too-little",
+    "finished": 4,
+    "historyDays": 70,
+    "needs": {
+     "finished": 20,
+     "days": 56
+    }
+   },
+   "notes": []
+  },
+  {
+   "team": "dev-platform",
+   "name": "Developer platform",
+   "issues": 10,
+   "inDoing": 1,
+   "days": 80,
+   "design": {
+    "issues": 7,
+    "days": 68,
+    "share": 0.85,
+    "by": {
+     "inventory": 12,
+     "premerge": 56
+    }
+   },
+   "activities": [],
+   "unclassified": {
+    "issues": 3,
+    "days": 12,
+    "share": 0.15
+   },
+   "coverage": 0.85,
+   "confidence": "medium",
+   "flow": {
+    "feature": 62,
+    "risk": 18
+   },
+   "calibration": {
+    "status": "too-little",
+    "finished": 7,
+    "historyDays": 77,
+    "needs": {
+     "finished": 20,
+     "days": 56
+    }
+   },
+   "notes": []
+  },
+  {
+   "team": "governance-risk",
+   "name": "Governance and risk",
+   "issues": 18,
+   "inDoing": 1,
+   "days": 150,
+   "design": {
+    "issues": 5,
+    "days": 57,
+    "share": 0.38,
+    "by": {
+     "inventory": 57
+    }
+   },
+   "activities": [
+    {
+     "activity": "audit-evidence",
+     "name": "Audit evidence collection",
+     "issues": 5,
+     "days": 36,
+     "share": 0.24
+    },
+    {
+     "activity": "questionnaires",
+     "name": "Customer security questionnaires",
+     "issues": 6,
+     "days": 42,
+     "share": 0.28
+    }
+   ],
+   "unclassified": {
+    "issues": 2,
+    "days": 15,
+    "share": 0.1
+   },
+   "coverage": 0.9,
+   "confidence": "medium",
+   "flow": {
+    "feature": 51,
+    "risk": 99
+   },
+   "calibration": {
+    "status": "too-little",
+    "finished": 17,
+    "historyDays": 94,
+    "needs": {
+     "finished": 20,
+     "days": 56
+    }
+   },
+   "notes": []
+  }
+ ],
+ "issues": [
+  {"key":"GRC-2","team":"governance-risk","bucket":"activity","of":"audit-evidence","days":9,"finished":true,"cycle":13},
+  {"key":"GRC-3","team":"governance-risk","bucket":"activity","of":"audit-evidence","days":6,"finished":true,"cycle":6},
+  {"key":"GRC-4","team":"governance-risk","bucket":"activity","of":"audit-evidence","days":8,"finished":true,"cycle":8},
+  {"key":"GRC-5","team":"governance-risk","bucket":"activity","of":"audit-evidence","days":7,"finished":true,"cycle":7},
+  {"key":"GRC-6","team":"governance-risk","bucket":"activity","of":"audit-evidence","days":6,"finished":true,"cycle":6},
+  {"key":"GRC-7","team":"governance-risk","bucket":"activity","of":"questionnaires","days":8,"finished":true,"cycle":8},
+  {"key":"GRC-8","team":"governance-risk","bucket":"activity","of":"questionnaires","days":7,"finished":true,"cycle":7},
+  {"key":"GRC-9","team":"governance-risk","bucket":"activity","of":"questionnaires","days":6,"finished":true,"cycle":6},
+  {"key":"GRC-10","team":"governance-risk","bucket":"activity","of":"questionnaires","days":9,"finished":true,"cycle":9},
+  {"key":"GRC-11","team":"governance-risk","bucket":"activity","of":"questionnaires","days":5,"finished":true,"cycle":5},
+  {"key":"GRC-12","team":"governance-risk","bucket":"activity","of":"questionnaires","days":7,"finished":true,"cycle":7},
+  {"key":"GRC-13","team":"governance-risk","bucket":"design","of":"inventory:U-02","via":"label","days":15,"finished":true,"cycle":15},
+  {"key":"GRC-14","team":"governance-risk","bucket":"design","of":"inventory:U-03","via":"label","days":14,"finished":true,"cycle":14},
+  {"key":"GRC-15","team":"governance-risk","bucket":"design","of":"inventory:U-04","via":"label","days":12},
+  {"key":"GRC-16","team":"governance-risk","bucket":"design","of":"inventory:U-04","via":"label","days":10,"finished":true,"cycle":10},
+  {"key":"GRC-17","team":"governance-risk","bucket":"design","of":"inventory:U-04","via":"label","days":6,"finished":true,"cycle":6},
+  {"key":"GRC-18","team":"governance-risk","bucket":"unclassified","days":9,"finished":true,"cycle":9},
+  {"key":"GRC-19","team":"governance-risk","bucket":"unclassified","days":6,"finished":true,"cycle":6},
+  {"key":"INC-1","team":"detection-response","bucket":"activity","of":"incident-oncall","days":6,"finished":true,"cycle":6},
+  {"key":"INC-2","team":"detection-response","bucket":"activity","of":"incident-oncall","days":4,"finished":true,"cycle":4},
+  {"key":"INC-3","team":"detection-response","bucket":"activity","of":"incident-oncall","days":7,"finished":true,"cycle":7},
+  {"key":"INC-4","team":"detection-response","bucket":"activity","of":"incident-oncall","days":5,"finished":true,"cycle":5},
+  {"key":"INC-5","team":"detection-response","bucket":"activity","of":"incident-oncall","days":8,"finished":true,"cycle":8},
+  {"key":"INC-6","team":"detection-response","bucket":"activity","of":"incident-oncall","days":3,"finished":true,"cycle":3},
+  {"key":"INC-7","team":"detection-response","bucket":"activity","of":"incident-oncall","days":6,"finished":true,"cycle":6},
+  {"key":"INC-8","team":"detection-response","bucket":"activity","of":"incident-oncall","days":5,"finished":true,"cycle":5},
+  {"key":"INC-9","team":"detection-response","bucket":"activity","of":"incident-oncall","days":4,"finished":true,"cycle":4},
+  {"key":"INC-10","team":"detection-response","bucket":"activity","of":"incident-oncall","days":6,"finished":true,"cycle":6},
+  {"key":"INC-11","team":"detection-response","bucket":"activity","of":"incident-oncall","days":7,"finished":true,"cycle":7},
+  {"key":"INC-12","team":"detection-response","bucket":"activity","of":"incident-oncall","days":5,"finished":true,"cycle":5},
+  {"key":"INC-13","team":"detection-response","bucket":"activity","of":"incident-oncall","days":4,"finished":true,"cycle":4},
+  {"key":"INC-14","team":"detection-response","bucket":"activity","of":"incident-oncall","days":6,"finished":true,"cycle":6},
+  {"key":"INC-15","team":"detection-response","bucket":"activity","of":"incident-oncall","days":5,"finished":true,"cycle":5},
+  {"key":"INC-16","team":"detection-response","bucket":"activity","of":"incident-oncall","days":8,"finished":true,"cycle":8},
+  {"key":"INC-17","team":"detection-response","bucket":"activity","of":"incident-oncall","days":4,"finished":true,"cycle":4},
+  {"key":"INC-18","team":"detection-response","bucket":"activity","of":"incident-oncall","days":6},
+  {"key":"INC-19","team":"detection-response","bucket":"activity","of":"incident-oncall","days":5,"finished":true,"cycle":5},
+  {"key":"PLAT-1","team":"detection-response","bucket":"design","of":"inventory:U-10","via":"label","days":11},
+  {"key":"PLAT-2","team":"detection-response","bucket":"design","of":"inventory:U-10","via":"label","days":25,"finished":true,"cycle":25},
+  {"key":"PLAT-3","team":"detection-response","bucket":"design","of":"inventory:U-11","via":"label","days":8},
+  {"key":"PLAT-4","team":"detection-response","bucket":"design","of":"inventory:U-11","via":"label","days":14,"finished":true,"cycle":14},
+  {"key":"PLAT-5","team":"detection-response","bucket":"design","of":"inventory:U-10","via":"label","days":18,"finished":true,"cycle":18},
+  {"key":"PLAT-6","team":"dev-platform","bucket":"design","of":"premerge:U-01","via":"label","days":20,"finished":true,"cycle":20},
+  {"key":"PLAT-7","team":"dev-platform","bucket":"design","of":"premerge:U-01","via":"label","days":12,"finished":true,"cycle":12},
+  {"key":"PLAT-8","team":"dev-platform","bucket":"design","of":"premerge:U-02","via":"label","days":18},
+  {"key":"PLAT-9","team":"dev-platform","bucket":"design","of":"premerge:U-02","via":"label","days":6,"finished":true,"cycle":6},
+  {"key":"PLAT-10","team":"dev-platform","bucket":"design","of":"inventory:U-01","via":"label","days":12,"finished":true,"cycle":12},
+  {"key":"PLAT-11","team":"dev-platform","bucket":"design","of":"inventory:U-05","via":"label","days":0},
+  {"key":"PLAT-12","team":"dev-platform","bucket":"design","of":"inventory:U-07","via":"label","days":0},
+  {"key":"PLAT-13","team":"dev-platform","bucket":"unclassified","days":5,"finished":true,"cycle":5},
+  {"key":"PLAT-14","team":"dev-platform","bucket":"unclassified","days":4,"finished":true,"cycle":4},
+  {"key":"PLAT-15","team":"dev-platform","bucket":"unclassified","days":3,"finished":true,"cycle":3},
+  {"key":"PLAT-16","team":"product-eng","bucket":"design","of":"premerge:U-04","via":"label","days":14},
+  {"key":"PLAT-17","team":"product-eng","bucket":"design","of":"premerge:U-04","via":"label","days":9,"finished":true,"cycle":9},
+  {"key":"PLAT-18","team":"product-eng","bucket":"design","of":"premerge:U-05","via":"label","days":6},
+  {"key":"PLAT-19","team":"product-eng","bucket":"design","of":"premerge:U-06","via":"label","days":7},
+  {"key":"PLAT-20","team":"product-eng","bucket":"design","of":"premerge:U-04","via":"label","days":15,"finished":true,"cycle":15},
+  {"key":"PLAT-21","team":"product-eng","bucket":"design","of":"premerge:U-04","via":"label","days":0},
+  {"key":"PLAT-22","team":"product-eng","bucket":"unclassified","days":5,"finished":true,"cycle":5},
+  {"key":"PLAT-23","team":"product-eng","bucket":"unclassified","days":4,"finished":true,"cycle":4},
+  {"key":"SEC-1","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":10,"finished":true,"cycle":14},
+  {"key":"SEC-2","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-3","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-4","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":11,"finished":true,"cycle":11},
+  {"key":"SEC-5","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-6","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":5,"finished":true,"cycle":5},
+  {"key":"SEC-7","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":9,"finished":true,"cycle":9},
+  {"key":"SEC-8","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-9","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-10","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-11","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":9,"finished":true,"cycle":9},
+  {"key":"SEC-12","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-13","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-14","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-15","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":5,"finished":true,"cycle":5},
+  {"key":"SEC-16","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":9,"finished":true,"cycle":9},
+  {"key":"SEC-17","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-18","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":6},
+  {"key":"SEC-19","team":"vuln-mgmt","bucket":"activity","of":"vuln-triage","days":14},
+  {"key":"SEC-20","team":"vuln-mgmt","bucket":"design","of":"intake:U-04","via":"label","days":45,"finished":true,"cycle":45},
+  {"key":"SEC-21","team":"vuln-mgmt","bucket":"design","of":"intake:U-04","via":"label","days":32},
+  {"key":"SEC-22","team":"vuln-mgmt","bucket":"design","of":"intake:U-05","via":"label","days":30,"finished":true,"cycle":30},
+  {"key":"SEC-23","team":"vuln-mgmt","bucket":"design","of":"intake:U-05","via":"label","days":14},
+  {"key":"SEC-24","team":"vuln-mgmt","bucket":"design","of":"intake:U-06","via":"label","days":40,"finished":true,"cycle":40},
+  {"key":"SEC-25","team":"vuln-mgmt","bucket":"design","of":"intake:U-06","via":"label","days":28},
+  {"key":"SEC-26","team":"vuln-mgmt","bucket":"design","of":"intake:U-07","via":"label","days":0},
+  {"key":"SEC-27","team":"vuln-mgmt","bucket":"design","of":"intake:U-01","via":"label","days":19,"finished":true,"cycle":19},
+  {"key":"SEC-28","team":"vuln-mgmt","bucket":"unclassified","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-29","team":"vuln-mgmt","bucket":"unclassified","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-30","team":"vuln-mgmt","bucket":"unclassified","days":10,"finished":true,"cycle":10},
+  {"key":"SEC-31","team":"vuln-mgmt","bucket":"unclassified","days":7,"finished":true,"cycle":7},
+  {"key":"SEC-32","team":"vuln-mgmt","bucket":"unclassified","days":9,"finished":true,"cycle":9},
+  {"key":"SEC-33","team":"appsec-platform","bucket":"activity","of":"pentest-coordination","days":7,"finished":true,"cycle":7},
+  {"key":"SEC-34","team":"appsec-platform","bucket":"activity","of":"pentest-coordination","days":5,"finished":true,"cycle":5},
+  {"key":"SEC-35","team":"appsec-platform","bucket":"activity","of":"pentest-coordination","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-36","team":"appsec-platform","bucket":"activity","of":"pentest-coordination","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-37","team":"appsec-platform","bucket":"activity","of":"scanner-rule-upkeep","days":8,"finished":true,"cycle":12},
+  {"key":"SEC-38","team":"appsec-platform","bucket":"activity","of":"scanner-rule-upkeep","days":6,"finished":true,"cycle":6},
+  {"key":"SEC-39","team":"appsec-platform","bucket":"activity","of":"scanner-rule-upkeep","days":7,"finished":true,"cycle":7},
+  {"key":"SEC-40","team":"appsec-platform","bucket":"activity","of":"scanner-rule-upkeep","days":5,"finished":true,"cycle":5},
+  {"key":"SEC-41","team":"appsec-platform","bucket":"activity","of":"scanner-rule-upkeep","days":9,"finished":true,"cycle":9},
+  {"key":"SEC-42","team":"appsec-platform","bucket":"activity","of":"scanner-rule-upkeep","days":5,"finished":true,"cycle":5},
+  {"key":"SEC-43","team":"appsec-platform","bucket":"design","of":"intake:U-01","via":"label","days":30,"finished":true,"cycle":30},
+  {"key":"SEC-44","team":"appsec-platform","bucket":"design","of":"intake:U-01","via":"label","days":22,"finished":true,"cycle":22},
+  {"key":"SEC-45","team":"appsec-platform","bucket":"design","of":"intake:U-02","via":"label","days":24},
+  {"key":"SEC-46","team":"appsec-platform","bucket":"design","of":"intake:U-02","via":"label","days":15,"finished":true,"cycle":15},
+  {"key":"SEC-47","team":"appsec-platform","bucket":"design","of":"intake:U-03","via":"label","days":0},
+  {"key":"SEC-48","team":"appsec-platform","bucket":"design","of":"premerge:U-03","via":"label","days":0},
+  {"key":"SEC-49","team":"appsec-platform","bucket":"design","of":"intake:U-10","via":"label","days":0},
+  {"key":"SEC-50","team":"appsec-platform","bucket":"design","of":"premerge:U-03","via":"label","days":13,"finished":true,"cycle":13},
+  {"key":"SEC-51","team":"appsec-platform","bucket":"design","of":"intake:U-03","via":"label","days":12,"finished":true,"cycle":12},
+  {"key":"SEC-52","team":"appsec-platform","bucket":"unclassified","days":8,"finished":true,"cycle":8},
+  {"key":"SEC-53","team":"appsec-platform","bucket":"unclassified","days":7,"finished":true,"cycle":7},
+  {"key":"SEC-54","team":"appsec-platform","bucket":"unclassified","days":5,"finished":true,"cycle":5},
+  {"key":"SEC-55","team":"detection-response","bucket":"unclassified","days":12,"finished":true,"cycle":12},
+  {"key":"SEC-56","team":"detection-response","bucket":"unclassified","days":8,"finished":true,"cycle":8}
+ ]
+}

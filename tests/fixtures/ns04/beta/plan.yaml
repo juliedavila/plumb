@@ -1,0 +1,5 @@
+phases:
+  - { id: P1, name: Checks run on every change, exit_test: Every merge runs the checks., order: 1 }
+units:
+  - { id: U-1, title: Wire the class rules, kind: code, phase: P1, elements: [{ id: runner, from: none, to: built }], requires: [proven-rules], check: The runner reads the rules., flow_item: risk }
+  - { id: U-2, title: Gate merges, kind: code, phase: P1, elements: [{ id: gate, from: none, to: built }], check: A failing check stops a merge., flow_item: risk }

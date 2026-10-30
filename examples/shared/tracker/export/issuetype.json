@@ -1,0 +1,57 @@
+[
+  {
+    "self": "https://tracker.example.test/rest/api/3/issuetype/10100",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/issuetypes/epic.svg",
+    "untranslatedName": "Epic",
+    "avatarId": 10300,
+    "id": "10100",
+    "name": "Epic",
+    "subtask": false,
+    "hierarchyLevel": 1
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/issuetype/10101",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/issuetypes/story.svg",
+    "untranslatedName": "Story",
+    "avatarId": 10300,
+    "id": "10101",
+    "name": "Story",
+    "subtask": false,
+    "hierarchyLevel": 0
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/issuetype/10102",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/issuetypes/task.svg",
+    "untranslatedName": "Task",
+    "avatarId": 10300,
+    "id": "10102",
+    "name": "Task",
+    "subtask": false,
+    "hierarchyLevel": 0
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/issuetype/10103",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/issuetypes/pen-test.svg",
+    "untranslatedName": "Pen test",
+    "avatarId": 10300,
+    "id": "10103",
+    "name": "Pen test",
+    "subtask": false,
+    "hierarchyLevel": 0
+  },
+  {
+    "self": "https://tracker.example.test/rest/api/3/issuetype/10104",
+    "description": "",
+    "iconUrl": "https://tracker.example.test/images/icons/issuetypes/incident.svg",
+    "untranslatedName": "Incident",
+    "avatarId": 10300,
+    "id": "10104",
+    "name": "Incident",
+    "subtask": false,
+    "hierarchyLevel": 0
+  }
+]

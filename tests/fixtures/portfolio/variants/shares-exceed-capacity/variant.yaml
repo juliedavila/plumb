@@ -1,0 +1,4 @@
+breaks: "Team B's two activities take 0.6 and 0.4 of its capacity, 1.0 in all."
+expect:
+  - { rule: org/shares-exceed-capacity, severity: warning, subject: "org:team-b (team)" }
+note: "Team B has no unit in doing, so its allowance of 0 raises no capacity finding as well."

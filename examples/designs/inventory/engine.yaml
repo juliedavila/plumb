@@ -1,0 +1,15 @@
+# Asset inventory cleanup: a fictional design for the example portfolio, the organization's own
+# and mostly transition work. It replaces spreadsheets and scripts with one owned asset list, records in current.yaml
+# what exists today, and sends Findings intake the owner of each asset through a seam the organization declared in its
+# root (patches/P-002).
+name: inventory
+title: Asset inventory cleanup
+description: >-
+  One list of every repository, cloud account and service with the team that owns it, built by reconciling a crawler,
+  the cloud accounts and the stewards' confirmations. The spreadsheets, scripts and exports that do this by hand today
+  are retired once the list can take their place.
+schema: "0.4"
+namespace: inventory
+root: ../../shared
+packs: [generic, plan, security]
+ladder: [none, stand-in, existing-tool, built]

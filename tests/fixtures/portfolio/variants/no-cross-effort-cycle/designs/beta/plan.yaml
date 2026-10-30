@@ -1,0 +1,21 @@
+phases:
+  - { id: B1, order: 1, name: Beta takes the spec, exit_test: Beta holds the spec., target: "2027-01-15" }
+  - { id: B2, order: 2, name: Beta uses the spec, exit_test: Beta acts on the spec., target: "2027-04-15" }
+units:
+  - id: BU-1
+    title: Take the spec in
+    kind: code
+    phase: B1
+    elements: [{ id: b-in, from: none, to: built }]
+    requires: [cap.spec]
+    provides: [cap.b, cap.loop]
+    check: Beta holds the spec.
+    flow_item: feature
+  - id: BU-2
+    title: Use the spec
+    kind: code
+    phase: B2
+    elements: [{ id: b-out, from: none, to: built }]
+    requires: [cap.b]
+    check: Beta acts on the spec.
+    flow_item: feature

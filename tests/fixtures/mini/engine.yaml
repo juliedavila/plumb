@@ -1,0 +1,9 @@
+name: mini
+title: Mini repair shop
+description: A tiny value stream used by the core tests.
+packs: [generic, plan, flow]
+flow:
+  max_handoffs: 4
+  source: declared       # the provenance of every flow number here, unless a part gives its own
+  as_of: "2026-10-01"
+  max_age_days: 36500   # a fixture: its numbers never go stale

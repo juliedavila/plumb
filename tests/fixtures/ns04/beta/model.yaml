@@ -1,0 +1,11 @@
+systems:
+  - { id: B, name: Checks }
+elements:
+  - { id: runner, name: Check runner, kind: runner, system: B, zone: ci, owner: devplat }
+  - { id: gate, name: Merge gate, kind: service, system: B, zone: ci, owner: devplat }
+relationships:
+  - { id: r1, from: runner, to: gate, kind: data, carries: [Verdict] }
+contracts:
+  - { name: Verdict, description: Pass or fail., produced_by: [runner], consumed_by: [gate] }
+claims:
+  - { id: CL-9, statement: Checks run before every merge., kind: premise, grade: inference }

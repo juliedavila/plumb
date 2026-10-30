@@ -1,0 +1,49 @@
+# TEMPLATE, not active here. Copy it into a repository's .github/workflows/ (for example as
+# .github/workflows/plumb-pages.yml) to publish plumb instances to GitHub Pages.
+# Nothing in this repository runs it: it is kept here so publishing is a copy, not a project.
+#
+# It builds every instance with `bun plumb.ts publish site instances/*` and deploys the folder with the
+# official Pages actions. In the repository's settings, set Pages > Source to "GitHub Actions".
+# Adjust the instance list and the working directory if the engine is not at the repository root.
+
+name: Publish plumb pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Test
+        run: bun test
+      - name: Build the static folder
+        run: bun plumb.ts publish site instances/*
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

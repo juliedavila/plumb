@@ -1,0 +1,23 @@
+# The manual-work catalog of the example portfolio: namespace shared, in its own file.
+# Kinds of manual work a design's units can relieve. Units say `relieves:` with one of these
+# ids; an org activity links to one with `manual_work:`. No shares or numbers live here: those are the organization's.
+namespace: shared
+version: "1.0.0"
+schema: { model: 5, design_engine: "0.4" }
+manual_work:
+  - id: finding-triage
+    name: Manual triage and validation of findings
+    description: Reading each new finding, checking it is real, and setting its severity and owner by hand.
+    flow_item: risk
+  - id: retest-after-fix
+    name: Manual retest after a fix
+    description: Rerunning a finding's test by hand to confirm a fix closed it.
+    flow_item: risk
+  - id: evidence-gathering
+    name: Manual evidence gathering for audits
+    description: Collecting screenshots, exports and sign-offs by hand each time an auditor asks.
+    flow_item: risk
+  - id: rule-tuning
+    name: Manual tuning of scanner rules
+    description: Editing each scanner's rules by hand to cut noise or catch what it misses.
+    flow_item: debt

@@ -1,0 +1,18 @@
+# Findings intake: a fictional design for the example portfolio, the platform of the pair. Rooted
+# at the example shared root, and pinned to the released edition of Pre-merge checks it was checked with: the version
+# and the sha256 of that edition's edition.yaml (examples/designs/premerge/editions/1.0.0/edition.yaml).
+name: intake
+title: Findings intake
+description: >-
+  One queue for every security finding. Scanner output and pen-test reports come in, repeats fold into one finding,
+  an agent drafts each finding's triage for an analyst to accept, and the classes of finding that keep coming back
+  are proven and sent to pre-merge checks so they stop at merge.
+schema: "0.4"
+namespace: intake
+root: ../../shared
+pins:
+  - { namespace: premerge, version: "1.0.0", sha256: f44526e579d0e16c4bf29c5e9f6ac1ded2c2e084ba9b1370039c3f0eff8fe5d2 }
+packs: [generic, plan, security]
+ladder: [none, stand-in, existing-tool, built]
+teams:
+  max_share: 0.5   # two teams carry most of intake's open work by design; flag a team only above half

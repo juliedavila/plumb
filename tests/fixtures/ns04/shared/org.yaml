@@ -1,0 +1,4 @@
+# The org layer: teams by role, as a fictional organization names them.
+teams:
+  - { id: appsec, name: AppSec platform, lead: the AppSec platform lead }
+  - { id: devplat, name: Developer platform, lead: the developer platform lead }

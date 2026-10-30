@@ -1,0 +1,37 @@
+# Notes and questions pinned to records of this design. People, agents and the page (under `bun plumb.ts dev`) all
+# write here. target.kind is element, relationship, contract, unit, phase, claim, patch or finding (a finding is named
+# pack/rule@at). To answer a question: set answer, set status to answered, and set updated to the current time.
+notes:
+  - id: N-1
+    target: { kind: claim, id: PR-2 }
+    kind: question
+    text: "Has anyone compared what the automated suite catches with what the manual test caught last quarter?"
+    status: open
+    author: person
+    created: "2026-10-20T09:12:00Z"
+    updated: "2026-10-20T09:12:00Z"
+  - id: N-2
+    target: { kind: element, id: ci-pipeline }
+    kind: question
+    text: "Who owns the flaky-test budget once deploys gate on the suite?"
+    status: answered
+    answer: "The platform team, from the next sprint; the quality team keeps the suite's coverage target."
+    author: person
+    created: "2026-10-19T14:30:00Z"
+    updated: "2026-10-21T10:05:00Z"
+  - id: N-3
+    target: { kind: patch, id: P-001 }
+    kind: note
+    text: "Accept only after U-09 is done: until the suite gates the deploy, release approval is the only check between the manual test and production."
+    status: open
+    author: agent
+    created: "2026-10-21T11:40:00Z"
+    updated: "2026-10-21T11:40:00Z"
+  - id: N-4
+    target: { kind: finding, id: flow/queue-has-wip-limit@roadmap-backlog }
+    kind: note
+    text: "Product will set the roadmap backlog's limit at the next planning review; leave the warning until then."
+    status: resolved
+    author: person
+    created: "2026-10-18T08:00:00Z"
+    updated: "2026-10-19T08:00:00Z"

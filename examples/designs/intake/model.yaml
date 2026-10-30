@@ -1,0 +1,214 @@
+# Findings intake, the platform of the example pair. Fictional. Parts name their owner team by its
+# org id (org.yaml), the way an importer writes a shipped design's parts, and keep the design role they were written
+# with in design_role. Shared records resolve bare: the systems engineering and people, the zones existing and
+# outside. The crossings to Pre-merge checks and to the code hosting system live in the shared layer, not here.
+systems:
+  - { id: pipeline, name: Intake pipeline, description: "Takes findings in, folds repeats together and keeps one queue." }
+  - { id: triage, name: Triage, description: "Sets each finding's severity and owner, with an agent drafting." }
+zones:
+  - { id: raw, name: Raw findings, description: Findings as each scanner and tester wrote them. }
+  - { id: curated, name: Curated findings, description: One record per finding, with severity and owner. }
+  - { id: proven, name: Proven classes, description: Classes of finding proven with fixtures, and the records that keep them honest. }
+elements:
+  - id: scanner-feeds
+    name: Scanner feeds
+    kind: external-system
+    system: pipeline
+    zone: outside
+    owner: appsec-platform
+    design_role: intake engineering
+    description: The raw output of the code, dependency and container scanners.
+  - id: pentest-reports
+    name: Pen-test reports
+    kind: external-system
+    system: pipeline
+    zone: outside
+    owner: appsec-platform
+    design_role: intake engineering
+    description: Reports from outside penetration testers, one document per test.
+  - id: normalizer
+    name: Finding normalizer
+    kind: service
+    system: pipeline
+    zone: raw
+    owner: appsec-platform
+    verifier: vuln-mgmt
+    design_role: intake engineering
+    description: "Turns each scanner's and tester's format into one finding record, with one severity mapping for all of them."
+    rests_on: [IN-3]
+  - id: dedup
+    name: Deduplication
+    kind: service
+    system: pipeline
+    zone: curated
+    owner: appsec-platform
+    verifier: vuln-mgmt
+    design_role: intake engineering
+    description: Folds repeats of one finding into one record and routes it to the team that owns the code.
+    rests_on: [IN-1]
+  - id: finding-queue
+    name: Finding queue
+    kind: store
+    system: pipeline
+    zone: curated
+    owner: vuln-mgmt
+    design_role: finding operations
+    description: One queue for every open finding, split by owning team.
+    partitioned_by: [owning_team]
+  - id: triage-agent
+    name: Triage agent
+    kind: agent
+    system: triage
+    zone: curated
+    owner: vuln-mgmt
+    design_role: finding operations
+    description: An AI agent that drafts a severity and an owner for each new finding. A person accepts or edits every draft.
+    module: autotriage
+    model_boundary: true
+    rests_on: [IN-2]
+  - id: triage-hints
+    name: Triage hints
+    kind: store
+    system: triage
+    zone: curated
+    owner: vuln-mgmt
+    design_role: finding operations
+    description: "The agent's drafts, kept until an analyst accepts or edits them."
+    module: autotriage
+    partitioned_by: [owning_team]
+  - id: triage-desk
+    name: Triage desk
+    kind: person
+    system: triage
+    zone: curated
+    owner: vuln-mgmt
+    design_role: finding operations
+    description: "Vulnerability analysts who set each finding's severity and owner."
+    role_class: human
+  - id: class-registry
+    name: Proven class registry
+    kind: registry
+    system: pipeline
+    zone: proven
+    owner: appsec-platform
+    verifier: governance-risk
+    design_role: class authoring
+    description: "Each proven finding class: the rule pattern, a safe example and the rule version."
+    partitioned_by: [finding_class]
+  - id: class-oracle
+    name: Class oracle
+    kind: store
+    system: pipeline
+    zone: proven
+    owner: appsec-platform
+    design_role: class authoring
+    description: "The expected outcome of each class's fixtures, kept apart from the registry. It never goes to pre-merge checks."
+    partitioned_by: [finding_class]
+  - id: merge-ledger
+    name: Merge ledger
+    kind: store
+    system: pipeline
+    zone: proven
+    owner: governance-risk
+    design_role: evidence records
+    description: Every signed merge stamp from pre-merge checks, per repository.
+    partitioned_by: [repository]
+  - id: class-tuner
+    name: Class tuner
+    kind: service
+    system: pipeline
+    zone: proven
+    owner: appsec-platform
+    design_role: class authoring
+    description: Reads check yield and proposes to retire or tighten classes that stop firing or fire falsely.
+  - id: risk-owner
+    name: Security risk owner
+    kind: person
+    system: people
+    zone: proven
+    owner: governance-risk
+    design_role: evidence records
+    description: Accepts a class as proven before it goes to pre-merge checks.
+    role_class: human
+relationships:
+  - { id: r01, from: scanner-feeds, to: normalizer, kind: data, label: Raw scanner output, carries: [RawFinding], content: untrusted }
+  - { id: r02, from: pentest-reports, to: normalizer, kind: data, label: Pen-test findings, carries: [RawFinding], content: untrusted }
+  - { id: r03, from: normalizer, to: dedup, kind: data, label: One finding record, carries: [Finding] }
+  - { id: r04, from: dedup, to: finding-queue, kind: data, label: Folded and routed, carries: [Finding] }
+  # the module autotriage: r05 and r07 cross its seam and are named on it; r08 crosses it and is not
+  - { id: r05, from: finding-queue, to: triage-agent, kind: data, label: New findings to draft, carries: [Finding] }
+  - { id: r06, from: triage-agent, to: triage-hints, kind: data, label: Drafted severity and owner, carries: [TriageHint] }
+  - { id: r07, from: triage-hints, to: triage-desk, kind: data, label: Drafts to accept or edit, carries: [TriageHint] }
+  - { id: r08, from: triage-hints, to: finding-queue, kind: data, label: Drafts written onto the queue entry, carries: [TriageHint] }
+  - { id: r09, from: triage-desk, to: finding-queue, kind: control, label: Severity and owner set, carries: [TriageDecision] }
+  - { id: r10, from: triage-desk, to: class-registry, kind: handoff, label: A repeat worth proving, carries: [ClassCandidate] }
+  - { id: r11, from: risk-owner, to: class-registry, kind: authorization, label: Accepts the class as proven, carries: [ClassAcceptance] }
+  - { id: r12, from: class-registry, to: class-oracle, kind: data, label: Expected outcomes kept apart, carries: [ClassOracle] }
+  - { id: r13, from: class-tuner, to: class-registry, kind: control, label: Retire or tighten a class, carries: [ClassChange] }
+  - { id: r14, from: class-tuner, to: risk-owner, kind: feedback, label: How each class performs, carries: [YieldReport] }
+  - { id: r15, from: class-tuner, to: triage-desk, kind: feedback, label: How often drafts were changed, carries: [TriageAccuracy] }
+contracts:
+  - { name: RawFinding, description: "A finding as its scanner or tester wrote it, title and text included.", produced_by: [scanner-feeds, pentest-reports], consumed_by: [normalizer] }
+  - { name: Finding, description: "One finding record: source, location, severity, owning team and the text it came with.", produced_by: [normalizer, dedup, finding-queue], consumed_by: [dedup, finding-queue, triage-agent] }
+  - name: TriageHint
+    description: "The agent's draft for one finding: a severity, an owner and the finding's title and snippet copied from the scanner."
+    untrusted_fields: [title, snippet]
+    produced_by: [triage-agent, triage-hints]
+    consumed_by: [triage-hints, triage-desk, finding-queue]
+  - { name: TriageDecision, description: The severity and owner an analyst set on a finding., produced_by: [triage-desk], consumed_by: [finding-queue] }
+  - { name: ClassCandidate, description: "A finding that keeps coming back, with the repeats that show it.", produced_by: [triage-desk], consumed_by: [class-registry] }
+  - { name: ClassAcceptance, description: The security risk owner's acceptance of a class as proven., produced_by: [risk-owner], consumed_by: [class-registry] }
+  - { name: ClassOracle, description: "The expected outcome of a class's fixtures: what a correct check must report.", produced_by: [class-registry], consumed_by: [class-oracle] }
+  - { name: ClassChange, description: A proposal to retire or tighten one class., produced_by: [class-tuner], consumed_by: [class-registry] }
+  - { name: YieldReport, description: "How often each class fired, was overridden and was switched off, per month.", measures: "fire, override and switch-off rate per class", produced_by: [class-tuner], consumed_by: [risk-owner] }
+  - { name: TriageAccuracy, description: "How often analysts changed the agent's drafts, per week.", measures: "share of drafts changed by an analyst", produced_by: [class-tuner], consumed_by: [triage-desk] }
+claims:
+  - id: IN-1
+    kind: premise
+    statement: Most of the triage team's manual time goes to repeats of findings that were already reported in another form.
+    grade: judgment
+    source: "The vulnerability management lead's sample of 40 findings in September."
+    fallback: Fold repeats only within one scanner, and keep cross-scanner repeats for the analysts.
+  - id: IN-2
+    kind: assumption
+    statement: "Analysts accept most of the triage agent's drafts unchanged."
+    grade: untested
+    source: A two-week trial on one team's findings, not yet run.
+    fallback: Show the drafts as hints only, and keep triage by hand.
+  - id: IN-3
+    kind: premise
+    statement: One severity mapping in the normalizer replaces most of the per-scanner rule tweaks the platform team keeps by hand.
+    grade: inference
+    source: "Of last quarter's 60 rule tweaks, 41 only changed a severity."
+    fallback: Keep per-scanner rules for the scanners whose severities do not map.
+  - id: IN-4
+    kind: premise
+    statement: A class that is proven and checked before merge does not come back as a new finding.
+    grade: inference
+    source: "Follows from IN-1 and from pre-merge checks' premise that teams keep a trusted check switched on."
+    fallback: Keep a sampled manual triage of repeat classes until a quarter of yield data shows they stopped.
+    rests_on: [IN-1, premerge:PM-2]   # a claim may rest on another design's claim: descriptive, so no dependency
+views:
+  - id: intake-flow
+    title: From scanner to queue
+    description: Every finding's path from its scanner or tester to one queue, with the agent drafting its triage.
+    elements: [scanner-feeds, pentest-reports, normalizer, dedup, finding-queue, triage-agent, triage-hints, triage-desk]
+  - id: proven-classes
+    title: Proven classes and what they feed
+    description: How a repeat becomes a proven class, and what intake hears back from pre-merge checks.
+    elements: [triage-desk, class-registry, class-oracle, risk-owner, class-tuner, merge-ledger]
+  - id: across-the-seam
+    title: Across the seam to pre-merge checks
+    description: Intake's parts at the seam and the parts of pre-merge checks they connect to. A view may name another design's parts.
+    elements: [class-registry, merge-ledger, class-tuner, premerge:check-runner, premerge:stamp-signer, premerge:yield-reporter]
+# Intake's own module seam (checked by the same rule as shared seams). Its crossings are this design's own relationships
+# between the module's parts (module: autotriage) and the rest; it declares them by naming them, with every contract
+# each carries. r08 crosses it and is not named, so the seam rule reports it, softened by the organization's exception.
+seams:
+  - id: autotriage
+    name: Triage automation
+    between: [core, autotriage]
+    owner_role: the triage automation owner
+    crossings:
+      - { id: r05, carries: [Finding] }
+      - { id: r07, carries: [TriageHint] }
