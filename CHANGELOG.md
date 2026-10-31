@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0
+
+A design's own unresolved tested_by unit is now an error.
+The content hash of a rooted design now covers each composed design's model and plan, so every rooted design's content hash changes once.
+
+Premises can be settled by units in another design. The read-only premises command projects every premise in scope and the shared register. Shared roots hold proposed and confirmed reconciliation links with pinned premise hashes. Confirmed dependencies extend the existing impact walk. Found and stale links have a separate cascade preview. Strategy and portfolio pages show reconciliation debt. The premise MCP tool includes links. The skill guides pair coverage and confirmation of one link at a time.
+
 ## 0.5.2
 
 - Wording only: the fictional example portfolio is now "Findings to fixes", led by "the program lead". The standalone test no longer walks `.git` or local `build/` output. No behavior change.

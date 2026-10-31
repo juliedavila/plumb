@@ -14,6 +14,8 @@ import { bundleTracker } from "../tracker/bundle.ts";
 import { modelSummary, viewGroups } from "./summary.ts";
 import { zoneScenes } from "./zones.ts";
 import { checkTour } from "./tour.ts";
+import { composeGraph } from "./portfolio.ts";
+import { readPremiseLinks, sharedSettlingFindings } from "./premise-links.ts";
 import { allPremiseImpacts } from "./premise.ts";
 import { findingNoteId, sortNotes } from "./notes.ts";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
@@ -27,9 +29,8 @@ import { flowBadgeLines, flowFacts, claimFlowChecks } from "./flow.ts";
 import { streamLayout } from "./flow-layout.ts";
 import { instanceMeasured } from "./flow-measured.ts";
 
-// 0.5.0: standalone Plumb, verified edition additions and generated Obsidian vaults.
-// 0.5.1 and 0.5.2: wording only.
-export const ENGINE_VERSION = "0.5.2";
+// 0.6.0: premise reconciliation across designs.
+export const ENGINE_VERSION = "0.6.0";
 
 /** sha256 of the canonical JSON of the inputs: instance config, model, plan, patches. No timestamp, no absolute paths. */
 export function contentHash(inst: Instance): string {
@@ -39,7 +40,7 @@ export function contentHash(inst: Instance): string {
   // a 0.4 design's build also rests on its root (its files and the root patches applied to them), the edition built and the designs composed with it
   const ns = inst.ns, r = ns?.root?.input;
   const rootPatches = r?.patches?.filter((p) => r.applied?.includes(p.id)) ?? [];
-  if (ns) base.ns = { root: r ? { shared: r.shared?.sha256, manual: r.shared?.manualWorkFile?.sha256, org: r.org?.sha256, ...(rootPatches.length ? { patches: sha256(canonicalJson(rootPatches)) } : {}) } : undefined, edition: inst.edition?.sha256, compose: ns.compose?.map((d) => [d.namespace, d.edition ?? "latest", d.editionSha256]) };
+  if (ns) base.ns = { premiseLinks: r && existsSync(join(r.dir, "premise-links.yaml")) ? sha256(readFileSync(join(r.dir, "premise-links.yaml"), "utf8")) : undefined, root: r ? { shared: r.shared?.sha256, manual: r.shared?.manualWorkFile?.sha256, org: r.org?.sha256, ...(rootPatches.length ? { patches: sha256(canonicalJson(rootPatches)) } : {}) } : undefined, edition: inst.edition?.sha256, compose: ns.compose?.map((d) => [d.namespace, d.edition ?? "latest", d.editionSha256, sha256(canonicalJson({ model: d.model, plan: d.plan }))]) };
   if (inst.current) base.current = inst.current; // current state is live, like progress: it moves the build, not the model hash
   return sha256(canonicalJson(base));
 }
@@ -86,6 +87,14 @@ export async function buildBundle(dirOrInstance: string | Instance, opts: { buil
     const before = inst.plan.units.find((x) => x.id === u)!;
     core.push(orphanFinding(u, before.title, (before.elements ?? []).map((m) => inst.model.elements.find((e) => e.id === m.id)?.name ?? m.id)));
   }
+  const namespace = inst.ns?.namespace ?? inst.config.name;
+  const scope = inst.ns ? composeGraph(inst.ns.root?.input, [
+    { d: { namespace, dir: inst.dir, title: inst.config.title, model: compiled.model, plan: compiled.plan, pins: inst.ns.pins }, config: inst.config },
+    ...(inst.ns.compose ?? []).map((d) => ({ d, config: { name: d.namespace, title: d.title, packs: [] } })),
+  ], inst.config.name, inst.config.title) : undefined;
+  const reconciliation = scope ? readPremiseLinks(inst.ns?.root?.dir, scope.model, [namespace, ...(inst.ns?.compose ?? []).map((d) => d.namespace)]) : undefined;
+  if (reconciliation) core.push(...reconciliation.findings);
+  if (scope) core.push(...sharedSettlingFindings(scope.model, scope.plan, [namespace, ...(inst.ns?.compose ?? []).map((d) => d.namespace)], inst.ns?.compose !== undefined));
   const checked = checkCompiled(inst, compiled, packs);
   const findings = [...core, ...checked];
   // Notes on findings: checked once every rule has run, against the findings of the design of record.
@@ -117,6 +126,7 @@ export async function buildBundle(dirOrInstance: string | Instance, opts: { buil
     },
     model, plan: compiled.plan,
     findings,
+    ...(reconciliation && inst.ns?.root && existsSync(join(inst.ns.root.dir, "premise-links.yaml")) ? { premiseLinks: reconciliation.data } : {}),
     analysis: analyzePlan(compiled.plan),
     patches,
     layouts,
@@ -133,7 +143,26 @@ export async function buildBundle(dirOrInstance: string | Instance, opts: { buil
   if (summary) bundle.summary = summary;
   const scenes = zoneScenes(model, opts.previous?.zoneScenes);
   if (scenes.length) bundle.zoneScenes = scenes;
-  if (model.claims?.length) bundle.premises = allPremiseImpacts(model, compiled.plan);
+  if (!scope && model.claims?.length) bundle.premises = allPremiseImpacts(model, compiled.plan);
+  if (scope && reconciliation) {
+    const impacts = allPremiseImpacts(scope.model, scope.plan, reconciliation.data.links);
+    // The design page retains its own bare ids. Foreign reach stays qualified.
+    const local = <T>(v: T): T => (typeof v === "string" ? v.startsWith(namespace + ":") ? v.slice(namespace.length + 1) : v
+      : Array.isArray(v) ? v.map(local) : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, local(x)])) : v) as T;
+    bundle.premises = {};
+    for (const c of model.claims ?? []) {
+      const id = c.id.includes(":") ? c.id : namespace + ":" + c.id;
+      if (impacts[id]) {
+        const impact = local(impacts[id]);
+        if (impact.exposure) impact.exposure.settling = (Array.isArray(c.attrs?.tested_by) ? c.attrs.tested_by : c.attrs?.tested_by ? [c.attrs.tested_by] : []).map((raw) => {
+          const ref = String(raw), q = ref.includes(":") ? ref : namespace + ":" + ref;
+          const u = scope.plan.units.find((u) => u.id === q);
+          return { id: ref, design: q.split(":")[0], ...(u ? { status: u.status ?? "todo" } : {}) };
+        });
+        bundle.premises[c.id] = impact;
+      }
+    }
+  }
   if (model.teams.length) bundle.teams = teamFacts(model, compiled.plan, inst.config, bundle.analysis);
   // each unit's lead: its own, else its owner team's (the first owner team), else none; a missing one is never a finding
   if (compiled.plan.units.length) bundle.leads = { units: unitLeads(model, compiled.plan, bundle.teams?.units) };

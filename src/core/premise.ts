@@ -5,7 +5,7 @@
 // the chain of claims that reaches it. The plan slice is every unit that rests on it directly, moves a part that rests
 // on it, or sits in a milestone that rests on it, grouped by milestone in plan order.
 
-import type { Claim, Model, Plan, PremiseExposure, PremiseImpact, RecordKind } from "../types.ts";
+import type { Claim, Model, Plan, PremiseExposure, PremiseImpact, PremiseLink, PremiseReach, PremiseStep, RecordKind } from "../types.ts";
 import { natCompare } from "./util.ts";
 
 type Ref = { kind: RecordKind; id: string };
@@ -26,20 +26,34 @@ export function restsOnIndex(model: Model, plan: Plan): Map<string, Ref[]> {
 
 const ORDER: Record<string, number> = { claim: 0, phase: 1, unit: 2, element: 3, relationship: 4 };
 
-export function premiseImpact(claimId: string, model: Model, plan: Plan, index = restsOnIndex(model, plan)): PremiseImpact {
+export function premiseImpact(claimId: string, model: Model, plan: Plan, index = restsOnIndex(model, plan), links: PremiseLink[] = []): PremiseImpact {
   const direct = [...(index.get(claimId) ?? [])];
-  const dependents: PremiseImpact["dependents"] = [];
-  const seen = new Set<string>([`claim:${claimId}`]);
-  // breadth first through claims, so each record keeps its shortest chain
-  const queue: { id: string; via: string[] }[] = [{ id: claimId, via: [claimId] }];
-  while (queue.length) {
-    const cur = queue.shift()!;
-    for (const r of index.get(cur.id) ?? []) {
-      const k = `${r.kind}:${r.id}`;
+  const dependents: PremiseReach[] = [], proposed: PremiseReach[] = [];
+  // Confirmed paths are exhausted first. A shorter proposed path can never mask a confirmed path.
+  // Two states per record retain the existing seen-set protection while allowing a later confirmed route.
+  const seen = new Set<string>([`confirmed:claim:${claimId}`, `found:claim:${claimId}`]);
+  type Visit = { id: string; via: string[]; steps: PremiseStep[]; found: boolean };
+  const queue: Visit[] = [{ id: claimId, via: [claimId], steps: [], found: false }];
+  const pending: Visit[] = [];
+  const claimOf = new Map((model.claims ?? []).map((c) => [c.id, c]));
+  while (queue.length || pending.length) {
+    const cur = (queue.length ? queue : pending).shift()!;
+    const edges: { ref: Ref; steps: PremiseStep[]; found: boolean }[] = (index.get(cur.id) ?? []).map((ref) => ({ ref, steps: cur.steps, found: cur.found }));
+    for (const link of links) if (link.type === "depends-on" && link.to === cur.id) {
+      const status = link.status === "confirmed" ? "confirmed" : "found";
+      edges.push({ ref: { kind: "claim", id: link.from }, steps: [...cur.steps, { id: link.id, status }], found: cur.found || status === "found" });
+    }
+    // Reaching a premise through a reconciliation link also reaches the work that settles it.
+    if (cur.steps.length) for (const id of testIds(claimOf.get(cur.id))) if (plan.units.some((u) => u.id === id))
+      edges.push({ ref: { kind: "unit", id }, steps: cur.steps, found: cur.found });
+    for (const { ref: r, steps, found } of edges) {
+      const k = `${found ? "found" : "confirmed"}:${r.kind}:${r.id}`;
       if (seen.has(k)) continue;
       seen.add(k);
-      dependents.push({ ...r, via: cur.via });
-      if (r.kind === "claim") queue.push({ id: r.id, via: [...cur.via, r.id] });
+      const d: PremiseReach = { ...r, via: cur.via, ...(steps.length ? { status: found ? "found" : "confirmed", links: steps } : {}) };
+      (found ? proposed : dependents).push(d);
+      if (!found && cur.id === claimId && !direct.some((x) => x.id === r.id && x.kind === r.kind)) direct.push(r);
+      if (r.kind === "claim") (found ? pending : queue).push({ id: r.id, via: [...cur.via, r.id], steps, found });
     }
   }
   dependents.sort((a, b) => ORDER[a.kind] - ORDER[b.kind] || natCompare(a.id, b.id));
@@ -51,6 +65,23 @@ export function premiseImpact(claimId: string, model: Model, plan: Plan, index =
     else if (d.kind === "phase") counts.phases++;
     else if (d.kind === "claim") counts.claims++;
   }
+  const main = planSlice(dependents, plan);
+  if (!links.length) return { claim: claimId, direct, dependents, counts, units: main.slice, openUnits: main.openUnits };
+  const confirmed = new Set(dependents.map((d) => `${d.kind}:${d.id}`));
+  const extra = proposed.filter((d) => !confirmed.has(`${d.kind}:${d.id}`)).sort((a,b) => ORDER[a.kind] - ORDER[b.kind] || natCompare(a.id,b.id));
+  const preview = planSlice(extra, plan);
+  const mainUnits = new Set(main.slice.flatMap((g) => g.units));
+  const units = preview.slice.map((g) => ({ ...g, units: g.units.filter((id) => !mainUnits.has(id)) })).filter((g) => g.units.length);
+  const openUnits = units.flatMap((g) => g.units).filter((id) => plan.units.find((u) => u.id === id)?.status !== "done").length;
+  return { claim: claimId, direct, dependents, counts, units: main.slice, openUnits: main.openUnits, preview: { dependents: extra, units, openUnits } };
+}
+
+function testIds(claim?: Claim): string[] {
+  const raw = claim?.attrs?.tested_by;
+  return (Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : []).map(String);
+}
+
+function planSlice(dependents: PremiseReach[], plan: Plan) {
   const els = new Set(dependents.filter((d) => d.kind === "element").map((d) => d.id));
   const phases = new Set(dependents.filter((d) => d.kind === "phase").map((d) => d.id));
   const units = new Set(dependents.filter((d) => d.kind === "unit").map((d) => d.id));
@@ -69,7 +100,8 @@ export function premiseImpact(claimId: string, model: Model, plan: Plan, index =
   const slice = [...byPhase].sort((a, b) => rank(a[0]) - rank(b[0]) || natCompare(a[0], b[0]))
     .map(([phase, us]) => ({ phase, units: us.sort(natCompare) }));
   const openUnits = [...units].filter((id) => (unitOf.get(id)?.status ?? "todo") !== "done").length;
-  return { claim: claimId, direct, dependents, counts, units: slice, openUnits };
+
+  return { slice, openUnits };
 }
 
 /** How much of the plan is built on a claim before its first test lands (types.ts PremiseExposure). */
@@ -78,15 +110,20 @@ export function exposure(im: PremiseImpact, claim: Claim, plan: Plan): PremiseEx
   const order = new Map([...plan.phases].sort((a, b) => a.order - b.order || natCompare(a.id, b.id)).map((p, i) => [p.id, i]));
   const raw = claim.attrs?.tested_by;
   const tests = (Array.isArray(raw) ? raw : typeof raw === "string" ? [raw] : []).map(String).filter((id) => unitOf.has(id));
+  const design = claim.id.includes(":") ? claim.id.split(":")[0] : undefined;
+  // Orders belong to a design. A foreign test cannot be placed before or after local work.
+  const outsidePlanOrder = design ? [...new Set(tests.map((id) => id.split(":")[0]).filter((ns) => ns !== design))] : [];
   let first: number | undefined;
-  for (const t of tests) { const i = order.get(unitOf.get(t)!.phase); if (i !== undefined && (first === undefined || i < first)) first = i; }
+  if (!outsidePlanOrder.length) for (const t of tests) { const i = order.get(unitOf.get(t)!.phase); if (i !== undefined && (first === undefined || i < first)) first = i; }
   const firstPhase = first === undefined ? undefined : [...order].find(([, i]) => i === first)![0];
   const beforeByPhase = im.units
+    .filter((g) => !design || g.phase.startsWith(design + ":"))
     .filter((g) => first === undefined || (order.get(g.phase) ?? 1e9) < first)
     .map((g) => ({ phase: g.phase, open: g.units.filter((id) => (unitOf.get(id)?.status ?? "todo") !== "done").length }))
     .filter((g) => g.open > 0);
   return {
     tests,
+    ...(outsidePlanOrder.length ? { outsidePlanOrder } : {}),
     ...(firstPhase ? { firstTest: { phase: firstPhase, units: tests.filter((t) => unitOf.get(t)!.phase === firstPhase) } } : {}),
     before: beforeByPhase.reduce((n, g) => n + g.open, 0),
     beforeByPhase,
@@ -111,10 +148,10 @@ export function rankByStakes(claims: Claim[], impacts: Record<string, PremiseImp
 }
 
 /** Every claim's impact, keyed by claim id. */
-export function allPremiseImpacts(model: Model, plan: Plan): Record<string, PremiseImpact> {
+export function allPremiseImpacts(model: Model, plan: Plan, links: PremiseLink[] = []): Record<string, PremiseImpact> {
   const index = restsOnIndex(model, plan);
   const out: Record<string, PremiseImpact> = {};
-  for (const c of model.claims ?? []) { out[c.id] = premiseImpact(c.id, model, plan, index); out[c.id].exposure = exposure(out[c.id], c, plan); }
+  for (const c of model.claims ?? []) { out[c.id] = premiseImpact(c.id, model, plan, index, links); out[c.id].exposure = exposure(out[c.id], c, plan); }
   return out;
 }
 

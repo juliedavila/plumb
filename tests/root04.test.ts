@@ -306,7 +306,7 @@ describe("estimates with provenance", () => {
     expect(r.check.org!.estimates.find((e) => e.record === "org:dev-platform")).toMatchObject({ ageDays: 119, stale: true });
     edit(join(d, "shared/engine.yaml"), (s) => s.replace("stale_after_days: 90", "stale_after_days: 200"));
     r = await rootCheck(d);
-    expect(r.findings).toEqual([]);
+    expect(r.findings.map((f) => [`${f.pack}/${f.rule}`, f.severity, f.at])).toEqual([]);
   });
 });
 
@@ -590,7 +590,7 @@ describe("notes pin to records of both namespaces", () => {
     const { bundle } = await buildRoot(join(examples(), "shared"), { built: BUILT });
     expect(bundle.notes!.items.map((n) => [n.id, n.target.kind, n.target.id])).toEqual([["N-1", "activity", "org:vuln-triage"], ["N-2", "contract", "shared:CheckYield"]]);
     expect(of(bundle.findings, "notes/target-exists")).toEqual([]);
-    expect(bundle.root.packs.map((p) => p.name)).toEqual(["org", "shared", "tracker", "notes"]); // tracker: the root holds an org mapping
+    expect(bundle.root.packs.map((p) => p.name)).toEqual(["org", "shared", "tracker", "notes"]); // Out-of-scope links produce no root findings or extra pack.
   });
 
   testEx("a note on a record the root does not hold is notes/target-exists; one on a design's kind is a problem", async () => {
@@ -651,9 +651,9 @@ describe("the root's own build", () => {
     const mine = exp.findings.filter((f) => /^(org|shared)\//.test(f.rule)).map((f) => `${f.rule} ${f.severity} ${f.subject.split(" ")[0]}`);
     expect(mine).toEqual(["org/estimate-stale warning org:dev-platform"]);
     const got = (fs: Finding[]) => fs.map((f) => `${f.pack}/${f.rule} ${f.severity} ${f.at}`);
-    expect(got((await rootCheck(d, ["intake", "premerge", "inventory"])).findings)).toEqual(mine);
+    expect(got((await rootCheck(d, ["intake", "premerge", "inventory"])).findings)).toEqual([...mine, "premises/links-valid warning PL-004"]);
     expect(got((await rootCheck(d)).findings)).toEqual(mine);
-    expect(got((await rootCheck(d, ["intake", "premerge", "inventory"], { with: "P-005" })).findings)).toEqual(mine); // P-005 adds a capacity warning, which is the portfolio's
+    expect(got((await rootCheck(d, ["intake", "premerge", "inventory"], { with: "P-005" })).findings)).toEqual([...mine, "premises/links-valid warning PL-004"]); // P-005 adds a capacity warning, which is the portfolio's
   });
 
   test("every broken variant for root rules fires its one rule and nothing else; each design's own build stays clean", async () => {

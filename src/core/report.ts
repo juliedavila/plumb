@@ -117,8 +117,13 @@ export function premiseMd(b: Bundle, claimId: string): string {
   const out = [`# If ${c.id} is false`, "", `> ${c.statement}`, "", `${c.kind[0].toUpperCase() + c.kind.slice(1)}, ${GRADE_WORD[c.grade] ?? c.grade}.${c.source ? ` Source: ${c.source}` : ""}`];
   if (c.fallback) out.push("", `Fallback: ${c.fallback}`);
   if (c.rests_on?.length) out.push("", `It rests on ${c.rests_on.map((x) => `\`${x}\``).join(", ")}.`);
-  const tested = (c.attrs?.tested_by as string[] | undefined) ?? [];
+  const rawTests = c.attrs?.tested_by;
+  const tested = (Array.isArray(rawTests) ? rawTests : typeof rawTests === "string" ? [rawTests] : []).map(String);
   if (tested.length) out.push("", `Tested by ${tested.map((x) => `\`${x}\``).join(", ")}.`);
+  const qualified = c.id.includes(":") ? c.id : (b.instance.namespace ?? b.instance.name) + ":" + c.id;
+  const links = b.premiseLinks?.links.filter((l) => l.from === qualified || l.to === qualified) ?? [];
+  if (links.length) out.push("", "## Reconciliation links", "", ...links.map((l) => `- ${l.id}: ${l.from} ${l.type} ${l.to} (${l.status}).${l.confirmed ? ` Clauses: “${l.confirmed.falsifier_clause}” moves “${l.confirmed.moved_clause}”.` : ""}`));
+  if (im?.preview?.dependents.length || im?.preview?.units.length) out.push("", "## Would cascade if confirmed", "", ...im.preview.dependents.map((d) => `- ${d.kind} ${d.id} (${d.status ?? "found"}), through ${d.links?.map((l) => `${l.id} (${l.status})`).join(", ")}.`), ...im.preview.units.map((g) => `- Work in ${g.phase}: ${g.units.join(", ")} (found).`));
   if (!im || !im.counts.total) { out.push("", "Nothing in the model or the plan rests on it.", ""); return out.join("\n"); }
   const k = im.counts;
   const bits = [k.elements && `${k.elements} part${k.elements === 1 ? "" : "s"}`, k.relationships && `${k.relationships} relationship${k.relationships === 1 ? "" : "s"}`, k.units && `${k.units} unit${k.units === 1 ? "" : "s"}`, k.phases && `${k.phases} milestone${k.phases === 1 ? "" : "s"}`, k.claims && `${k.claims} other claim${k.claims === 1 ? "" : "s"}`].filter(Boolean);

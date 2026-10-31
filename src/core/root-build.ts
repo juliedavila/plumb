@@ -13,7 +13,7 @@
 //
 // The root's build writes no page of its own; the portfolio page reads its bundle (RootBundle).
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, join, relative } from "node:path";
 import type { ComposedDesign, Finding, Note, RootBundle, RootCheck, RootInput, RootLoadOptions, RootProblem, RulePack, Team, TrackerInput } from "../types.ts";
 import { buildContext, compareFindings, corePack, dedupeFindings, loadPacks, runRules } from "./rules.ts";
@@ -25,6 +25,10 @@ import { ORG, parseRef, SHARED } from "./namespace.ts";
 import { canonicalJson, natCompare, sha256 } from "./util.ts";
 import { findingsMd } from "./report.ts";
 import { pack as NOTES_PACK } from "../../packs/notes/index.ts";
+import { pack as PREMISES_PACK } from "../../packs/premises/index.ts";
+import { composeGraph } from "./portfolio.ts";
+import { readPremiseLinks, sharedSettlingFindings } from "./premise-links.ts";
+import { allPremiseImpacts } from "./premise.ts";
 import { ENGINE_VERSION } from "./bundle.ts";
 import { loadTracker } from "../tracker/load.ts";
 import { attachMeasured, loadMeasures, rootTrackerFacts } from "../tracker/measures.ts";
@@ -118,6 +122,9 @@ export async function checkRoot(rootOrDir: RootInput | string, opts: RootBuildOp
   for (const p of root.problems) findings.push({ pack: "core", rule: "xref-resolves", severity: "error", at: "engine.yaml", atKind: "instance", message: p });
   for (const p of [...(root.shared?.problems ?? []), ...(root.org?.problems ?? [])]) findings.push({ pack: "core", rule: "xref-resolves", severity: "error", at: "engine.yaml", atKind: "instance", message: p });
   findings.push(...(root.loadFindings ?? []));
+  const graph = composeGraph(root, (opts.compose ?? []).map((d) => ({ d, config: { name: d.namespace, title: d.title, packs: [] } })), "root", "Root");
+  findings.push(...readPremiseLinks(root.dir, graph.model, (opts.compose ?? []).map((d) => d.namespace)).findings);
+  findings.push(...sharedSettlingFindings(graph.model, graph.plan, (opts.compose ?? []).map((d) => d.namespace), opts.compose !== undefined));
   findings.push(...problems.filter((p) => p.rule.startsWith("core/")).map(asFinding));
   // notes pinned to records of either namespace; notes on findings once every rule has run
   const notes = root.notes?.notes ?? [];
@@ -127,6 +134,7 @@ export async function checkRoot(rootOrDir: RootInput | string, opts: RootBuildOp
   for (const n of notes) if (n.target.kind === "finding" && !ids.has(n.target.id))
     findings.push({ pack: "notes", rule: "target-exists", severity: "warning", at: n.id, atKind: "note", message: `${n.kind === "question" ? "Question" : "Note"} ${n.id} is pinned to finding ${n.target.id}, which no longer fires` });
   const usedPacks: RulePack[] = [...packs];
+  if (findings.some((f) => f.pack === "premises")) usedPacks.push({ ...PREMISES_PACK, rules: PREMISES_PACK.rules04 ?? [] });
   if (root.notes) usedPacks.push(NOTES_PACK);
   if (findings.some((f) => f.pack === "core")) usedPacks.unshift(corePack(true, findings));
   return { root, check, findings: dedupeFindings(findings).sort(compareFindings), packs: usedPacks, ...(tracker ? { tracker } : {}) };
@@ -172,6 +180,10 @@ export async function buildRoot(dir: string, opts: RootBuildOptions = {}): Promi
     findings,
     ...(root.notes ? { notes: { version: root.notes.version, items: [...root.notes.notes].sort((a, b) => natCompare(a.id, b.id)) } } : {}),
   };
+  const graph = composeGraph(root, (opts.compose ?? []).map((d) => ({ d, config: { name: d.namespace, title: d.title, packs: [] } })), "root", "Root");
+  const reconciliation = readPremiseLinks(root.dir, graph.model, (opts.compose ?? []).map((d) => d.namespace)).data;
+  if (existsSync(join(root.dir, "premise-links.yaml"))) bundle.premiseLinks = reconciliation;
+  bundle.premises = allPremiseImpacts(graph.model, graph.plan, reconciliation.links);
   return { bundle, root };
 }
 

@@ -164,6 +164,7 @@ contracts:
   - { name: TriageAccuracy, description: "How often analysts changed the agent's drafts, per week.", measures: "share of drafts changed by an analyst", produced_by: [class-tuner], consumed_by: [triage-desk] }
 claims:
   - id: IN-1
+    falsifier: A timed sample finds that repeat reports take less than half of manual triage time.
     kind: premise
     statement: Most of the triage team's manual time goes to repeats of findings that were already reported in another form.
     grade: judgment
@@ -176,6 +177,7 @@ claims:
     source: A two-week trial on one team's findings, not yet run.
     fallback: Show the drafts as hints only, and keep triage by hand.
   - id: IN-3
+    falsifier: A quarter of scanner severity cases still need scanner-specific rule changes.
     kind: premise
     statement: One severity mapping in the normalizer replaces most of the per-scanner rule tweaks the platform team keeps by hand.
     grade: inference

@@ -499,7 +499,9 @@ function risksOf(c: Ctx): RiskBet[] {
       const affected = !ms.length ? "the design that rests on it is in question"
         : ms.length === remaining.length && ms.length > 2 ? `every remaining milestone is in question, starting with ${quote(nameOf(ms[0]))}`
         : `reaching ${list(ms.map((p) => quote(nameOf(p))))} is in question`;
-      const testing = !tests.length ? "Nothing tests it yet: it needs a test and an owner"
+      const outside = c.b.premises?.[cl.id]?.exposure?.outsidePlanOrder;
+      const testing = outside?.length ? `It is settled in ${list(outside)}, outside this design's plan order`
+        : !tests.length ? "Nothing tests it yet: it needs a test and an owner"
         : `We are testing it by ${quote(c.title(tests[0]))}${tests.length > 1 ? " and other work" : ""} (${c.owners(tests[0]).length ? teamsText(c, c.owners(tests[0])) : "needs an owner"})`;
       const bet = sentence(`We are betting that ${clause(cl.statement)}`), ifWrong = sentence(`If it is wrong, ${affected}`), t = sentence(testing);
       return { claim: cl.id, text: [bet, ifWrong, t].join(" "), bet, ifWrong, testing: t, milestones: ms, testedBy: tests, teams, weight };

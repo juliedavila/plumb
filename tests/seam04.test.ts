@@ -60,7 +60,8 @@ async function available(rule: string): Promise<boolean> {
   if (pack === "core") return [...CORE_PACK.rules, ...CORE_RULES_04].some((r) => r.id === id);
   const p = join(DE, "packs", pack, "index.ts");
   if (!existsSync(p)) return false;
-  return ((await import(p)).pack.rules as Rule[]).some((r) => r.id === id);
+  const loaded = (await import(p)).pack;
+  return ([...loaded.rules, ...(loaded.rules04 ?? [])] as Rule[]).some((r) => r.id === id);
 }
 /** Does a finding match an expectation of expected.yaml or a variant.yaml: rule and severity exactly, the subject by its id? */
 function matches(exp: { rule: string; severity: string; subject: string }, f: PortfolioFinding): boolean {

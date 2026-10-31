@@ -142,6 +142,7 @@ function exposureSentence(ix, c, im) {
   var ex = im && im.exposure;
   if (!ex) return "";
   var units = function (n) { return PROSE.count(n, "open unit"); };
+  if (ex.outsidePlanOrder) return reconciliationExposure(ex);
   if (ex.firstTest) return ex.before
     ? "Its first test lands in " + PROSE.quote(milestoneLabel(ix, ex.firstTest.phase)) + "; " + units(ex.before) + " in earlier milestones " + (ex.before === 1 ? "is" : "are") + " built on it first."
     : "Its first test lands in " + PROSE.quote(milestoneLabel(ix, ex.firstTest.phase)) + ", before any open work in an earlier milestone is built on it.";
@@ -172,9 +173,10 @@ function claimDetail(ix, id, o) {
   // a flow metric that can regrade it: today's value, its source, and whether it holds; a person regrades
   if (im && im.flow) h.push(sec("Measured by flow", null, '<p class="small' + (im.flow.holds === false ? " warn-text" : "") + '">' + esc(im.flow.text) + (im.flow.view ? ' <a href="' + R.view(im.flow.view) + '">Open the stream</a>' : "") + "</p>"));
   var tested = arr(ex ? ex.tests : at.tested_by).filter(function (u) { return ix.unit.has(u); });
+  var outsideTests = typeof reconciliationDetail === "function" ? reconciliationDetail(ix, id, im, h) : [];
   h.push(sec("Tested by", tested.length || null, tested.length
     ? '<ul class="rows work-rows">' + tested.map(function (u) { return workRow(ix, u); }).join("") + "</ul>"
-    : '<p class="small no-test">' + icon("warning", "icon icon-sm st-warning") + " No work tests this; it needs a test and an owner.</p>"));
+    : outsideTests.length ? '<p class="small fg2">The settling work is listed above.</p>' : '<p class="small no-test">' + icon("warning", "icon icon-sm st-warning") + " No work tests this; it needs a test and an owner.</p>"));
 
   // the milestones at stake: those whose own work rests on it (with what reaching them means), and apart from them,
   // those its being untested turns amber (their status reasons name it, also through a part their work changes)
@@ -204,7 +206,8 @@ function claimDetail(ix, id, o) {
       if (!xs.length) return "";
       var row = function (d) {
         var link = d.kind === "element" ? elLink(ix, d.id) : d.kind === "unit" ? unitLink(ix, d.id) : d.kind === "claim" ? claimLink(ix, d.id) : d.kind === "phase" ? '<a href="' + R.milestone(d.id) + '">' + esc(milestoneLabel(ix, d.id)) + "</a>" : noteTargetHtml(ix, { kind: "relationship", id: d.id });
-        return "<li>" + link + (arr(d.via).length > 1 ? ' <span class="xs muted">through ' + arr(d.via).slice(1).map(function (v) { return esc(recName(ix, v)); }).join(" → ") + "</span>" : "") + "</li>";
+        if (ix.b.premiseLinks) link = reconciliationRef(ix, d, link);
+        return "<li>" + link + (arr(d.via).length > 1 ? ' <span class="xs muted">through ' + arr(d.via).slice(1).map(function (v) { return ix.claim.has(v) ? esc(recName(ix, v)) : "<code>" + esc(v) + "</code>"; }).join(" → ") + "</span>" : "") + "</li>";
       };
       return '<h4 class="xs muted" style="margin:8px 0 2px">' + g[1] + " " + xs.length + '</h4><ul class="rows">' + xs.slice(0, 12).map(row).join("") + "</ul>"
         + (xs.length > 12 ? '<details class="disc"><summary>' + esc("Show " + PROSE.fmt(xs.length - 12) + " more") + '</summary><div class="body"><ul class="rows">' + xs.slice(12).map(row).join("") + "</ul></div></details>" : "");

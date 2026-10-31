@@ -91,6 +91,7 @@ contracts:
   - { name: OwnershipGaps, description: Assets with no confirmed owner, per team., measures: "assets with no confirmed owner, per team", produced_by: [audit-export], consumed_by: [asset-steward] }
 claims:
   - id: IV-1
+    falsifier: An audit finds assets whose ownership cannot be assigned to a single team.
     kind: premise
     statement: Every asset has one team that can be named as its owner.
     grade: judgment

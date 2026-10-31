@@ -11,6 +11,8 @@ import { PROSE } from "../site/prose.ts";
 import { flowSettings, flowSteps, patchFlowEffect } from "./flow.ts";
 import { instanceMeasured } from "./flow-measured.ts";
 import { natCompare, natSort } from "./util.ts";
+import { composeGraph } from "./portfolio.ts";
+import { readPremiseLinks } from "./premise-links.ts";
 
 export function checkCompiled(inst: Instance, c: Compiled, packs: RulePack[]): Finding[] {
   const ns = inst.ns ? { ns: { ...(inst.ns.namespace ? { own: inst.ns.namespace } : {}), rooted: !!inst.ns.root } } : {};
@@ -19,8 +21,23 @@ export function checkCompiled(inst: Instance, c: Compiled, packs: RulePack[]): F
   if (inst.ns?.root?.input) ctx.rootInput = inst.ns.root.input; // a rooted design: the seam rule reads its shared seams and exceptions
   // a 0.4 design's current state, for the plan pack's rules that read it (src/core/current.ts)
   if (c.current) ctx.current = currentFacts(c.current, currentContext(inst, inst.config.ladder ?? DEFAULT_LADDER));
-  const out = runRules(packs, ctx);
+  // The load-bearing check uses the composed scope below, with the same impact walk as the bundle.
+  const localPacks = inst.ns ? packs.map((p) => p.name === "premises" ? { ...p, rules: p.rules.filter((r) => r.id !== "load-bearing-untested") } : p) : packs;
+  let out = runRules(localPacks, ctx);
   if (!inst.ns) return out;
+  const premises = packs.find((p) => p.name === "premises");
+  if (premises) {
+    const namespace = inst.ns.namespace ?? inst.config.name;
+    const designs = [{ namespace, dir: inst.dir, title: inst.config.title, model: c.model, plan: c.plan, pins: inst.ns.pins }, ...(inst.ns.compose ?? [])];
+    const graph = composeGraph(inst.ns.root?.input, designs.map((d) => ({ d, config: inst.config })), inst.config.name, inst.config.title);
+    const evidence = readPremiseLinks(inst.ns.root?.dir, graph.model, designs.map((d) => d.namespace));
+    const pc = buildContext(inst.config, graph.model, graph.plan);
+    pc.premiseLinks = evidence.data.links;
+    const own = new Map((c.model.claims ?? []).map((cl) => [cl.id.includes(":") ? cl.id : `${namespace}:${cl.id}`, cl.id]));
+    const scoped = runRules([{ ...premises, rules: premises.rules.filter((r) => r.id === "load-bearing-untested") }], pc)
+      .filter((f) => own.has(f.at)).map((f) => ({ ...f, at: own.get(f.at)!, message: f.message.replaceAll(`${namespace}:`, "") }));
+    out.push(...scoped);
+  }
   // a 0.4 design: rules about records it does not own are skipped, and resolution's and current state's findings join the rest
   return dedupeFindings([...dropOutsideFindings(out, c.model), ...(c.ns?.findings ?? []), ...(c.current?.findings ?? [])]).sort(compareFindings);
 }

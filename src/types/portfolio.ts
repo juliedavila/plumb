@@ -120,6 +120,7 @@ export interface PortfolioDesign {
 
 /** What `bun plumb.ts portfolio build` writes as portfolio.json, and what `check` and `impact` read. */
 export interface PortfolioData {
+  premiseLinks?: import("./premise-links.ts").PremiseLinks;
   engine: { version: string; built: string };
   portfolio: { name: string; title: string; mode: PortfolioMode; root: string; horizon_months?: number; file: string };
   designs: PortfolioDesign[];

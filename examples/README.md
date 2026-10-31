@@ -206,10 +206,11 @@ Transition work: 7 of inventory's 11 units move a part whose disposition is tran
 
 ## The findings, all together
 
-A portfolio check of `examples/portfolio` on 2026-11-16, working view, should report exactly these ten. `expected.yaml` holds the same list. Today's packs (generic, plan, security, teams, premises) find nothing else on the composed designs, with the four moves to `retired` supported by the current-state rules.
+A portfolio check of `examples/portfolio` on 2026-11-16, working view, should report exactly these eleven. `expected.yaml` holds the same list. The reconciliation review flag joins the existing checks. Today's packs find nothing else on the composed designs, with the four moves to `retired` supported by the current-state rules.
 
 | Rule | Severity | Subject |
 |---|---|---|
+| premises/links-valid | warning | A contradiction review flag between the ownership and repeat-triage premises. |
 | core/xref-pin-stale | warning | intake's pin on premerge 1.0.0 (lists the check runner) |
 | portfolio/seam-crossing-declared | error | inventory v01 |
 | portfolio/seam-crossing-declared | warning | intake r08 (excepted) |

@@ -41,6 +41,7 @@ import { designRef, rootRef, seamReport } from "./seams.ts";
 import { canonicalJson, natCompare, sha256 } from "./util.ts";
 import { loadDeltas, loadFacts } from "./capacity.ts";
 import { estimateSettings } from "./org.ts";
+import { readPremiseLinks } from "./premise-links.ts";
 import { loadMeasures, measureSummary } from "../tracker/measures.ts";
 
 type Raw = Record<string, unknown>;
@@ -126,10 +127,11 @@ export function composeGraph(root: RootInput | undefined, designs: { d: Composed
     for (const c of d.model.contracts.filter((x) => !x.home)) model.contracts.push(prune({ ...clone(c), name: q(c.name), produced_by: c.produced_by?.map(q), consumed_by: c.consumed_by?.map(q), home: ns } as Contract));
     for (const c of (d.model.claims ?? []).filter((x) => !x.home)) {
       const cc = { ...clone(c), id: q(c.id), rests_on: c.rests_on?.map(q), home: ns };
-      if (Array.isArray(cc.attrs?.tested_by)) cc.attrs!.tested_by = (cc.attrs!.tested_by as unknown[]).map((x) => (typeof x === "string" ? q(x) : x));
+      if (cc.attrs?.tested_by !== undefined) cc.attrs!.tested_by = (Array.isArray(cc.attrs.tested_by) ? cc.attrs.tested_by : [cc.attrs.tested_by]).map((x) => (typeof x === "string" ? q(x) : x));
       model.claims!.push(prune(cc));
     }
     for (const v of d.model.views) model.views.push(prune({ ...clone(v), id: q(v.id), elements: v.elements.map(q), relationships: v.relationships?.map(q) } as View));
+    // Milestone orders stay local to their design, including in the composed graph.
     for (const ph of d.plan.phases) plan.phases.push(prune({ ...clone(ph), id: q(ph.id), rests_on: ph.rests_on?.map(q) } as Phase));
     for (const u of d.plan.units) {
       const uu = prune({
@@ -162,7 +164,11 @@ export function composeGraph(root: RootInput | undefined, designs: { d: Composed
     const o = ownerOf(p.owner); if (o) e.owner = o;
     model.elements.push(e);
   }
-  for (const c of sh?.claims ?? []) model.claims!.push({ ...clone(c), id: rootRef(c.id), ...(c.rests_on ? { rests_on: c.rests_on.map(rootRef) } : {}), home: SHARED });
+  for (const c of sh?.claims ?? []) {
+    const cc = { ...clone(c), id: rootRef(c.id), ...(c.rests_on ? { rests_on: c.rests_on.map(rootRef) } : {}), home: SHARED };
+    if (cc.attrs?.tested_by !== undefined) cc.attrs.tested_by = (Array.isArray(cc.attrs.tested_by) ? cc.attrs.tested_by : [cc.attrs.tested_by]).map((x) => rootRef(String(x)));
+    model.claims!.push(cc);
+  }
   for (const c of sh?.contracts ?? []) {
     const con: Contract = { ...clone(c), name: rootRef(c.name), home: SHARED };
     if (c.produced_by) con.produced_by = c.produced_by.map(rootRef);
@@ -394,7 +400,7 @@ export async function runPortfolio(pathIn: string, opts: PortfolioOptions = {}):
   // marks, src/core/shared.ts), the seams, and the portfolio's own pack
   let rootCheck: Awaited<ReturnType<typeof checkRoot>> | undefined;
   try { rootCheck = await checkRoot(root, { built, compose: composed }); } catch (err) { own.push(pf("xref-resolves", "error", "portfolio", `the root ${file.root} could not be checked: ${(err as Error).message}`)); }
-  for (const f of rootCheck?.findings ?? []) own.push({ ...f, subject: RECORD_KINDS.has(f.atKind) || isNamespaced(f.at) ? f.at : `${rootFileNs(f.at)} (${f.at})` });
+  for (const f of rootCheck?.findings ?? []) own.push({ ...f, subject: RECORD_KINDS.has(f.atKind) || isNamespaced(f.at) || f.pack === "premises" ? f.at : `${rootFileNs(f.at)} (${f.at})` });
   const marks: Marks | undefined = rootCheck?.check.marks;
   const seams = seamReport({ root, designs: composed, ...(marks ? { marks } : {}), marksAvailable: !!marks, ...(today ? { today } : {}) });
   const roots: Record<string, { dir?: string; written?: string }> = {};
@@ -423,6 +429,7 @@ export async function runPortfolio(pathIn: string, opts: PortfolioOptions = {}):
   const data: PortfolioData = {
     engine: { version: ENGINE_VERSION, built }, portfolio: portfolioWords(file, mode),
     designs: runs.map((r) => designWords(r, mode, file)),
+    ...(existsSync(join(root.dir, "premise-links.yaml")) ? { premiseLinks: readPremiseLinks(root.dir, graph.model, composed.map((d) => d.namespace)).data } : {}),
     findings, seams, ...(marks ? { marks } : {}),
     notes: [...graph.notes, ...seams.notes.filter((n) => !graph.notes.includes(n)), ...(marks ? [] : ["No mark derivation reached this build (src/core/shared.ts computeMarks), so every undeclared crossing counts as security-relevant."]),
       ...(load?.notes ?? []).filter((n) => !graph.notes.includes(n))],

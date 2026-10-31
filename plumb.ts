@@ -33,6 +33,7 @@ import { computeImpact, findPatch } from "./src/core/impact.ts";
 import { loadInstance, packNames } from "./src/core/load.ts";
 import { analyzePlan } from "./src/core/plan.ts";
 import { buildSummaryMd, findingsMd, impactMd, planMd, premiseMd } from "./src/core/report.ts";
+import { premisesCommand } from "./src/core/premises-command.ts";
 import { rankClaims, weight } from "./src/core/premise.ts";
 import { diffCli } from "./src/core/diff.ts";
 import { reportCli } from "./src/core/report-cli.ts";
@@ -54,6 +55,7 @@ const USAGE = `usage:
   plumb brief  <instance-dir>
   plumb impact <instance-dir> <patch-id>
   plumb plan   <instance-dir>
+  plumb premises <instance-or-root-or-portfolio> [--json]
   plumb premise <instance-dir> [claim-id]
   plumb diff   <instance-dir> --from <bundle.json | git ref | edition folder> [--to ...] [--save] [--json]
   plumb report <instance-dir> [--presented]
@@ -85,6 +87,8 @@ async function main(argv: string[]) {
   const [cmd, dir, ...rest] = argv;
   if (!cmd || cmd === "-h" || cmd === "--help" || cmd === "help") { console.log(USAGE); return 0; }
   if (!dir) die(USAGE);
+
+  if (cmd === "premises") { console.log(await premisesCommand(dir, rest.includes("--json"))); return 0; }
 
   if (cmd === "design") return designCli([dir, ...rest]);
 

@@ -81,7 +81,7 @@ export interface ResolveResult {
 }
 
 interface Where { kind: F["atKind"]; id: string; field: string }
-interface Opt { team?: boolean; descriptive?: boolean; config?: boolean }
+interface Opt { team?: boolean; descriptive?: boolean; settles?: boolean; config?: boolean }
 
 /** The resolver for one design: own, then shared, then org for teams; collects what it names outside itself. */
 class Resolver {
@@ -102,6 +102,7 @@ class Resolver {
     const r = parseRef(raw);
     const where = `${at.kind === "instance" ? "" : `${at.kind} ${at.id} `}names ${raw}${at.field ? ` in ${at.field}` : ""}`;
     if (r.ns === undefined || r.ns === this.own) {
+      if (opt.settles && !this.ix[kind].has(r.id)) this.f.push(xref(at.id, at.kind, `${where}, which does not resolve to a unit in this design`));
       if (this.ix[kind].has(r.id) || r.ns === this.own) return r.id; // own (an own namespace written out is still own)
       const sk = kind as SK;
       if ((SHARED_KINDS as readonly string[]).includes(kind) && this.sh[sk].has(r.id)) {
@@ -131,6 +132,7 @@ class Resolver {
       return canon;
     }
     const d = this.compose?.find((x) => x.namespace === r.ns);
+    if (!d && opt.settles && this.compose) this.f.push({ ...xref(at.id, at.kind, `${where}: unknown namespace ${r.ns} in this workspace`), severity: "warning" });
     if (d && !composedHas(d, kind, r.id)) this.f.push(xref(at.id, at.kind, `${where}, which ${d.title} (${r.ns}) does not hold`));
     if (!this.foreign.has(canon)) this.foreign.set(canon, { kind, descriptive: true });
     return canon;
@@ -204,7 +206,7 @@ function canonicalizeOwn(s: State, R: Resolver): void {
     const at: Where = { kind: "claim", id: c.id, field: "" };
     if (c.rests_on) c.rests_on = R.refs(c.rests_on, "claim", { descriptive: true }, { ...at, field: "rests_on" });
     const tb = c.attrs?.tested_by;
-    if (Array.isArray(tb)) c.attrs!.tested_by = tb.map((x) => (typeof x === "string" ? R.ref(x, "unit", {}, { ...at, field: "attrs.tested_by" }) : x));
+    if (tb !== undefined) c.attrs!.tested_by = (Array.isArray(tb) ? tb : [tb]).map((x) => (typeof x === "string" ? R.ref(x, "unit", { descriptive: true, settles: true }, { ...at, field: "attrs.tested_by" }) : x));
   }
   for (const ph of p.phases) if (ph.rests_on) ph.rests_on = R.refs(ph.rests_on, "claim", { descriptive: true }, { kind: "phase", id: ph.id, field: "rests_on" });
   for (const u of p.units) {

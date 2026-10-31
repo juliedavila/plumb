@@ -4,6 +4,7 @@
 built: "2026-11-16T10:00:00Z"
 view: working
 findings:
+  - { rule: premises/links-valid, severity: warning, subject: "PL-004" }
   - { rule: core/xref-pin-stale, severity: warning, subject: "intake (its pin on premerge 1.0.0)", lists: [premerge:check-runner] }
   - { rule: portfolio/seam-crossing-declared, severity: error, subject: "inventory:v01" }
   - { rule: portfolio/seam-crossing-declared, severity: warning, subject: "intake:r08", excepted_by: "org exception on intake:autotriage" }
@@ -14,7 +15,7 @@ findings:
   - { rule: plan/retire-before-replace, severity: error, subject: "inventory:ownership-spreadsheet" }
   - { rule: plan/retire-before-replace, severity: warning, subject: "inventory:tag-sync-job", clause: order }
   - { rule: plan/retire-before-replace, severity: warning, subject: "inventory:ownership-macros", clause: dependency }
-# The presenting view composes premerge 1.0.0, so the pin finding is gone there and the other nine stay.
+# The presenting view composes premerge 1.0.0, so the pin finding is gone there and the other ten stay.
 presenting_drops: [core/xref-pin-stale]
 # The proposed root patch P-005, if accepted, adds exactly this finding, so its verdict is caution.
 P-005_adds:

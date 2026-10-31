@@ -16,6 +16,7 @@ import CLIENT_PROSE from "./client/prose.js" with { type: "text" };
 import CLIENT_FLOW from "./client/flow.js" with { type: "text" };
 import { FLOWUI } from "./flow.ts";
 import CLIENT_DIGEST from "./client/digest.js" with { type: "text" };
+import CLIENT_RECONCILIATION from "./client/reconciliation.js" with { type: "text" };
 import CLIENT_STRATEGY from "./client/strategy.js" with { type: "text" };
 import CLIENT_CORE from "./client/core.js" with { type: "text" };
 import CLIENT_GRAMMAR from "./client/grammar.js" with { type: "text" };
@@ -38,7 +39,7 @@ import { RAG_ICON as RAG_ICON_NAME, RAG_SYMBOLS, RAG_WORD, historyStrip, ragHtml
 import { dayText, trackerSays } from "../core/status";
 
 /** The client script: one IIFE that defines DE, then boots when the page holds a bundle. */
-export const CLIENT_JS = `var DE = (function () {\n"use strict";\nvar api = {};\n${CLIENT_PROSE}\napi.prose = PROSE;\n${CLIENT_FLOW}\napi.flow = FLOWUI;\n${CLIENT_DIGEST}\napi.digest = DIGEST;\n${CLIENT_CORE}\n${CLIENT_BLOCKERS}\n${CLIENT_GRAMMAR}\n${CLIENT_GRAPH}\n${CLIENT_VIEWS}\n${CLIENT_STRATEGY}\n${CLIENT_PRESENT}\n${CLIENT_TEAMS}\n${CLIENT_LEARN}\n${CLIENT_GLOSSARY}\n${CLIENT_FOCUS}\n${CLIENT_UI}\n${CLIENT_OVERVIEW}\n${CLIENT_APP}\nreturn api;\n})();
+export const CLIENT_JS = `var DE = (function () {\n"use strict";\nvar api = {};\n${CLIENT_PROSE}\napi.prose = PROSE;\n${CLIENT_FLOW}\napi.flow = FLOWUI;\n${CLIENT_DIGEST}\napi.digest = DIGEST;\n${CLIENT_CORE}\n${CLIENT_BLOCKERS}\n${CLIENT_GRAMMAR}\n${CLIENT_GRAPH}\n${CLIENT_VIEWS}\n${CLIENT_STRATEGY}\n${CLIENT_RECONCILIATION}\n${CLIENT_PRESENT}\n${CLIENT_TEAMS}\n${CLIENT_LEARN}\n${CLIENT_GLOSSARY}\n${CLIENT_FOCUS}\n${CLIENT_UI}\n${CLIENT_OVERVIEW}\n${CLIENT_APP}\nreturn api;\n})();
 if (typeof document !== "undefined" && document.getElementById && document.getElementById("de-bundle")) {
   try { DE.boot(); } catch (e) { if (typeof console !== "undefined") console.error("Plumb: the page script failed", e); }
 }
@@ -1311,7 +1312,7 @@ ${presentSection(b)}
 <div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 <div id="toast" class="toast" role="status" hidden><span id="toast-text"></span><a id="toast-link" href="#notes" hidden></a><button type="button" id="toast-close" aria-label="Dismiss">${icon("close", "icon icon-sm")}</button></div>
 <script type="application/json" id="de-bundle">${inlineJson(b)}</script>
-<script>${inlineScript(CLIENT_JS)}</script>
+<script>${inlineScript(b.premiseLinks || Object.values(b.premises ?? {}).some((im) => im.exposure?.settling?.length || im.exposure?.outsidePlanOrder?.length) ? CLIENT_JS : CLIENT_JS.replace(CLIENT_RECONCILIATION, ""))}</script>
 </body>
 </html>
 `;

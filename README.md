@@ -1,4 +1,4 @@
-# Plumb 0.5.2
+# Plumb 0.6.0
 
 Plumb tracks a complex system as designed against the system as built. Systems worth designing are usually built over years: part of the target already exists, part is in flight, and other long-horizon efforts run alongside it, some touching it and some not. Plumb keeps the design, the plan, what stands today and the decisions between them in checked local files, so the distance between as-designed and as-built is a record you can query, part by part.
 
@@ -49,6 +49,7 @@ Without org.yaml each imported design keeps its own teams. With it, teams live o
 | `bun plumb.ts check <design>` | Print findings. Error findings exit 1. |
 | `bun plumb.ts brief <design>` | Read-only status, changes since a report, questions, proposals and work that can start. |
 | `bun plumb.ts plan <design>` | Ready work, blockers, milestone progress and critical path. |
+| `bun plumb.ts premises <instance-or-root-or-portfolio> [--json]` | Read every premise and reconciliation link in scope. |
 | `bun plumb.ts premise <design> [claim]` | Claims ranked by exposure, or what depends on one claim if it is false. |
 | `bun plumb.ts impact <design> <patch>` | Verdict, reasons, changed records and introduced or resolved findings. |
 | `bun plumb.ts diff <design> --from <bundle.json> [--to <bundle.json>] [--save]` | Compare generated builds. Save a comparison when requested. |
@@ -78,6 +79,14 @@ Activities consume part of a team's capacity. Units in progress across designs c
 Slowdowns record a temporary lower share, what will wait, the risk, acceptors, start and end. Exceptions record a seam, contracts, acceptor, end and why. An organization's exception list replaces that seam's shipped default. An empty list declines it. Exceptions relax only the seam rule. Composed security findings keep their severity. Security marks have a floor from the shipped checks that patches cannot lower. Raise relevance with `security.raised: { by, why }`.
 
 Use `skill/plumb/workflows/org-decisions.md` for proposals. Root changes are reviewed with portfolio impact. Accepting a risk and accepting a patch are separate decisions.
+
+## Reconcile premises across designs
+
+Run `bun plumb.ts premises examples/portfolio --json` to read every premise beside its falsifier, load, settling units, hash and reconciliation links. Text output groups premises by design. The command writes nothing and also accepts a design or shared root. A root alone shows its shared register.
+
+Keep `premise-links.yaml` in the shared root beside `team-map.yaml`. The skill workflow `skill/plumb/workflows/reconcile-premises.md` compares pairs and proposes found links with quoted evidence. A person confirms one link at a time with clauses picked from the premises and their current hashes. Changed text makes that confirmation stale. The engine never confirms a discovery.
+
+Current confirmed dependencies extend the existing impact walk. Found and stale dependencies appear under “Would cascade if confirmed”. Contradictions and duplicates stay review flags. Strategy shows links and reconciliation debt. The portfolio shows debt counts. A settling unit can use `namespace:unit-id` to name work in another design. Its status counts when that design is composed.
 
 ## Current state
 

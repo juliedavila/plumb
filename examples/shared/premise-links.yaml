@@ -1,0 +1,60 @@
+# Fictional reconciliation evidence. The engine never writes this file.
+links:
+  - id: PL-001
+    from: intake:IN-4
+    to: inventory:IV-1
+    type: depends-on
+    found:
+      by: "agent:premise-reconciler"
+      at: "2026-11-02"
+      reasoning: "The falsifier \"An audit finds assets whose ownership cannot be assigned to a single team.\" would move the fallback \"Keep a sampled manual triage of repeat classes until a quarter of yield data shows they stopped.\" because repeat-class sampling needs an accountable team."
+      sources: ["plumb premises examples/portfolio --json"]
+    confirmed:
+      by: "the program lead"
+      at: "2026-11-03"
+      falsifier_clause: "An audit finds assets whose ownership cannot be assigned to a single team."
+      moved_clause: "Keep a sampled manual triage of repeat classes until a quarter of yield data shows they stopped."
+      pins: { from: "cebac0a58a29", to: "aa356d5809cd" }
+  - id: PL-002
+    from: premerge:PM-1
+    to: intake:IN-1
+    type: depends-on
+    found:
+      by: "agent:premise-reconciler"
+      at: "2026-11-02"
+      reasoning: "The falsifier \"A timed sample finds that repeat reports take less than half of manual triage time.\" would move the fallback \"Send the failing check to the owning team as a finding, and keep the agent for the classes it fixes well.\" by changing which failures warrant owning-team triage."
+      sources: ["plumb premises examples/portfolio --json"]
+  - id: PL-003
+    from: inventory:IV-2
+    to: intake:IN-3
+    type: depends-on
+    found:
+      by: "agent:premise-reconciler"
+      at: "2026-11-02"
+      reasoning: "The falsifier \"A quarter of scanner severity cases still need scanner-specific rule changes.\" would move the fallback \"Keep gathering by hand the evidence the export cannot produce.\" when scanner exceptions make evidence gathering manual."
+      sources: ["plumb premises examples/portfolio --json"]
+    confirmed:
+      by: "the program lead"
+      at: "2026-11-03"
+      falsifier_clause: "A quarter of scanner severity cases still need scanner-specific rule changes."
+      moved_clause: "Keep gathering by hand the evidence the export cannot produce."
+      # The earlier statement was "Ownership evidence can be exported for every audit."
+      pins: { from: "b1de671216b0", to: "f58a8f116a42" }
+  - id: PL-004
+    from: inventory:IV-1
+    to: intake:IN-1
+    type: contradicts
+    found:
+      by: "agent:premise-reconciler"
+      at: "2026-11-02"
+      reasoning: "Review flag only. The falsifier \"A timed sample finds that repeat reports take less than half of manual triage time.\" raises a scope question for \"An asset two teams share goes to a lead named per asset.\": scanner-level repetition may hide team ownership boundaries. A person must review whether these premises conflict."
+      sources: ["plumb premises examples/portfolio --json"]
+runs:
+  - id: RUN-001
+    by: "agent:premise-reconciler"
+    at: "2026-11-02"
+    designs: ["intake","premerge","inventory","shared"]
+    pairs_considered: 17
+    pairs_skipped: 0
+    rule: "every cross-design pair including the shared register"
+    proposed: ["PL-001","PL-002","PL-003","PL-004"]

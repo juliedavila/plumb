@@ -496,7 +496,7 @@ export function loadRoot(dirIn: string, opts: RootLoadOptions = {}): RootInput {
     problems,
   };
   input.modelHash = sha256(canonicalJson(modelInputs(input, orgRaw)));
-  input.hash = sha256(canonicalJson({ model: modelInputs(input, orgRaw), patches: input.patches ?? [], notes: input.notes?.notes }));
+  input.hash = sha256(canonicalJson({ premiseLinks: fileSha256(join(input.dir, "premise-links.yaml")), model: modelInputs(input, orgRaw), patches: input.patches ?? [], notes: input.notes?.notes }));
   return input;
 }
 

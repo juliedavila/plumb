@@ -86,7 +86,7 @@ const loadBearingUntested: Rule = {
     const out: F[] = [];
     for (const c of ctx.model.claims ?? []) {
       if (c.grade !== "untested" || c.kind === "claim") continue;
-      const im = premiseImpact(c.id, ctx.model, ctx.plan, index);
+      const im = premiseImpact(c.id, ctx.model, ctx.plan, index, ctx.premiseLinks);
       const w = weight(im);
       if (w < at) continue;
       const bits = [im.counts.elements && `${im.counts.elements} part${im.counts.elements === 1 ? "" : "s"}`, im.counts.relationships && `${im.counts.relationships} relationship${im.counts.relationships === 1 ? "" : "s"}`, im.counts.claims && `${im.counts.claims} claim${im.counts.claims === 1 ? "" : "s"}`, im.counts.phases && `${im.counts.phases} milestone${im.counts.phases === 1 ? "" : "s"}`].filter(Boolean);
@@ -102,4 +102,10 @@ export const pack: RulePack = {
   title: "Premises",
   description: "The claims the design rests on: each is declared, graded and acyclic, and no premise that much rests on is untested.",
   rules: [restsOnResolves, claimWellFormed, claimsAcyclic, loadBearingUntested],
+  // Input findings are supplied by the reconciliation reader, like core's input checks.
+  rules04: [{
+    id: "links-valid", title: "Premise reconciliation preserves the evidence and needs review", severity: "error",
+    why: "Premise links keep agent discoveries apart from a person's confirmation. Missing premises, changed text and review flags remain visible.",
+    check: () => [],
+  }],
 };

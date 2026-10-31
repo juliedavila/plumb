@@ -389,7 +389,7 @@ export interface Phase { rests_on?: string[] }
 export interface PremiseImpact {
   claim: string;
   direct: { kind: RecordKind; id: string }[];                     // records whose rests_on names the claim
-  dependents: { kind: RecordKind; id: string; via: string[] }[];  // every record resting on it, with the claim chain that reaches it (via[0] is this claim)
+  dependents: import("./types/premise-links.ts").PremiseReach[];  // every record resting on it, with the claim chain that reaches it (via[0] is this claim)
   counts: { elements: number; relationships: number; units: number; phases: number; claims: number; total: number };
   units: { phase: string; units: string[] }[];                    // the plan slice: units resting on it directly, through a part they move, or through their gate; by phase order
   openUnits: number;                                               // of those, units not done
@@ -406,6 +406,7 @@ export interface Bundle { premises?: Record<string, PremiseImpact> }
  */
 export interface PremiseExposure {
   tests: string[];                                       // units that test it and are in the plan
+  outsidePlanOrder?: string[];                         // settling designs whose plan order cannot be compared with this claim's
   firstTest?: { phase: string; units: string[] };        // the earliest milestone holding a test, and its tests there
   before: number;                                        // open units of the slice in milestones before the first test (all open units when untested)
   beforeByPhase: { phase: string; open: number }[];      // the same, by milestone in plan order
@@ -954,3 +955,10 @@ export interface BundleInstance {
   edition?: { version: string; date?: string; sha256: string }; // the released edition this build is of
   homes?: Record<string, string>;        // namespace -> how the page names it ("the shared layer", a design's title)
 }
+
+export * from "./types/premise-links.ts";
+export interface Bundle { premiseLinks?: import("./types/premise-links.ts").PremiseLinks }
+export interface PremiseImpact { preview?: { dependents: import("./types/premise-links.ts").PremiseReach[]; units: { phase: string; units: string[] }[]; openUnits: number } }
+
+export interface PremiseExposure { settling?: { id: string; design: string; status?: string }[] }
+export interface RuleContext { premiseLinks?: import("./types/premise-links.ts").PremiseLink[] }

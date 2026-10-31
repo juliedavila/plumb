@@ -201,6 +201,8 @@ export interface RootInput {
 
 /** The root's own build: what the page and the portfolio read. */
 export interface RootBundle {
+  premises?: Record<string, import("../types.ts").PremiseImpact>;
+  premiseLinks?: import("./premise-links.ts").PremiseLinks;
   engine: { version: string; built: string; hash: string; modelHash: string; rules: string };
   root: {
     kind: "root"; name: string; title: string; description?: string; schema?: string; approver?: string;

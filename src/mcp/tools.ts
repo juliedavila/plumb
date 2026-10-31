@@ -4,6 +4,7 @@ import { FLOWUI } from "../site/flow.ts";
 import { natCompare } from "../core/util.ts";
 import { premiseMd } from "../core/report.ts";
 import { rankClaims, weight } from "../core/premise.ts";
+import { count } from "../site/prose.ts";
 
 type Out = { text: string; isError?: boolean };
 const str = (description: string) => ({ type: "string", description });
@@ -217,7 +218,8 @@ export function call(b: Bundle, name: string, aIn: unknown): Out {
       const claims = m.claims ?? [];
       if (a.id === undefined || a.id === null || String(a.id).trim() === "") {
         if (!claims.length) return { text: "This instance declares no claims." };
-        return { text: [`${claims.length} claims, ranked by how much rests on each:`, ...rankClaims(claims, b.premises ?? {}).map(c => `- ${c.id} (${c.kind}, ${c.grade}; ${b.premises?.[c.id] ? weight(b.premises[c.id]) : 0} rest on it): ${c.statement}`)].join("\n") };
+        const d = b.premiseLinks?.debt;
+        return { text: [`${count(claims.length, "claim")}, ranked by how much rests on each:`, ...rankClaims(claims, b.premises ?? {}).map(c => `- ${c.id} (${c.kind}, ${c.grade}; ${b.premises?.[c.id] ? weight(b.premises[c.id]) : 0} rest on it): ${c.statement}`), ...(d ? [`Reconciliation: ${count(d.found, "found link")} ${d.found === 1 ? "awaits" : "await"} a person, ${count(d.stale, "stale link")} and ${count(d.flags, "review flag")}.`, ...b.premiseLinks!.links.map((l) => `- ${l.id}: ${l.from} ${l.type} ${l.to} (${l.status}).`)] : [])].join("\n") };
       }
       const id = String(a.id).trim();
       if (!claims.some(c => c.id === id)) return { text: `No claim ${id}. Claims: ${claims.map(c => c.id).join(", ") || "none"}.`, isError: true };

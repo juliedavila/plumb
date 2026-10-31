@@ -57,9 +57,13 @@ export function strategyBrief(b: Bundle): string {
 /** What is built on a claim before its first test, in words: the row's number and the claim page's lead. */
 export function exposureLine(b: Bundle, c: Claim): { short: string; long: string } {
   const im = b.premises?.[c.id], ex = im?.exposure;
-  const name = (p: string) => quote(b.plan.phases.find((x) => x.id === p)?.name ?? p);
+  const name = (p: string) => quote(b.plan.phases.find((x) => x.id === p)?.name ?? (p.includes(":") ? `a milestone in ${p.split(":")[0]}` : p));
   if (!im || !ex) return { short: "", long: "" };
   const units = (n: number) => count(n, "open unit");
+  if (ex.outsidePlanOrder?.length) {
+    const where = `settled in ${list(ex.outsidePlanOrder)}, outside this design's plan order`;
+    return { short: where, long: `It is ${where}. ${units(ex.before)} in this design ${ex.before === 1 ? "rests" : "rest"} on it.` };
+  }
   if (ex.firstTest) {
     const where = `Its first test lands in ${name(ex.firstTest.phase)}`;
     return ex.before
@@ -92,6 +96,14 @@ function claimRow(b: Bundle, c: Claim, lb: Set<string>): string {
 <span class="meta">${tags.join("")}</span></a></li>`;
 }
 
+export function reconciliationSection(b: Bundle): string {
+  const data = b.premiseLinks;
+  if (!data) return "";
+  const d = data.debt, run = d.last_run;
+  const group = (title: string, links: typeof data.links) => links.length ? `<h3>${title}</h3><ul class="rows">${links.map((l) => `<li>${esc(l.statements.from)} → ${esc(l.statements.to)}: ${esc(l.type.replace(/-/g, " "))} (${l.status})${l.changed.length ? `. Changed: ${esc(l.changed.map((side) => side === "from" ? "the premise at risk" : "the premise it rests on").join(" and "))}` : ""}</li>`).join("")}</ul>` : "";
+  return `<section class="section" aria-labelledby="h-reconciliation"><div class="section-head"><h2 id="h-reconciliation">Reconciliation</h2><p>${count(d.found, "found link")} ${d.found === 1 ? "awaits" : "await"} a person. ${count(d.stale, "stale link")} ${d.stale === 1 ? "needs" : "need"} review. ${count(d.flags, "review flag")}.</p></div>${group("Found links awaiting a person", data.links.filter((l) => l.type === "depends-on" && l.status === "found"))}${group("Stale links", data.links.filter((l) => l.type === "depends-on" && l.status === "stale"))}${group("Review flags", data.links.filter((l) => l.type !== "depends-on"))}<p class="small fg2">${run ? esc(`The last run considered ${count(run.pairs_considered, "pair")} across ${run.designs.join(", ")} and skipped ${run.pairs_skipped}: ${run.rule}.`) : "No reconciliation run is recorded."}</p></section>`;
+}
+
 export function strategyPage(b: Bundle): string {
   const cs = b.model.claims ?? [];
   const lb = new Set(loadBearing(b));
@@ -102,6 +114,7 @@ export function strategyPage(b: Bundle): string {
   return `<section class="page" id="strategy" data-page="strategy" aria-labelledby="h-strategy">
 <div class="page-head"><h1 id="h-strategy" tabindex="-1">Strategy</h1></div>
 <div class="plan-layout" id="strategy-layout"><div class="plan-main" style="min-width:0">
+${reconciliationSection(b)}
 <p class="brief" id="strategy-brief">${esc(strategyBrief(b))}</p>
 ${cs.length ? `<section aria-labelledby="h-claims"><div class="section-head"><h2 id="h-claims">What the design is betting on</h2><p>The least tested first, then the most work built on each before its first test lands: the next bet to test is at the top. Open one to see what would be in question if it were false</p></div>
 <div class="chipbar" id="claim-filters" role="group" aria-label="Filter claims" style="margin-bottom:var(--sp-2)" hidden>${grades.map((g) => chip("grade", g, GRADE[g].word)).join("")}${kinds.length > 1 ? kinds.map((k) => chip("kind", k, KIND_WORD[k][1].replace(/^./, (x) => x.toUpperCase()))).join("") : ""}<label class="field grow" style="min-width:160px"><span class="sr-only">Search claims</span><input type="search" id="claim-text" placeholder="Search claims" autocomplete="off"></label></div>

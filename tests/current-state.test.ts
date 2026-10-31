@@ -58,9 +58,9 @@ describe("The examples: what current state reports", () => {
     const want = exp.findings.filter((f: any) => CUR_RULES.includes(f.rule));
     expect(want.length).toBe(3);
     const b = await build(join(EX, "designs/inventory"));
-    // today's packs find nothing else on inventory once the four moves to retired are legal (examples/README.md), but for
-    // the seam rule's v01, which shows in inventory's own build too (the README's seam-crossing table)
-    expect(b.findings.map((f) => `${f.pack}/${f.rule}`)).toEqual(["plan/retire-before-replace", "plan/retire-before-replace", "plan/retire-before-replace", "portfolio/seam-crossing-declared"]);
+    // Inventory retains the seam finding and three warnings about reconciliation links touching its lone scope.
+    expect(b.findings.map((f) => `${f.pack}/${f.rule}`)).toEqual(["plan/retire-before-replace", "plan/retire-before-replace", "plan/retire-before-replace", "portfolio/seam-crossing-declared", ...Array(3).fill("premises/links-valid")]);
+    expect(b.findings.filter((f) => f.rule === "links-valid").map((f) => f.at)).toEqual(["PL-001", "PL-003", "PL-004"]);
     expect(b.findings.filter((f) => f.rule === "seam-crossing-declared").map((f) => `${f.at} ${f.severity}`)).toEqual(["v01 error"]);
     const got = of(b.findings, "plan/retire-before-replace");
     for (const w of want) {

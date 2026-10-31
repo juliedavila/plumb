@@ -132,7 +132,17 @@ const CONFIG_WORDS: [string, string][] = [
 export function addReaderText(b: Bundle, capabilities: SharedCapability[] = []): void {
   for (const u of b.plan.units) u.title = readerUnitTitle(u, capabilities);
   const names = recordNames(b.model, b.plan, { patches: b.patches, capabilities, namespace: b.instance.namespace });
-  const one = (nm: Names) => (f: Finding) => { const t = nameIds(f.message, nm); if (t !== f.message) f.text = t; };
+  for (const link of b.premiseLinks?.links ?? []) for (const side of ["from", "to"] as const) {
+    if (!names.byKind.has("claim")) names.byKind.set("claim", new Map());
+    const shown = q(claimShort(link.statements[side]));
+    names.byKind.get("claim")!.set(link[side], shown);
+    names.any.set(link[side], shown);
+  }
+  const one = (nm: Names) => (f: Finding) => {
+    const t = f.pack === "premises" && f.rule === "links-valid" && f.message.includes("absent from scope")
+      ? "This link names a premise in a design outside this workspace and is skipped." : nameIds(f.message, nm);
+    if (t !== f.message) f.text = t;
+  };
   b.findings.forEach(one(names));
   for (const p of b.patches) {
     // a record the patch adds or removes is named from the patch's own snapshot
