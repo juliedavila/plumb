@@ -114,6 +114,8 @@ test("legacy scrub path warns only once and explicit paths avoid home fallbacks"
   const result=Bun.spawnSync([process.execPath,script],{stdout:"pipe",stderr:"pipe"});
   expect(result.exitCode).toBe(0);
   expect(result.stderr.toString().match(/scrub path is deprecated/g)).toHaveLength(1);
+  expect(result.stderr.toString()).toContain(old);
+  expect(result.stderr.toString()).toContain("set PLUMB_SCRUB_LIST explicitly to silence this notice");
   expect(result.stdout.toString().trim().split("\n")).toEqual([old,old]);
   expect(scrubListPath({PLUMB_SCRUB_LIST:"./local-scrub.txt"},home)).toBe(join(process.cwd(),"local-scrub.txt"));
   expect(scrubListPath({},join(dir,"absent"))).toBe(join(dir,"absent/.config/plumb/scrub.txt"));
@@ -202,4 +204,19 @@ test("shipped null ends warn in a design build; organization null ends remain er
   writeFileSync(join(dir,"shared/org.yaml"),JSON.stringify({seam_exceptions:{[raw.seams[0].id]:[exception]}}));
   const own=await buildBundle(loadInstance(join(dir,"designs/alpha")));
   expect(own.bundle.findings).toContainEqual(expect.objectContaining({pack:"org",rule:"exception-valid",severity:"error",message:expect.stringContaining("has no end")}));
+});
+
+test("premise structure comes from the claim and from records resting on it, in canonical form", () => {
+  const model = {
+    elements: [
+      { id: "beta:p", name: "P", rests_on: ["beta:claim/B-1"] },
+      { id: "beta:q", name: "Q", rests_on: ["beta:B-2"] },
+    ],
+    relationships: [{ id: "beta:r", from: "beta:p", to: "beta:q", rests_on: ["beta:B-1"] }],
+    claims: [{ id: "beta:B-1", statement: "s", kind: "premise", grade: "untested", attrs: { rests_on_records: { parts: ["beta:element/p"], relationships: ["beta:relationship/r"] } } }],
+  } as any;
+  const data = { links: [], runs: [], debt: { found: 0, stale: 0, flags: 0, declared: 0 } } as any;
+  const [p] = premisesProjection(["beta"], model, { phases: [], units: [] }, data).premises;
+  expect(p.rests_on_parts).toEqual(["beta:p"]);
+  expect(p.rests_on_relationships).toEqual(["beta:r"]);
 });

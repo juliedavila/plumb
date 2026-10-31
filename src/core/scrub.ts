@@ -15,7 +15,7 @@ export function scrubListPath(env: Record<string, string | undefined> = process.
   const path = join(home, ".config/plumb/scrub.txt");
   const old = join(home, ".config/design-engine/scrub.txt");
   if (!existsSync(path) && existsSync(old)) {
-    if (!warnedLegacyPath) process.stderr.write("The design-engine scrub path is deprecated; move it to ~/.config/plumb/scrub.txt.\n");
+    if (!warnedLegacyPath) process.stderr.write(`The design-engine scrub path is deprecated; found ${old}. Move it to ${path}, or set PLUMB_SCRUB_LIST explicitly to silence this notice.\n`);
     warnedLegacyPath = true;
     return old;
   }

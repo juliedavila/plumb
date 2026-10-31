@@ -299,10 +299,12 @@ export function normUnit(raw: Raw): Unit {
  */
 export function normClaim(raw: Raw): Claim {
   const { k, attrs } = split(raw, ["id", "statement", "kind", "grade", "source", "fallback", "rests_on"]);
+  const records = k.rests_on && typeof k.rests_on === "object" && !Array.isArray(k.rests_on) && ["claims", "parts", "relationships"].some(key => key in (k.rests_on as Raw)) ? k.rests_on as Raw : undefined;
   return prune({
     id: String(k.id), statement: str(k.statement) ?? "", kind: (str(k.kind)?.trim().toLowerCase() ?? "premise") as Claim["kind"],
     grade: (str(k.grade)?.trim().toLowerCase() ?? "untested") as Claim["grade"],
-    source: str(k.source), fallback: str(k.fallback), rests_on: strList(k.rests_on && typeof k.rests_on === "object" && !Array.isArray(k.rests_on) && "claims" in k.rests_on ? (k.rests_on as Raw).claims : k.rests_on), attrs,
+    source: str(k.source), fallback: str(k.fallback), rests_on: strList(records ? records.claims : k.rests_on),
+    attrs: records ? { ...attrs, rests_on_records: records } : attrs,
   });
 }
 

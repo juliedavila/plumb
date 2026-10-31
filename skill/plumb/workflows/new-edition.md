@@ -12,7 +12,20 @@ A folder may hold edition.yaml directly, `<namespace>/<version>/edition.yaml`, o
 
 Plumb verifies manifests, hashes, shared-layer agreement and exact pins before workspace writes. Missing pins print an exact command when a matching nearby folder exists, otherwise explain which folder must hold the edition. Use `--with-pins` when the requested addition includes its dependencies; dependencies come from the same source and cycles are refused. Pins can also live at `<source>/pins/<namespace>/edition.yaml` or `<source>/pins/<namespace>/<version>/edition.yaml`. Installation writes a frozen copy under `instances/<namespace>/editions/<version>/` and live adapters in `instances/<namespace>/` and records provenance in `instances/shared/engine.yaml`.
 
-Read the summary's role counts. Complete unresolved entries from `instances/shared/team-map.draft.yaml` in the hand-written `team-map.yaml`, using the organization's supplied teams. With org.yaml, teams live there; otherwise declare teams in the map. Re-add the identical stamp to regenerate live files and frozen adapters. Plumb retains progress, current state, milestones, notes, tracker, reports, deck, tour and patches. A different stamp under the same version is refused.
+Read the summary's role counts. Complete unresolved entries from `instances/shared/team-map.draft.yaml` in the hand-written `team-map.yaml`, using the organization's supplied teams. With org.yaml, teams live there; otherwise declare teams in the map. Re-add the identical stamp with `--with-pins` to regenerate the design and every installed transitive pin’s live files and frozen adapters. Plumb retains progress, current state, milestones, notes, tracker, reports, deck, tour and patches. A different stamp under the same version is refused.
+
+
+Place this `portfolio.yaml` at the Plumb workspace root. Paths are relative to that file; replace the namespaces with your installed designs.
+
+```yaml
+name: initiatives
+title: Initiatives
+root: instances/shared
+designs:
+  - { namespace: intake, from: instances/intake }
+  - { namespace: premerge, from: instances/premerge }
+horizon_months: 12
+```
 
 A team map has this shape. With org.yaml, declare teams there and omit the map's teams list. Empty owner mappings are accepted as unresolved placeholders. Keep rows you cannot map yet with `teams: []`, then re-add after mapping them.
 

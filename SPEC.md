@@ -1,4 +1,4 @@
-# Plumb 0.6.1 specification
+# Plumb 0.6.2 specification
 
 Plumb holds a complex system as designed against the system as built, for systems built over time: a local-first checked model with executable rule packs, proposals with impact reports, a capability-based plan, current state kept as discovered or confirmed, and generated views.
 
@@ -252,7 +252,7 @@ MANIFEST records each other file's SHA-256, size and relative path. A leak scan 
 
 skill/plumb/SKILL.md routes to workflows for design and portfolio orientation, root estimates, slowdowns, exceptions, current-state confirmation, BAU refresh, notes, design patch drafting, patch review, progress, Jira reconciliation, decks and released editions. Every workflow declares commands, artifacts and a done condition. Root patches use portfolio impact. Agents never edit org.yaml or shipped seams.yaml for routine decisions. They never accept a patch, record risk acceptance or confirm a discovery without the user's words. Existing authorization continues to apply.
 
-The release cold test requests Sonnet 5 at default effort with only the skill, fictional example portfolio and a runnable engine. It must orient, propose an estimate, record a slowdown, declare an exception with acceptor and end, confirm a discovery on a person's word and refresh BAU from the fixture export. A command rehearsal can validate file shapes but cannot substitute for a model test. Record model availability, commands, outputs and every skill gap honestly.
+The release cold test requests a model at default effort with only the skill, fictional example portfolio and a runnable engine. It must orient, propose an estimate, record a slowdown, declare an exception with acceptor and end, confirm a discovery on a person's word and refresh BAU from the fixture export. A command rehearsal can validate file shapes but cannot substitute for a model test. Record model availability, commands, outputs and every skill gap honestly.
 
 ## Schema 0.4 and shared composition
 
@@ -306,7 +306,7 @@ The roadmap renders undated milestones as an ordered strip with one tile per pha
 
 `bun plumb.ts vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]` builds a generated Obsidian vault. It uses the same compiled model, accepted patches, plan, live current state and findings as the site. Portfolio builds compose their shared root and designs through `runPortfolio`. They do not write a portfolio lock. A lone design retains its existing schema behavior. Schema failures stop output. Existing error findings exit 1 after output, as a site build does.
 
-The engine version is 0.6.1. The design schema remains 0.4, and lone legacy instances retain their schema behavior.
+The engine version is 0.6.2. The design schema remains 0.4, and lone legacy instances retain their schema behavior.
 
 The vault contains one Markdown note per part, relationship, contract, unit, milestone, team and finding. It includes a design index for every design and a portfolio index when the input is a portfolio. Shared and org records have one home. Relationships link endpoints and carried contracts. Contracts link producers and consumers. Units link changed parts, owner teams and milestones. Findings link their subjects. Indexes link their records. References without a generated home are rendered as unresolved or outside references in plain text. The generator emits wikilinks only for notes present in the output. It requires no Obsidian plugins.
 
@@ -336,7 +336,7 @@ A claim's attrs.tested_by accepts a unit id or a namespace:unit-id, in a string 
 
 `plumb premises <instance-or-root-or-portfolio> [--json]` builds in memory and writes nothing. A portfolio selects its listed designs plus the root register. An instance selects that design plus its register. A root alone selects its register. Programmatic root composition selects the explicitly supplied designs too. No sibling design discovery occurs. Exit is zero despite build findings, unless inputs cannot load.
 
-Text has one block per premise grouped by design. JSON is one object with designs, premises, links, runs and debt. Premises have qualified id, design, statement, grade, falsifier, load, if_it_flips, fallback, rests_on, settling_units, hash, preview and every touching link. Preview is the additional reach through found steps, with tagged paths and the extra plan slice. Validation findings print on stderr in text and JSON modes, leaving stdout JSON valid. Shared ids use shared:id. Settling unit ids are qualified and include status when present in scope. Only kind premise enters this register projection. Other claim kinds retain existing impact behavior.
+Text has one block per premise grouped by design. JSON is one object with designs, premises, links, runs and debt. Premises have qualified id, design, statement, grade, falsifier, load, if_it_flips, fallback, rests_on, rests_on_parts, rests_on_relationships, settling_units, hash, preview and every touching link. The rests_on array retains claim references; the two structural arrays retain the edition claim's parts and relationships with qualified ids, including references outside scope. Missing structural arrays project as empty lists. Preview is the additional reach through found steps, with tagged paths and the extra plan slice. Validation findings print on stderr in text and JSON modes, leaving stdout JSON valid. Shared ids use shared:id. Settling unit ids are qualified and include status when present in scope. Only kind premise enters this register projection. Other claim kinds retain existing impact behavior.
 
 ### Evidence file and validity
 

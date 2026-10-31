@@ -352,12 +352,14 @@ describe("builds, projections and pages", () => {
     expect(stale.premises!.A.counts.total).toBe(0);
   });
   test("read-only text and JSON include qualified fields, hashes, status, shared register and touching links", async () => {
-    const { dir } = fixture(), file = join(dir, "shared/premise-links.yaml");
+    const { dir, yaml } = fixture(), file = join(dir, "shared/premise-links.yaml");
+    yaml(join(dir, "designs/alpha/model.yaml"), (m) => { m.claims[0].rests_on = { parts: ["part", "shared:common"], relationships: ["flow"] }; });
     const raw = { links: [{ ...link("PL-001", "alpha:A", "beta:B"), found }], runs: [{ ...run, designs: ["alpha", "beta"] }] };
     writeFileSync(file, JSON.stringify(raw)); const before = readFileSync(file, "utf8");
     const json = JSON.parse(await premisesCommand(join(dir, "portfolio"), true));
     expect(Object.keys(json)).toEqual(["designs", "premises", "links", "runs", "debt"]);
     expect(json.designs).toEqual(["alpha", "beta"]);
+    expect(json.premises.find((p: any) => p.id === "alpha:A")).toMatchObject({ rests_on_parts: ["alpha:part", "shared:common"], rests_on_relationships: ["alpha:flow"] });
     expect(json.premises.find((p: any) => p.id === "alpha:A")).toMatchObject({ design: "alpha", statement: "Premise A holds.", grade: "untested", falsifier: "A sample fails the check.", load: "Automated approval relies on this.", fallback: "Retain manual review.", rests_on: [], settling_units: [{ id: "beta:BU-1", status: "todo" }, { id: "alpha:AU-3", status: "todo" }], links: [{ id: "PL-001", status: "found" }] });
     expect(json.premises.some((p: any) => p.id.startsWith("shared:"))).toBe(true);
     expect(json.premises.find((p: any) => p.id === "beta:B").preview).toMatchObject({ dependents: ["alpha:A", "alpha:AU-3", "beta:BU-1"].map((id) => ({ id, status: "found", links: [{ id: "PL-001", status: "found" }] })), units: [{ phase: "alpha:A2", units: ["alpha:AU-3"] }], openUnits: 1 });

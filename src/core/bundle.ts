@@ -30,8 +30,9 @@ import { flowBadgeLines, flowFacts, claimFlowChecks } from "./flow.ts";
 import { streamLayout } from "./flow-layout.ts";
 import { instanceMeasured } from "./flow-measured.ts";
 
-// 0.6.1: adopter dry-run fixes and design-declared links.
-export const ENGINE_VERSION = "0.6.1";
+// 0.6.1: adoption fixes and design-declared links.
+// 0.6.2: workspace polish, pinned regeneration and structural premise output.
+export const ENGINE_VERSION = "0.6.2";
 
 /** sha256 of the canonical JSON of the inputs: instance config, model, plan, patches. No timestamp, no absolute paths. */
 export function contentHash(inst: Instance): string {

@@ -1,6 +1,6 @@
 # portfolio.lock: written by bun plumb.ts portfolio build. Which editions each mode composed, over which root. Never edited by hand.
 working:
-  built: "2026-10-31T12:26:29.690Z"
+  built: "2026-11-16T12:00:00.000Z"
   root: { hash: "1b84925861be", shared_sha256: "ac0edcff9920", accepted_patches: 4 }
   designs:
     intake: { edition: "latest", model: "8b8b6968bdc8" }

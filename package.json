@@ -1,1 +1,1 @@
-{"name":"@juliedavila/plumb","version":"0.6.1","type":"module","bin":{"plumb":"./plumb.ts"},"license":"MIT","private":false}
+{"name":"@juliedavila/plumb","version":"0.6.2","type":"module","bin":{"plumb":"./plumb.ts"},"license":"MIT","private":false}

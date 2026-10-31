@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.2
+
+Re-adding a design with pins regenerates installed dependencies against the current team map. Premise JSON includes qualified structural parts and relationships. Scrub notices identify the deprecated file and explain how to silence them. Documentation supplies adopter portfolio and composite role examples, source placement and build output options. Fictional evidence and release metadata are clarified.
+
 ## 0.6.1
 
 Local adoption finds pins inside direct edition folders and prints commands that work without linking. Passing tests capture expected fixture diagnostics. Legacy scrub notices print once per process. YAML errors name their file and position. Team drafts explain unresolved placeholders and briefs identify a shared error class. Pins with unchanged named records stay out of the stale list. Design-declared premise dependencies load as declared links and cascade without reconciliation confirmation. The adopter documentation explains workspace layout, frozen copies, portfolio fields, source confidence and structural reconciliation screening.

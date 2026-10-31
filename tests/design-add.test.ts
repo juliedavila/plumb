@@ -33,6 +33,20 @@ const add = (workspace:string,from=fixtures,withPins=false) => addDesign("intake
 const cli = (args:string[],cwd:string) => Bun.spawnSync([process.execPath,join(import.meta.dir,"../plumb.ts"),...args],{cwd,stdout:"pipe",stderr:"pipe"});
 
 describe("design add from folders",()=>{
+  test("with-pins regenerates installed pins after a team map edit and retains live state",async()=>{
+    const workspace=temp();
+    await addDesign("premerge","1.0.0",{workspace,from:fixtures,withPins:true});
+    const pin=join(workspace,"instances/intake"), frozen=join(pin,"editions/1.0.0");
+    const original=readFileSync(join(frozen,"plumb/model.yaml"));
+    writeFileSync(join(pin,"notes.yaml"),"notes: []\n# keep\n");
+    map(workspace);
+    const result=await addDesign("premerge","1.0.0",{workspace,from:fixtures,withPins:true});
+    expect(result.map(d=>[d.namespace,d.unresolved])).toEqual([["intake",0],["premerge",0]]);
+    expect(Y(join(pin,"model.yaml")).elements[0].owner).toBe("counter");
+    expect(loadInstance(pin,{edition:"1.0.0"}).model.elements[0].owner).toBe("counter");
+    expect(readFileSync(join(frozen,"plumb/model.yaml"))).toEqual(original);
+    expect(readFileSync(join(pin,"notes.yaml"),"utf8")).toBe("notes: []\n# keep\n");
+  });
   test("deterministic generator; direct, namespace/version, and editions/namespace/version layouts",async()=>{
     const generated=temp();makeEditions(generated);
     expect(readFileSync(join(generated,"premerge/1.0.0/edition.yaml"))).toEqual(readFileSync(join(fixtures,"premerge/1.0.0/edition.yaml")));

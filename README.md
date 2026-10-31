@@ -1,4 +1,4 @@
-# Plumb 0.6.1
+# Plumb 0.6.2
 
 Plumb tracks a complex system as designed against the system as built. Systems worth designing are usually built over years: part of the target already exists, part is in flight, and other long-horizon efforts run alongside it, some touching it and some not. Plumb keeps the design, the plan, what stands today and the decisions between them in checked local files, so the distance between as-designed and as-built is a record you can query, part by part.
 
@@ -10,7 +10,9 @@ Builds write one HTML page per design that opens from disk, a portfolio page acr
 
 ## Start here
 
-Run commands below from the folder holding `plumb.ts`. `bun link` is optional. Without linking, run `bun <path-to-plumb>/plumb.ts` from any workspace. Paths in command arguments are relative to where you run the command. For example, from an adopter workspace holding the Plumb source in `tools/plumb/`, run `bun tools/plumb/plumb.ts build plumb/instances/intake`. When using the adopter skills, the Plumb workspace is `<adopter workspace>/plumb`, beside `upstream/` and `org/`.
+Run commands below from the folder holding `plumb.ts`. `bun link` is optional. Without linking, run `bun <path-to-plumb>/plumb.ts` from any workspace. Paths in command arguments are relative to where you run the command. Plumb source may live anywhere outside `upstream/` and `org/`. From an adopter workspace, run `bun <path-to-plumb>/plumb.ts build plumb/instances/intake`. When using the adopter skills, the Plumb workspace is `<adopter workspace>/plumb`, beside `upstream/` and `org/`.
+
+Home scrub files are optional; a fresh machine prints no home-path deprecation notice.
 
 ```sh
 bun test
@@ -34,6 +36,19 @@ For the lone value stream, run `bun plumb.ts build examples/delivery-stream` and
 | Live state | A design's `progress.yaml`, `milestones.yaml`, `current.yaml`, notes, tracker files, reports, deck and tour survive reimports. |
 | Decisions | Root or design `patches/*.yaml`. Proposed patches have no effect until accepted with `decision: { by, at, reason }`. |
 | Released designs | `editions/<version>/edition.yaml` and frozen inputs. Building an edition uses today's live state. |
+
+
+Place this `portfolio.yaml` at the Plumb workspace root. Paths are relative to that file; replace the namespaces with your installed designs.
+
+```yaml
+name: initiatives
+title: Initiatives
+root: instances/shared
+designs:
+  - { namespace: intake, from: instances/intake }
+  - { namespace: premerge, from: instances/premerge }
+horizon_months: 12
+```
 
 Portfolio fields are read from `portfolio.yaml`:
 
@@ -60,7 +75,7 @@ Without org.yaml each imported design keeps its own teams. With it, teams live o
 
 | Command | Result |
 |---|---|
-| `bun plumb.ts build <design> [--edition <version>]` | Write bundle.json and index.html. Print the model hash for a patch's `provenance.based_on`. |
+| `bun plumb.ts build <design> [--out <dir>] [--edition <version>]` | Write bundle.json and index.html. Print the model hash for a patch's `provenance.based_on`. |
 | `bun plumb.ts check <design>` | Print findings. Error findings exit 1. |
 | `bun plumb.ts brief <design>` | Read-only status, changes since a report, questions, proposals and work that can start. |
 | `bun plumb.ts plan <design>` | Ready work, blockers, milestone progress and critical path. |
@@ -69,10 +84,10 @@ Without org.yaml each imported design keeps its own teams. With it, teams live o
 | `bun plumb.ts impact <design> <patch>` | Verdict, reasons, changed records and introduced or resolved findings. |
 | `bun plumb.ts diff <design> --from <bundle.json> [--to <bundle.json>] [--save]` | Compare generated builds. Save a comparison when requested. |
 | `bun plumb.ts report <design> [--presented]` | Save a snapshot. Mark presented only after the user says it was shown. |
-| `bun plumb.ts build <root>` | Write root.json with org state, estimate history, marks, proposals and findings. |
+| `bun plumb.ts build <root> [--out <dir>]` | Write root.json with org state, estimate history, marks, proposals and findings. |
 | `bun plumb.ts check <root>` | Check the shared root itself. |
 | `bun plumb.ts portfolio brief <portfolio>` | Read-only portfolio status and decisions needing a person. |
-| `bun plumb.ts portfolio build <portfolio> [--presenting] [--today YYYY-MM-DD]` | Write the portfolio page, data, design pages and lock. |
+| `bun plumb.ts portfolio build <portfolio> [--out <dir>] [--presenting] [--today YYYY-MM-DD]` | Write the portfolio page, data, design pages and lock. |
 | `bun plumb.ts portfolio check <portfolio>` | Check references, seams, composed security, dependencies and capacity. |
 | `bun plumb.ts portfolio impact <portfolio> <root-patch>` | Evaluate a root proposal across all composed designs. |
 | `bun plumb.ts migrate <design> [--to 0.4] [--root <dir>] [--moved <file>] [--dry-run]` | Review and apply schema or moved-id migrations. |
@@ -80,6 +95,8 @@ Without org.yaml each imported design keeps its own teams. With it, teams live o
 | `bun plumb.ts dev <design-or-portfolio> [--port 4317] [--out <dir>]` | Serve locally with live rebuilds. An external target needs an output directory. |
 | `bun plumb.ts vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]` | Write an Obsidian vault and sync human annotations as proposal notes. |
 | `bun plumb.ts publish <out-dir> <design-or-portfolio>...` | Write a static folder. It does not deploy it. |
+
+Build output defaults to the invoking directory’s `build/<name>/` for designs and shared roots, `build/<name>-<version>/` for editions, and `build/portfolio-<name>/` (with `-presenting` in presenting mode) for portfolios. Pass `--out <dir>` to any build command to choose its output folder. Portfolio builds also write `portfolio.lock` beside `portfolio.yaml`.
 
 Working portfolios use latest design files. `--presenting` selects newest released editions with today's progress, milestones, current state and tracker data. Only accepted patches frozen with an edition change its released design. Presenting is not a snapshot of old status.
 
@@ -169,13 +186,23 @@ bun plumb.ts design add intake@1.0.0 --from ../repair-designs --workspace ./work
 
 A local clone root works as `--from`: Plumb finds `editions/<namespace>/<version>/edition.yaml` beneath it. A direct edition folder also works. Pins may live in `<from>/pins/<namespace>/edition.yaml` or `<from>/pins/<namespace>/<version>/edition.yaml`.
 
-An edition must ship `edition.yaml` with `plumb.interface: 1` and hashed engine-format inputs. Plumb verifies every listed file, the manifest digest, shared seams and manual-work bytes, and exact pins before writing. Missing pins print a usable command when a matching nearby folder exists, otherwise explain which folder must hold the edition; `--with-pins` verifies and adds dependencies first. Each added edition has its own frozen copy under `instances/<namespace>/editions/<version>/`. This is expected. The adopter's `upstream/` remains its read-only copy. Frozen published files stay byte-identical. Re-adding an identical stamp re-derives its live files and frozen adapters while retaining progress, notes, current state, tracker, reports, patches, deck and tour.
+An edition must ship `edition.yaml` with `plumb.interface: 1` and hashed engine-format inputs. Plumb verifies every listed file, the manifest digest, shared seams and manual-work bytes, and exact pins before writing. Missing pins print a usable command when a matching nearby folder exists, otherwise explain which folder must hold the edition; `--with-pins` verifies and adds dependencies first. Each added edition has its own frozen copy under `instances/<namespace>/editions/<version>/`. This is expected. The adopter's `upstream/` remains its read-only copy. Frozen published files stay byte-identical. With `--with-pins`, re-adding also regenerates every installed transitive pin against the current team map. Re-adding an identical stamp re-derives its live files and frozen adapters while retaining progress, notes, current state, tracker, reports, patches, deck and tour.
+
+A role string naming several parties maps to every team it names. Map the exact role string to all applicable team ids, for example:
+
+```yaml
+teams:
+  - { id: platform, name: Platform team }
+  - { id: security, name: Security team }
+owners:
+  "Platform team + Security team": { teams: [platform, security] }
+```
 
 Roles resolve through `instances/shared/team-map.yaml`. Optional `org.yaml` holds the teams once. Unresolved owners retain their role text; Plumb writes a sorted `team-map.draft.yaml` for you to complete. It never replaces the written team map. An owner row with `teams: []` is accepted as an unresolved placeholder. Keep rows you cannot map yet and fill them from supplied evidence. A first build with an unfinished map reports one error per unmapped owner role reference, so one role used by several records can produce several errors. The brief names the error class and count when all errors share a class. GitHub editions default to the tag `<namespace>-v<version>` and path `editions/<namespace>/<version>`; `--ref` and `--path` override their location. Files are limited to 32 MB and each edition to 256 MB; redirects cannot leave the source host. The hashes prove that every file matches the edition's own manifest. No signature stands behind that manifest, so an edition is as trustworthy as the repository and tag it comes from.
 
 ## Configuration
 
-`PLUMB_SCRUB_LIST` selects the external scrub list. The default is `~/.config/plumb/scrub.txt`. The former `DE_SCRUB_LIST` setting and `~/.config/design-engine/scrub.txt` path remain fallbacks and print a deprecation note when used. The legacy path notice prints at most once per process. Plumb reads exactly two default home files: `~/.config/plumb/scrub.txt` when it exists, otherwise `~/.config/design-engine/scrub.txt` when it exists. It does not read other home files. An explicit `PLUMB_SCRUB_LIST` or fallback `DE_SCRUB_LIST` can select another path, including a home path. Existence checks precede reads. `PLUMB_GITHUB_RAW` overrides the GitHub raw base URL (`DE_GITHUB_RAW` is the deprecated fallback).
+`PLUMB_SCRUB_LIST` selects the external scrub list. The default is `~/.config/plumb/scrub.txt`. The former `DE_SCRUB_LIST` setting and `~/.config/design-engine/scrub.txt` path remain fallbacks and print a deprecation note when used. The legacy path notice prints at most once per process. Plumb optionally reads one of two default home files: `~/.config/plumb/scrub.txt` when it exists, otherwise `~/.config/design-engine/scrub.txt` when it exists. It does not read other home files. An explicit `PLUMB_SCRUB_LIST` or fallback `DE_SCRUB_LIST` can select another path, including a home path. Existence checks precede reads. `PLUMB_GITHUB_RAW` overrides the GitHub raw base URL (`DE_GITHUB_RAW` is the deprecated fallback).
 
 Scrub lists contain case-insensitive regexes, optionally followed by ` => replacement`. `section: <regex>` declares Markdown heading text under which entries marked `allow-in-section:` may appear. The older `landscape:` entry marker is also read. Without a section declaration, a marked entry is allowed nowhere. Vault packaging applies every pattern everywhere.
 

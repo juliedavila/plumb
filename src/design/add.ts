@@ -70,7 +70,7 @@ export async function addDesign(namespace: string, version: string, options: Add
         await visit(pin.namespace,pin.version,pin.sha256,installed ? join(instances,pin.namespace,"editions",pin.version) : undefined);
       }
       visiting.delete(ns);
-      if (!installedDir) order.push(ed);
+      if (!installedDir || options.withPins) order.push(ed);
     };
     await visit(namespace,version);
     const first = order[0];

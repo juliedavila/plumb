@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type { Claim, Finding, Model, Plan, PremiseLink, PremiseLinks, PremiseRun } from "../types.ts";
 import { sha256 } from "./util.ts";
 import { allPremiseImpacts } from "./premise.ts";
+import { formatRef, parseRef } from "./namespace.ts";
 import { count } from "../site/prose.ts";
 
 export const strings = (v: unknown): string[] => (Array.isArray(v) ? v : v == null ? [] : [v]).map(String);
@@ -142,11 +143,23 @@ export function sharedSettlingFindings(model: Model, plan: Plan, designs: string
 /** A stable read-only projection. All unit and premise ids arrive qualified from composition. */
 export function premisesProjection(designs: string[], model: Model, plan: Plan, data: PremiseLinks) {
   const units = new Map(plan.units.map((u) => [u.id, u]));
+  // A premise's parts and relationships, qualified and canonical (kind dropped): the ones its claim record carries,
+  // plus every element or relationship whose own rests_on names the premise, which is where an edition records them.
+  const canonical = (id: string, ns: string) => { const r = parseRef(id); return formatRef({ ns: r.ns ?? ns, id: r.id }); };
+  const structural = (c: Claim, field: "parts" | "relationships", records: { id: string; rests_on?: string[] }[]) => {
+    const ns = c.id.split(":")[0];
+    const named = strings((c.attrs?.rests_on_records as any)?.[field]).map((id) => canonical(id, ns));
+    const reverse = records.filter((r) => (r.rests_on ?? []).some((on) => canonical(on, r.id.split(":")[0]) === c.id)).map((r) => canonical(r.id, ns));
+    return [...new Set([...named, ...reverse])].sort();
+  };
   const impacts = allPremiseImpacts(model, plan, data.links);
   const premises = (model.claims ?? []).filter((c) => c.kind === "premise").map((c) => ({
     id: c.id, design: c.id.split(":")[0], statement: c.statement, grade: c.grade, falsifier: falsifier(c),
     load: c.attrs?.load ?? null, if_it_flips: c.attrs?.if_it_flips ?? c.fallback ?? null, fallback: c.fallback ?? null,
-    rests_on: c.rests_on ?? [], settling_units: strings(c.attrs?.tested_by).map((id) => ({ id, ...(units.has(id) ? { status: units.get(id)!.status ?? "todo" } : {}) })),
+    rests_on: c.rests_on ?? [],
+    rests_on_parts: structural(c, "parts", model.elements as any),
+    rests_on_relationships: structural(c, "relationships", model.relationships as any),
+    settling_units: strings(c.attrs?.tested_by).map((id) => ({ id, ...(units.has(id) ? { status: units.get(id)!.status ?? "todo" } : {}) })),
     hash: premiseHash(c), links: data.links.filter((l) => l.from === c.id || l.to === c.id),
     preview: impacts[c.id]?.preview ?? { dependents: [], units: [], openUnits: 0 },
   })).sort((a, b) => a.design.localeCompare(b.design) || a.id.localeCompare(b.id, undefined, { numeric: true }));
