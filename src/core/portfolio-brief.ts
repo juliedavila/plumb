@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // `bun plumb.ts portfolio brief <portfolio>`: what needs a person across the designs, as Markdown,
 // read-only. It composes the portfolio in memory (nothing is written, not even build/ or portfolio.lock) and lists, in
 // this order: teams over capacity, undeclared crossings, stale pins, exceptions near their end, slowdowns due for
@@ -17,7 +18,7 @@ export async function portfolioBriefMd(target: string, opts: { mode?: PortfolioM
   const d = p.data, page = d.page!, L = d.load;
   const today = page.today;
   const out: string[] = [`# Brief: ${d.portfolio.title} (${d.portfolio.mode === "presenting" ? "presenting released editions" : "working copies"})`, "",
-    `Built ${d.engine.built}. Root build hash \`${d.lock.root.hash}\` identifies root inputs, patch records and notes. It is not provenance.based_on. For a new root patch, use the model hash printed by \`bun plumb.ts build <root>\`.`, "", page.sentence, "",
+    `Built ${d.engine.built}. Root build hash \`${d.lock.root.hash}\` identifies root inputs, patch records and notes. It is not provenance.based_on. For a new root patch, use the model hash printed by \`${invocation()} build <root>\`.`, "", page.sentence, "",
     ...page.designs.map((x) => `- \`${x.namespace}\`: ${x.label}`), "", "## Needs a person", ""];
   const section = (title: string, lines: string[]) => { out.push(`### ${title} (${lines.length})`, "", ...(lines.length ? lines : ["- none"]), ""); };
 
@@ -48,6 +49,6 @@ export async function portfolioBriefMd(target: string, opts: { mode?: PortfolioM
   section("Discovered current-state records waiting for a person to confirm", waiting);
   const errors = page.findings.filter((f) => f.severity === "error");
   out.push(`## Errors across the portfolio (${errors.length})`, "", ...(errors.length ? errors.map((f) => `- \`${f.pack}/${f.rule}@${f.subject}\`${f.design ? ` (in ${page.designs.find((x) => x.namespace === f.design)?.title ?? f.design}'s build)` : ""}: ${cut(f.text)}`) : ["- none"]), "",
-    "Run `bun plumb.ts portfolio check <portfolio>` for every finding, and `bun plumb.ts portfolio build <portfolio>` for the page.", "");
+    `Run \`${invocation()} portfolio check <portfolio>\` for every finding, and \`${invocation()} portfolio build <portfolio>\` for the page.`, "");
   return out.join("\n");
 }

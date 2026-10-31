@@ -374,10 +374,10 @@ describe("pins and the import graph", () => {
     const stale = async (edition?: string) => of((await build(join(d, "alpha"), { compose: [composeDesign(join(d, "beta"), edition)] })).bundle.findings, "core/xref-pin-stale").map((f) => f.message);
     expect((await build(join(d, "alpha"))).bundle.findings).toEqual([]); // the pinned design not composed: nothing to judge
     expect(await stale("1.0.0")).toEqual([]);                             // the pinned edition composed: not stale
-    expect(await stale()).toEqual(["alpha pins Pre-merge checks 1.0.0, and this build composes the working copy of Pre-merge checks: the one record of Pre-merge checks the shared layer names did not change"]);
+    expect(await stale()).toEqual([]);
     // a reworded record is not stale; a changed or removed one is
     edit(join(d, "beta/model.yaml"), (s) => s.replace("name: Check runner, kind: runner", "name: The check runner, kind: runner"));
-    expect(await stale()).toEqual(["alpha pins Pre-merge checks 1.0.0, and this build composes the working copy of Pre-merge checks: the one record of Pre-merge checks the shared layer names did not change"]);
+    expect(await stale()).toEqual([]);
     edit(join(d, "beta/model.yaml"), (s) => s.replace("kind: runner, system: B", "kind: service, system: B"));
     expect(await stale()).toEqual(["alpha pins Pre-merge checks 1.0.0, and this build composes the working copy of Pre-merge checks: of the one record of Pre-merge checks the shared layer names, The check runner (runner), changed"]);
     edit(join(d, "beta/model.yaml"), (s) => s.replace(/  - \{ id: runner,.*\n/, ""));
@@ -396,7 +396,7 @@ describe("pins and the import graph", () => {
     const f = async () => of((await build(join(d, "alpha"))).bundle.findings, "core/xref-pin-stale").map((x) => x.message);
     expect(await f()).toEqual([]);
     edit(join(d, "shared/seams.yaml"), (s) => s.replace("description: A rule a check runs.", "description: A rule that a check runs."));
-    expect((await f())[0]).toMatch(/^edition 1.0.0 was checked with the shared file at sha256 [0-9a-f]{12}, and the root's shipped seams.yaml is now [0-9a-f]{12}: none of the \d+ shared records this design names changed$/);
+    expect(await f()).toEqual([]);
     edit(join(d, "shared/seams.yaml"), (s) => s.replace("{ id: x1, from: alpha:rule-store, to: beta:runner, kind: data", "{ id: x1, from: alpha:rule-store, to: beta:runner, kind: control"));
     expect((await f())[0]).toMatch(/: of the \d+ shared records this design names, relationship shared:x1, changed$/);
     // the edition build answers to its own record too

@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -9,12 +10,19 @@ export class EditionSource {
   readonly stage = mkdtempSync(join(tmpdir(), "plumb-add-"));
   constructor(readonly options: SourceOptions) {}
 
-  /** A direct local edition's missing dependencies are added from its enclosing collection. */
-  pinFrom(namespace: string,version: string): string {
+  /** Find a matching local dependency for a pasteable missing-pin command. */
+  pinFrom(namespace: string,version: string): string | undefined {
     if (this.options.from.startsWith("github:")) return this.options.from;
-    const root=resolve(this.options.from);
-    if (!existsSync(join(root,"edition.yaml"))) return this.options.from;
-    return root.endsWith(`/${namespace}/${version}`) ? resolve(root,"../..") : dirname(root);
+    return this.localCandidates(namespace, version, true).find(p => {
+      if (!existsSync(join(p,"edition.yaml"))) return false;
+      try { const r = parseYaml(regularFile(p,"edition.yaml").toString(),join(p,"edition.yaml")) as any; return r.namespace === namespace && r.version === version; } catch { return false; }
+    });
+  }
+
+  private localCandidates(namespace: string, version: string, pinned: boolean): string[] {
+    const root = resolve(this.options.from);
+    const bases = [root, ...(pinned ? [resolve(root,".."),resolve(root,"../.."),resolve(root,"../../..")] : [])];
+    return bases.flatMap(base => [base, join(base,namespace,version), join(base,"editions",namespace,version), join(base,"pins",namespace), join(base,"pins",namespace,version)]);
   }
 
   private async fetchFile(url: URL, file: string): Promise<Buffer> {
@@ -68,18 +76,12 @@ export class EditionSource {
       get = file => this.fetchFile(new URL(prefix + file.split("/").map(encodeURIComponent).join("/"), base), file);
       description = `${from} ${ref}/${path}`;
     } else {
-      const root = resolve(from);
-      const candidates = [root, join(root, namespace, version), join(root, "editions", namespace, version)];
-      // A direct edition is considered only if it names the requested design; recursive pins are siblings.
-      if (pinned) {
-        const upward = [resolve(root,".."),resolve(root,"../.."),resolve(root,"../../..")];
-        for (const parent of upward) candidates.push(join(parent,namespace,version),join(parent,"editions",namespace,version));
-      }
+      const candidates = this.localCandidates(namespace,version,pinned);
       let dir: string | undefined;
       for (const candidate of candidates) {
         if (!existsSync(join(candidate,"edition.yaml"))) continue;
         if (pinned) {
-          try { const r = Bun.YAML.parse(regularFile(candidate,"edition.yaml").toString()) as any; if (r.namespace !== namespace || r.version !== version) continue; } catch { /* verification below reports malformed matching candidates */ }
+          try { const r = parseYaml(regularFile(candidate,"edition.yaml").toString(),join(candidate,"edition.yaml")) as any; if (r.namespace !== namespace || r.version !== version) continue; } catch { /* verification below reports malformed matching candidates */ }
         }
         dir = candidate; break;
       }

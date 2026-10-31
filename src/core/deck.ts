@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // Present mode: <instance>/deck.yaml, one leadership template whose slides are queries over the bundle.
 //
 // Slides speak in outcomes, names and consequences: milestones by name, work by title, teams by name, status as red,
@@ -47,7 +48,7 @@ export function loadDeckConfig(dir: string): { config?: DeckConfig; problems: st
   const path = join(dir, "deck.yaml");
   if (!existsSync(path)) return { problems: [] };
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(path, "utf8")); } catch (e) { return { problems: [`deck.yaml: YAML parse error: ${(e as Error).message}`] }; }
+  try { raw = parseYaml(readFileSync(path, "utf8"),path); } catch (e) { return { problems: [`deck.yaml: YAML parse error: ${(e as Error).message}`] }; }
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { problems: ["deck.yaml: must be a mapping with title and slides"] };
   const r = raw as Raw;
   const problems: string[] = [];

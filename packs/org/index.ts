@@ -4,7 +4,7 @@
 import type { Finding, Rule, RuleContext, RulePack } from "../../src/types.ts";
 
 type F = Omit<Finding, "pack" | "rule" | "severity">;
-const found = (rule: string) => (ctx: RuleContext): F[] => (ctx.root?.problems ?? []).filter((p) => p.rule === `org/${rule}`).map(({ at, atKind, message }) => ({ at, atKind, message }));
+const found = (rule: string) => (ctx: RuleContext): F[] => (ctx.root?.problems ?? []).filter((p) => p.rule === `org/${rule}`).map(({ at, atKind, message, severity }) => ({ at, atKind, message, ...(severity ? { severity } : {}) }));
 
 const estimateValid: Rule = {
   id: "estimate-valid", title: "Every org number says what it is, who gave it, when and how sure", severity: "error",

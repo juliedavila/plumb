@@ -7,13 +7,16 @@ export const SCRUB_DEFAULT = "~/.config/plumb/scrub.txt";
 export const DEFAULT_REPLACEMENT = "[scrubbed]";
 export type ScrubList = [RegExp, string, boolean?][];
 
-export function scrubListPath(env: Record<string, string | undefined> = process.env): string {
+let warnedLegacyPath = false;
+
+export function scrubListPath(env: Record<string, string | undefined> = process.env, home = homedir()): string {
   const configured = setting("SCRUB_LIST", env);
-  if (configured) return configured.startsWith("~/") ? join(homedir(), configured.slice(2)) : resolve(configured);
-  const path = join(homedir(), ".config/plumb/scrub.txt");
-  const old = join(homedir(), ".config/design-engine/scrub.txt");
+  if (configured) return configured.startsWith("~/") ? join(home, configured.slice(2)) : resolve(configured);
+  const path = join(home, ".config/plumb/scrub.txt");
+  const old = join(home, ".config/design-engine/scrub.txt");
   if (!existsSync(path) && existsSync(old)) {
-    process.stderr.write("The design-engine scrub path is deprecated; move it to ~/.config/plumb/scrub.txt.\n");
+    if (!warnedLegacyPath) process.stderr.write("The design-engine scrub path is deprecated; move it to ~/.config/plumb/scrub.txt.\n");
+    warnedLegacyPath = true;
     return old;
   }
   return path;

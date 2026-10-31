@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 // Role strings mapped to declared teams; legacy split helpers also serve older adapters.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,7 +16,8 @@ export interface TeamReport { strings: number; mapped: number; unresolved: strin
 /** Read the team map. Absent: an empty map (every string is split automatically and reported). */
 export function loadTeamMap(path: string): TeamMap {
   if (!existsSync(path)) return { teams: [], owners: {} };
-  const raw = Bun.YAML.parse(readFileSync(path, "utf8")) as any;
+  let raw: any;
+  try { raw = parseYaml(readFileSync(path, "utf8")); } catch (e) { throw new Error(`team-map.yaml: ${(e as Error).message}`); }
   const teams: Team[] = (Array.isArray(raw?.teams) ? raw.teams : []).map((t: any) => ({ id: String(t.id), name: String(t.name ?? t.id), ...(t.description ? { description: String(t.description) } : {}), ...(t.lead != null && String(t.lead).trim() ? { lead: String(t.lead).trim() } : {}) }));
   const ids = new Set(teams.map((t) => t.id));
   const owners: Record<string, OwnerEntry> = Object.create(null);
@@ -23,7 +25,7 @@ export function loadTeamMap(path: string): TeamMap {
     const ts: string[] = (Array.isArray(v?.teams) ? v.teams : []).map(String);
     const decider = asList(v?.decider), not = asList(v?.not);
     const bad = [...ts, ...(v?.verifier ? [String(v.verifier)] : []), ...decider, ...not, ...Object.keys(v?.roles ?? {})].filter((t) => !ids.has(t));
-    if (!ts.length || bad.length) throw new Error(`team-map.yaml: owner "${k}" ${!ts.length ? "names no team" : `names undeclared team ${bad.join(", ")}`}`);
+    if (!Array.isArray(v?.teams) || bad.length) throw new Error(`team-map.yaml: owner "${k}" ${!Array.isArray(v?.teams) ? "names no team" : `names undeclared team ${bad.join(", ")}`}`);
     owners[k.trim()] = { teams: ts, ...(v.verifier ? { verifier: String(v.verifier) } : {}), ...(decider.length ? { decider } : {}), ...(not.length ? { not } : {}), ...(v.roles ? { roles: Object.fromEntries(Object.entries(v.roles).map(([a, b]) => [a, String(b)])) } : {}) };
   }
   const ur = raw?.unit_roles;
@@ -60,7 +62,7 @@ export function normaliseOwners(strings: string[], map: TeamMap) {
   let mapped = 0;
   for (const s of [...new Set(strings)]) {
     const known = map.owners[s];
-    if (known) { owners.set(s, known); mapped++; continue; }
+    if (known?.teams.length) { owners.set(s, known); mapped++; continue; }
     unresolved.push(s);
     const teams: string[] = [], roles: Record<string, string> = {};
     for (const p of splitOwner(s)) {

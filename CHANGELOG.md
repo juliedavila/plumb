@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+Local adoption finds pins inside direct edition folders and prints commands that work without linking. Passing tests capture expected fixture diagnostics. Legacy scrub notices print once per process. YAML errors name their file and position. Team drafts explain unresolved placeholders and briefs identify a shared error class. Pins with unchanged named records stay out of the stale list. Design-declared premise dependencies load as declared links and cascade without reconciliation confirmation. The adopter documentation explains workspace layout, frozen copies, portfolio fields, source confidence and structural reconciliation screening.
+
 ## 0.6.0
 
 A design's own unresolved tested_by unit is now an error.

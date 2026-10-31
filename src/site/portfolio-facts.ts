@@ -194,8 +194,15 @@ export function openingSentence(data: PortfolioData, undeclared: { relevant: num
   if (n) out.push(sentence(`${cap(said(n, "crossing"))} ${n === 1 ? "is" : "are"} undeclared and security-relevant${undeclared.excepted ? `; ${undeclared.excepted === n ? (n === 1 ? "an exception makes it a warning for now" : "exceptions make them warnings for now") : `an exception makes ${said(undeclared.excepted, "of them", "of them")} a warning for now`}` : ""}`));
   const running = L?.counts.slowdownsRunning ?? 0;
   if (running) out.push(sentence(`${cap(said(running, "slowdown bet"))} ${running === 1 ? "is" : "are"} running`));
-  const errors = data.findings.filter((f) => f.severity === "error").length;
-  if (!L && errors) out.push(sentence(`The checks report ${count(errors, "error")}`));
+  const errorFindings = data.findings.filter(f => f.severity === "error");
+  const errors = errorFindings.length;
+  const sameClass = errors && errorFindings.every(f => f.pack === errorFindings[0].pack && f.rule === errorFindings[0].rule);
+  const ownerCount = errorFindings.filter(f => /owner team.*(?:does not exist|not exist)|unresolved owner/i.test(f.message)).length;
+  const ownerRoles = ownerCount > errors / 2;
+  const classes = new Map<string, number>();
+  for (const f of errorFindings) { const key = `${f.pack}/${f.rule}`; classes.set(key, (classes.get(key) ?? 0) + 1); }
+  const dominant = [...classes].find(([, n]) => n > errors / 2);
+  if (errors && (!L || dominant || ownerRoles)) out.push(sentence(`The checks report ${count(errors, "error")}${ownerRoles ? ownerCount === errors ? ", all unresolved owner roles: finish the team map" : `; ${ownerCount} of ${errors} errors are unresolved owner roles: finish the team map` : sameClass ? `, all ${errorFindings[0].pack}/${errorFindings[0].rule}` : dominant ? `; ${dominant[1]} of ${errors} errors are ${dominant[0]}` : ""}`));
   return out.join(" ");
 }
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

@@ -1,3 +1,4 @@
+import { invocation } from "../core/invocation.ts";
 // `bun plumb.ts migrate <instance> [--to 0.4] [--root <dir>] [--moved <file>] [--dry-run]`.
 //
 // Runs src/migrate/<from>-<to>.ts in order, from the schema the instance declares (0.3 when it declares none) up to
@@ -74,7 +75,7 @@ export function applyMigration(m: Migration): void {
   for (const c of m.changes) { mkdirSync(dirname(c.path), { recursive: true }); writeFileSync(c.path, c.after); }
 }
 
-export const MIGRATE_USAGE = "usage: plumb migrate <instance-dir> [--to 0.4] [--root <dir>] [--moved <file>] [--dry-run]";
+export const MIGRATE_USAGE = `usage: ${invocation()} migrate <instance-dir> [--to 0.4] [--root <dir>] [--moved <file>] [--dry-run]`;
 
 export function migrateCli(dir: string, args: string[]): number {
   const opt = (k: string) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : undefined; };

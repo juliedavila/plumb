@@ -6,8 +6,8 @@ function reconciliationDetail(ix, id, im, h) {
   var qualified = id.indexOf(":") >= 0 ? id : (ix.b.instance.namespace || ix.b.instance.name) + ":" + id;
   var links = arr(ix.b.premiseLinks && ix.b.premiseLinks.links).filter(function (l) { return l.from === qualified || l.to === qualified; });
   if (links.length) h.push(sec("Reconciliation links in and out", links.length, '<ul class="rows">' + links.map(function (l) {
-    return "<li><code>" + esc(l.id) + "</code>: " + (l.from === qualified ? "Out to " : "In from ") + "<code>" + esc(l.from === qualified ? l.to : l.from) + "</code> · " + esc(l.type.replace(/-/g, " ")) + " · " + esc(l.status)
-      + (l.confirmed ? "<br>Falsifier clause: “" + esc(l.confirmed.falsifier_clause) + "”<br>Moved clause: “" + esc(l.confirmed.moved_clause) + "”" : "<br>" + esc(l.found.reasoning)) + "</li>";
+    return "<li><code>" + esc(l.id) + "</code>: " + (l.from === qualified ? "Out to " : "In from ") + "<code>" + esc(l.from === qualified ? l.to : l.from) + "</code> · " + esc(l.type.replace(/-/g, " ")) + " · " + esc(l.status) + (l.external ? " · external" : "")
+      + (l.confirmed ? "<br>Falsifier clause: “" + esc(l.confirmed.falsifier_clause) + "”<br>Moved clause: “" + esc(l.confirmed.moved_clause) + "”" : "<br>" + esc(l.declaration ? l.declaration.source : l.found && l.found.reasoning || "")) + "</li>";
   }).join("") + "</ul>"));
   if (im && im.preview && (arr(im.preview.dependents).length || arr(im.preview.units).length)) h.push(sec("Would cascade if confirmed", null, '<ul class="rows">' + arr(im.preview.dependents).map(function (d) {
     return "<li>" + esc(d.kind) + " <code>" + esc(d.id) + "</code> · " + esc(d.status || "found") + " through " + arr(d.links).map(function (l) { return esc(l.id + " (" + l.status + ")"); }).join(", ") + "</li>";

@@ -2,7 +2,7 @@
 
 Write only the requested design's `current.yaml`. Current state is live and never frozen in an edition. A design records only its own parts. It cannot record shared parts' current state in 0.4. A replacement may be shared.
 
-Read current.yaml and the design model first. An agent may add a discovery with `found: { by: "agent:current-state-scout", from: <specific local source>, as_of: <date>, confidence: medium }`. Keep baseline and disposition grounded in the supplied evidence. A missing disposition remains undecided and is displayed. Never infer it from a name. Dispositions are new, retain, transition, replace and retire.
+Read current.yaml and the design model first. An agent may add a discovery with `found: { by: "agent:current-state-scout", from: <specific local source>, as_of: <date>, confidence: medium }`. Record a person's spoken or written correction with `from: "conversation with <role>, <date>"`. Set confidence to high for a local file read directly, medium for a person's account, and low for inference from absence or indirect evidence. Keep baseline and disposition grounded in the supplied evidence. A missing disposition remains undecided and is displayed. Never infer it from a name. Dispositions are new, retain, transition, replace and retire.
 
 A part that exists only today uses `add: { name, kind, system, owner }`. Its system must be one the design places parts in. A replacement may name `replaced_by`. Retirement work belongs in a design patch and moves the part to `retired`. Do not invent such work during confirmation.
 

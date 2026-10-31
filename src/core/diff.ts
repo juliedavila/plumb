@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // Compare two builds of an instance: `bun plumb.ts diff <instance> --from <bundle.json | git ref> [--to ...] [--save]`.
 //
 // Each side is a built bundle file or this instance at a git ref.
@@ -124,7 +125,7 @@ export async function resolveSide(dir: string, value: string | undefined): Promi
 export async function diffCli(dir: string, args: string[]): Promise<number> {
   const opt = (k: string) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : undefined; };
   const from = opt("--from"), to = opt("--to");
-  if (!from) { process.stderr.write("usage: plumb diff <instance-dir> --from <bundle.json | git ref | edition folder> [--to <bundle.json | git ref | edition folder>] [--save] [--json]\n"); return 2; }
+  if (!from) { process.stderr.write(`usage: ${invocation()} diff <instance-dir> --from <bundle.json | git ref | edition folder> [--to <bundle.json | git ref | edition folder>] [--save] [--json]\n`); return 2; }
   const a = await resolveSide(dir, from), b = await resolveSide(dir, to);
   try {
     const d = diffBundles(a.bundle, b.bundle, { from: a.label, to: b.label });

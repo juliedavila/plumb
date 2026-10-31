@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // The shared root's own build: what the root holds, checked by itself.
 //
 // `bun plumb.ts check <root>` and `bun plumb.ts build <root>` load the root with its accepted patches applied, read the org
@@ -187,7 +188,7 @@ export async function buildRoot(dir: string, opts: RootBuildOptions = {}): Promi
   return { bundle, root };
 }
 
-export const ROOT_USAGE = "  bun plumb.ts check <root-dir>                       a shared root's own checks (its engine.yaml says kind: root)\n  bun plumb.ts build <root-dir> [--out <dir>]         write build/<name>/root.json";
+export const ROOT_USAGE = `  ${invocation()} check <root-dir>                       a shared root's own checks (its engine.yaml says kind: root)\n  ${invocation()} build <root-dir> [--out <dir>]         write build/<name>/root.json`;
 
 /** `bun plumb.ts check|build <root>`: a shared root in place of an instance. */
 export async function rootCli(cmd: string, dir: string, rest: string[], engineRoot: string): Promise<number> {

@@ -1,3 +1,4 @@
+import { invocation } from "../core/invocation.ts";
 // `bun plumb.ts tracker <discover|draft-mapping|reconcile|export|measure> <instance|root> ...`: the tracker workflow, files only.
 //
 //   discover <instance> --from <dir> [--adapter jira]   raw tracker REST JSON -> <instance>/tracker/inventory.json
@@ -23,10 +24,10 @@ import { ORG_TRACKER_USAGE, orgTrackerCli } from "./org-cli.ts";
 import { inventoryChanges } from "./inventory-diff.ts";
 
 export const TRACKER_USAGE = `usage:
-  plumb tracker discover      <instance-dir> --from <raw-export-dir> [--adapter jira]
-  plumb tracker draft-mapping <instance-dir> [--force]
-  plumb tracker reconcile     <instance-dir> [--from <raw-export-dir>]
-  plumb tracker export        <instance-dir> [--out <file>]
+  ${invocation()} tracker discover      <instance-dir> --from <raw-export-dir> [--adapter jira]
+  ${invocation()} tracker draft-mapping <instance-dir> [--force]
+  ${invocation()} tracker reconcile     <instance-dir> [--from <raw-export-dir>]
+  ${invocation()} tracker export        <instance-dir> [--out <file>]
 ${ORG_TRACKER_USAGE}`;
 
 const opt = (args: string[], name: string) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
@@ -89,7 +90,7 @@ export async function trackerCli(args: string[]): Promise<number> {
 
   const inst = loadInstance(instDir);
   const t = loadTracker(instDir, { from: opt(rest, "--from") });
-  if (isOrgMapping(t?.mapping)) { console.error("tracker/mapping.yaml here is an org mapping (kind: org): it belongs in a shared root's tracker/, where bun plumb.ts tracker measure <root> reads it"); return 1; }
+  if (isOrgMapping(t?.mapping)) { console.error(`tracker/mapping.yaml here is an org mapping (kind: org): it belongs in a shared root's tracker/, where ${invocation()} tracker measure <root> reads it`); return 1; }
 
   if (sub === "draft-mapping") {
     if (!t?.inventory) { console.error(`no ${FILES.inventory} in ${tdir}: run tracker discover first`); return 1; }
@@ -97,7 +98,7 @@ export async function trackerCli(args: string[]): Promise<number> {
     const text = getAdapter(t.inventory.adapter).draftMapping(t.inventory, c.model, c.plan);
     const target = existsSync(join(tdir, FILES.mapping)) && !rest.includes("--force") ? join(tdir, "mapping.draft.yaml") : join(tdir, FILES.mapping);
     writeFileSync(target, text);
-    console.log(`wrote ${target}${target.endsWith("draft.yaml") ? ` (mapping.yaml exists and is kept; compare the two, or pass --force to replace it)` : ""}. Edit it until it is right; \`bun plumb.ts check\` validates it against the inventory.`);
+    console.log(`wrote ${target}${target.endsWith("draft.yaml") ? ` (mapping.yaml exists and is kept; compare the two, or pass --force to replace it)` : ""}. Edit it until it is right; \`${invocation()} check\` validates it against the inventory.`);
     return 0;
   }
 

@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { tmpdir } from "node:os";
+import { localPath, shellArg } from "../src/core/invocation.ts";
 import { addDesign } from "../src/design/add.ts";
 import { hash, yamlText, FILE_LIMIT } from "../src/design/manifest.ts";
 import { filesDigest, readEdition, verifyEdition } from "../src/core/edition.ts";
@@ -63,7 +64,7 @@ describe("design add from folders",()=>{
     put(join(portfolio,"portfolio.yaml"),{name:"repairs",title:"Repair services",root:"../../instances/shared",designs:[{namespace:"intake",from:"../../instances/intake"},{namespace:"premerge",from:"../../instances/premerge"}]});
     for(const mode of ["working","presenting"] as const){const run=await runPortfolio(portfolio,{mode});expect(run.data.stopped).toBeFalsy();expect(run.data.findings.filter(f=>f.severity==="error")).toEqual([]);}
     const command=cli(["design","add","premerge@1.0.0","--from",fixtures,"--workspace",workspace],workspace);
-    expect(command.exitCode).toBe(0);expect(command.stdout.toString()).toContain("plumb portfolio build");
+    expect(command.exitCode).toBe(0);expect(command.stdout.toString()).toContain(`${relative(realpathSync(workspace),join(import.meta.dir,"../plumb.ts"))} portfolio build`);
   });
   test("same stamp re-derives against a new team map; every live-state category survives",async()=>{
     const workspace=temp();await add(workspace);
@@ -74,7 +75,7 @@ describe("design add from folders",()=>{
     const result=await add(workspace);expect(result[0].resolved).toBe(2);expect(result[0].unresolved).toBe(0);
     expect(readFileSync(join(workspace,"instances/shared/team-map.yaml"))).toEqual(teamBytes);
     expect(Y(join(dir,"model.yaml")).elements[0]).toMatchObject({owner:"counter",owner_as_written:"counter operations",attrs:{design_role:"counter operations"}});
-    expect(Y(join(workspace,"instances/shared/team-map.draft.yaml"))).toEqual({owners:{}});
+    expect(Y(join(workspace,"instances/shared/team-map.draft.yaml"))).toEqual({teams:[],owners:{}});
     for(const f of files)expect(readFileSync(join(dir,f),"utf8")).toBe(`# authored ${f}\n`);
     expect(verifyEdition(readEdition(dir,"1.0.0"))).toEqual([]);
     writeFileSync(join(dir,"editions/1.0.0/model.engine.yaml"),"# tampered adapter\n");
@@ -96,14 +97,14 @@ describe("design add from folders",()=>{
     put(file,{teams:[{id:"counter"}],owners:{"counter operations":{teams:["counter"]},"repair operations":{teams:[]}}});
     const before=readFileSync(file);const r=await add(workspace);
     expect(r[0]).toMatchObject({resolved:1,unresolved:1});expect(readFileSync(file)).toEqual(before);
-    expect(Y(join(workspace,"instances/shared/team-map.draft.yaml"))).toEqual({owners:{"repair operations":{teams:[]}}});
+    expect(Y(join(workspace,"instances/shared/team-map.draft.yaml"))).toEqual({teams:[],owners:{"repair operations":{teams:[]}}});
   });
 });
 
 describe("verification refuses before workspace writes",()=>{
   test("absent pin reports the exact next command",async()=>{
     const workspace=join(temp(),"workspace");
-    await expect(addDesign("premerge","1.0.0",{workspace,from:fixtures})).rejects.toThrow(`plumb design add intake@1.0.0 --from ${JSON.stringify(fixtures)} --workspace ${JSON.stringify(workspace)}`);
+    await expect(addDesign("premerge","1.0.0",{workspace,from:fixtures})).rejects.toThrow(`bun plumb.ts design add intake@1.0.0 --from ${shellArg(localPath(release(fixtures)))} --workspace ${shellArg(localPath(workspace))}`);
     expect(existsSync(workspace)).toBe(false);
   });
   test("present pin at a different version or hash is refused",async()=>{

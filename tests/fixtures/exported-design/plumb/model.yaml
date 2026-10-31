@@ -1,0 +1,6 @@
+claims:
+  - id: EX-1
+    kind: premise
+    statement: Export depends on upstream availability
+    rests_on:
+      claims: [upstream:UP-1, shared:SH-1]

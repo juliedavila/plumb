@@ -8,6 +8,7 @@ import { DEFAULT_LADDER, loadInstance, packNames, patchKey } from "./load.ts";
 import { analyzePlan } from "./plan.ts";
 import { compareFindings, corePack, loadPacks, packsFor } from "./rules.ts";
 import { nsBuildFindings } from "./compose.ts";
+import { readOrgView } from "./org.ts";
 import { bundleCurrent } from "./current.ts";
 import { canonicalJson, sha256 } from "./util.ts";
 import { bundleTracker } from "../tracker/bundle.ts";
@@ -29,8 +30,8 @@ import { flowBadgeLines, flowFacts, claimFlowChecks } from "./flow.ts";
 import { streamLayout } from "./flow-layout.ts";
 import { instanceMeasured } from "./flow-measured.ts";
 
-// 0.6.0: premise reconciliation across designs.
-export const ENGINE_VERSION = "0.6.0";
+// 0.6.1: adopter dry-run fixes and design-declared links.
+export const ENGINE_VERSION = "0.6.1";
 
 /** sha256 of the canonical JSON of the inputs: instance config, model, plan, patches. No timestamp, no absolute paths. */
 export function contentHash(inst: Instance): string {
@@ -79,6 +80,12 @@ export async function buildBundle(dirOrInstance: string | Instance, opts: { buil
   for (const e of packErrors) core.push({ pack: "core", rule: "pack-loads", severity: "error", at: e.name, atKind: "instance", message: `pack ${e.name} did not load: ${e.message}` });
   core.push(...(inst.loadFindings ?? []));
   if (inst.ns) core.push(...inst.ns.findings, ...nsBuildFindings(inst, compiled)); // a 0.4 design: schema, namespace, root, pins and stale pins
+  if (inst.ns?.root?.input) {
+    const org = readOrgView(inst.ns.root.input, { compose: inst.ns.compose, today: inst.asOf });
+    // Surface the edition's adoption end-date decision here; other org checks belong to the root build.
+    for (const p of org?.problems ?? []) if (p.rule === "org/exception-valid" && /awaits the organization's end date|has no end \(until:/.test(p.message))
+      core.push({ pack: "org", rule: "exception-valid", severity: p.severity ?? "error", at: p.at, atKind: p.atKind, message: p.message });
+  }
   for (const p of inst.patches) for (const msg of compiled.resultsByKey[patchKey(p)]?.errors ?? [])
     core.push({ pack: "core", rule: "patch-applies", severity: "error", at: p.id, atKind: "instance", message: msg });
   // Units the accepted patches left with no part to move.
@@ -126,7 +133,7 @@ export async function buildBundle(dirOrInstance: string | Instance, opts: { buil
     },
     model, plan: compiled.plan,
     findings,
-    ...(reconciliation && inst.ns?.root && existsSync(join(inst.ns.root.dir, "premise-links.yaml")) ? { premiseLinks: reconciliation.data } : {}),
+    ...(reconciliation && (reconciliation.data.links.length || inst.ns?.root && existsSync(join(inst.ns.root.dir, "premise-links.yaml"))) ? { premiseLinks: reconciliation.data } : {}),
     analysis: analyzePlan(compiled.plan),
     patches,
     layouts,

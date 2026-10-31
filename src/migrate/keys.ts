@@ -1,3 +1,5 @@
+import { parseYaml } from "../core/yaml.ts";
+import { invocation } from "../core/invocation.ts";
 // Expand and contract: every renamed key, the version it was renamed in and the version that
 // removes the old one. For one minor version the loader reads the old key through the new one, and in an instance that
 // declares schema 0.4, core/deprecated-key warns with the file, the line, the new key and the version that removes it.
@@ -47,7 +49,7 @@ export function deprecatedUses(dir: string): KeyUse[] {
     if (!existsSync(path)) continue;
     const text = readFileSync(path, "utf8");
     let raw: unknown;
-    try { raw = Bun.YAML.parse(text); } catch { continue; } // the file's own loader reports a parse error
+    try { raw = parseYaml(text,path); } catch { continue; } // the file's own loader reports a parse error
     const count = countAt(raw, entry.path, entry.old);
     if (!count) continue;
     out.push({ entry, count, lines: keyLines(text, entry.old) });
@@ -61,7 +63,7 @@ export function deprecatedKeyFindings(dir: string): Finding[] {
   for (const u of deprecatedUses(dir)) {
     const { entry } = u;
     const lines = u.lines.length === u.count ? u.lines : [];
-    const said = (line?: number) => `${entry.file}${line ? ` line ${line}` : ""}: the key ${entry.old} (${entry.path}) is deprecated; write ${entry.new}, which it is read as until ${entry.removed_in} removes ${entry.old} (bun plumb.ts migrate renames it)`;
+    const said = (line?: number) => `${entry.file}${line ? ` line ${line}` : ""}: the key ${entry.old} (${entry.path}) is deprecated; write ${entry.new}, which it is read as until ${entry.removed_in} removes ${entry.old} (${invocation()} migrate renames it)`;
     if (lines.length) for (const n of lines) out.push({ pack: "core", rule: "deprecated-key", severity: "warning", at: `${entry.file}:${n}`, atKind: "instance", message: said(n) });
     else out.push({ pack: "core", rule: "deprecated-key", severity: "warning", at: entry.file, atKind: "instance", message: said() + (u.count > 1 ? ` (${u.count} uses)` : "") });
   }
@@ -69,9 +71,9 @@ export function deprecatedKeyFindings(dir: string): Finding[] {
 }
 
 /** Rename one deprecated key in a file's text, on the lines that write it; comments and the rest stay as they are. */
-export function renameKey(text: string, entry: DeprecatedKey): { text: string; lines: number[]; unsafe: boolean } {
+export function renameKey(text: string, entry: DeprecatedKey, path = entry.file): { text: string; lines: number[]; unsafe: boolean; problem?: string } {
   let raw: unknown;
-  try { raw = Bun.YAML.parse(text); } catch { return { text, lines: [], unsafe: true }; }
+  try { raw = parseYaml(text,path); } catch (e) { return { text, lines: [], unsafe: true, problem: (e as Error).message }; }
   const count = countAt(raw, entry.path, entry.old);
   if (!count) return { text, lines: [], unsafe: false };
   const lines = keyLines(text, entry.old);

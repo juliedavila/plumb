@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // bun plumb.ts portfolio <build | check | impact | brief>. build writes the
 // portfolio page and a page for each design built inside it (src/site/portfolio-build.ts); check, impact and brief
 // print, and write nothing.
@@ -10,10 +11,10 @@ import { portfolioBriefMd } from "./portfolio-brief.ts";
 import { isDate } from "./estimate.ts";
 
 export const PORTFOLIO_USAGE = `usage:
-  plumb portfolio build  <portfolio> [--presenting] [--out <dir>] [--today <YYYY-MM-DD>]   compose and check; write the portfolio page, each design's page built inside it, portfolio.json and portfolio.lock
-  plumb portfolio check  <portfolio> [--presenting] [--today <YYYY-MM-DD>]                 every finding across the designs as Markdown; exit 1 on errors
-  plumb portfolio impact <portfolio> <root patch> [--presenting] [--today <YYYY-MM-DD>]     the portfolio with and without one of the root's patches, and its verdict
-  plumb portfolio brief  <portfolio> [--presenting] [--today <YYYY-MM-DD>]                 what needs a person across the designs, read-only
+  ${invocation()} portfolio build  <portfolio> [--presenting] [--out <dir>] [--today <YYYY-MM-DD>]   compose and check; write the portfolio page, each design's page built inside it, portfolio.json and portfolio.lock
+  ${invocation()} portfolio check  <portfolio> [--presenting] [--today <YYYY-MM-DD>]                 every finding across the designs as Markdown; exit 1 on errors
+  ${invocation()} portfolio impact <portfolio> <root patch> [--presenting] [--today <YYYY-MM-DD>]     the portfolio with and without one of the root's patches, and its verdict
+  ${invocation()} portfolio brief  <portfolio> [--presenting] [--today <YYYY-MM-DD>]                 what needs a person across the designs, read-only
 <portfolio> is a folder holding portfolio.yaml, or the file. --presenting composes each design's newest released edition with today's status.
 --today builds as of that date (ages, ends, what is in force), for a page that must read the same on any day.`;
 

@@ -291,13 +291,13 @@ export function readOrgView(root: RootInput, opts: OrgReadOptions = {}): OrgView
         if (until) ex.until = until;
         if (why) ex.why = why;
         if (!by) ex.problems.push("names no risk acceptor (accepted_by)");
-        if (!until) ex.problems.push("has no end (until: a milestone or a date)");
+        if (!until) ex.problems.push(!fromOrg && x.until === null ? "awaits the organization's end date" : "has no end (until: a milestone or a date)");
         else if (!isDate(until) && !isMilestoneRef(until)) ex.problems.push(`has until "${until}", which is neither a date (YYYY-MM-DD) nor a milestone (<namespace>:<id>)`);
         if (!ex.contracts.length) ex.problems.push("names no contract, so it excepts nothing");
         if (carried) for (const c of ex.contracts) if (!carried.has(c)) ex.problems.push(`names ${c}, which its seam does not carry`);
       }
       ex.valid = !ex.problems.length;
-      if (ex.problems.length) problems.push({ rule: "org/exception-valid", at: seamAt, atKind: "instance", message: `${who}${nth} on the seam ${key} ${ex.problems.join(", ")}; it does not apply` });
+      if (ex.problems.length) problems.push({ rule: "org/exception-valid", ...(!fromOrg && isMap(x) && x.until === null && ex.problems.length === 1 ? { severity: "warning" as const } : {}), at: seamAt, atKind: "instance", message: `${who}${nth} on the seam ${key} ${ex.problems.join(", ")}; it does not apply` });
       return ex;
     });
   }

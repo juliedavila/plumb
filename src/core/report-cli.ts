@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // `bun plumb.ts report <instance> [--presented]`: build, save a compact snapshot in <instance>/reports/, and say what
 // changed since the deck's baseline before this one (the last presented snapshot, else the last saved).
 
@@ -36,7 +37,7 @@ export function sinceLine(b: Awaited<ReturnType<typeof buildBundle>>["bundle"]):
 export async function reportCli(dir: string, args: string[]): Promise<number> {
   const presented = args.includes("--presented");
   const unknown = args.filter((a) => a !== "--presented");
-  if (unknown.length) { process.stderr.write(`usage: plumb report <instance-dir> [--presented]\nunknown argument: ${unknown[0]}\n`); return 2; }
+  if (unknown.length) { process.stderr.write(`usage: ${invocation()} report <instance-dir> [--presented]\nunknown argument: ${unknown[0]}\n`); return 2; }
   const { bundle } = await buildBundle(resolve(dir));
   const line = sinceLine(bundle);
   // one snapshot per build: the same build saved again is the snapshot already there (marked presented when asked)

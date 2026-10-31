@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // Notes and questions pinned to records: <instance>/notes.yaml.
 //
 //   notes:
@@ -76,7 +77,7 @@ export function normNote(raw: unknown, i: number, problems: string[]): Note | un
 export function parseNotes(text: string): { notes: Note[]; problems: string[] } {
   const problems: string[] = [];
   let raw: unknown;
-  try { raw = Bun.YAML.parse(text); } catch (e) { return { notes: [], problems: [`notes.yaml: YAML parse error: ${(e as Error).message}`] }; }
+  try { raw = parseYaml(text,"notes.yaml"); } catch (e) { return { notes: [], problems: [`notes.yaml: YAML parse error: ${(e as Error).message}`] }; }
   if (raw === null || raw === undefined) return { notes: [], problems };
   const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" ? (raw as Raw).notes : undefined;
   if (list === undefined || list === null) return { notes: [], problems };
@@ -180,7 +181,7 @@ export function editNotesText(text: string | undefined, edit: NoteEdit): string 
   const blocks = noteBlocks(text);
   const lines = text.split("\n");
   let raw: unknown;
-  try { raw = Bun.YAML.parse(text); } catch { raw = undefined; }
+  try { raw = parseYaml(text,"notes.yaml"); } catch { raw = undefined; }
   const rawList = raw && typeof raw === "object" && !Array.isArray(raw) && Array.isArray((raw as Raw).notes) ? ((raw as Raw).notes as unknown[]) : undefined;
   const inPlace = blocks && rawList && blocks.length === rawList.length;
   if (!inPlace) {

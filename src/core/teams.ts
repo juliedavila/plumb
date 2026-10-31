@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // Teams and roles: who owns and who verifies each part and unit, which teams wait on which, and how the load spreads.
 //
 // The model's teams are the registry: an owner or verifier names a declared team (the generic, plan and teams packs
@@ -206,7 +207,7 @@ export function readTeamMap(path: string): RootTeamMap | undefined {
   const sha256 = new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
   const out: RootTeamMap = { file: "team-map.yaml", sha256, owners: Object.create(null), teams: [], problems: [] };
   let raw: unknown;
-  try { raw = Bun.YAML.parse(bytes); } catch (e) { out.problems.push(`team-map.yaml: YAML parse error: ${(e as Error).message}`); return out; }
+  try { raw = parseYaml(bytes,path); } catch (e) { out.problems.push(`team-map.yaml: YAML parse error: ${(e as Error).message}`); return out; }
   if (raw === null || raw === undefined) return out;
   if (typeof raw !== "object" || Array.isArray(raw)) { out.problems.push("team-map.yaml: must be a mapping with owners (and optionally unit_roles and teams)"); return out; }
   const r = raw as Record<string, unknown>;
@@ -221,7 +222,7 @@ export function readTeamMap(path: string): RootTeamMap | undefined {
     if (!v || typeof v !== "object" || Array.isArray(v)) { out.problems.push(`team-map.yaml: owner "${k}" must be a mapping like { teams: [<team>] }`); continue; }
     const e = v as Record<string, unknown>;
     const teams = asTeamList(e.teams);
-    if (!teams.length) { out.problems.push(`team-map.yaml: owner "${k}" names no team`); continue; }
+    if (!teams.length && !(Array.isArray(e.teams) && e.teams.length === 0)) { out.problems.push(`team-map.yaml: owner "${k}" names no team`); continue; }
     const entry: TeamMapEntry = { teams };
     if (e.verifier != null && String(e.verifier).trim()) entry.verifier = String(e.verifier).trim();
     const decider = asTeamList(e.decider), not = asTeamList(e.not);

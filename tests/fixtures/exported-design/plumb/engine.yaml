@@ -1,0 +1,5 @@
+name: exported
+title: Exported design
+schema: "0.4"
+namespace: exported
+packs: [generic, plan]

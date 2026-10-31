@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // Current state: where each part of a design stands today, part by part, in <design>/current.yaml.
 //
 // current.yaml is live state, like progress.yaml: read from the instance folder (never from a released edition), never
@@ -102,7 +103,7 @@ export function loadCurrent(dir: string): CurrentInput | undefined {
   const path = join(dir, CURRENT_FILE);
   if (!existsSync(path)) return undefined;
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(path, "utf8")); } catch (e) { return { file: CURRENT_FILE, records: [], problem: `YAML parse error: ${(e as Error).message}` }; }
+  try { raw = parseYaml(readFileSync(path, "utf8"),path); } catch (e) { return { file: CURRENT_FILE, records: [], problem: `YAML parse error: ${(e as Error).message}` }; }
   if (raw === null || raw === undefined) return { file: CURRENT_FILE, records: [] };
   if (!isMap(raw)) return { file: CURRENT_FILE, records: [], problem: `expected a mapping with parts: (part ids to records), not ${what(raw)}` };
   const parts = raw.parts;

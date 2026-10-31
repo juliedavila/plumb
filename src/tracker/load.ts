@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 // Load <instance>/tracker/: inventory.json (from `tracker discover`), mapping.yaml (declared by the organization),
 // links.yaml (confirmed matches) and the live issue state, read from the raw export the inventory records.
 // Nothing here throws on a bad file: problems are collected and the tracker rule pack reports them.
@@ -39,7 +40,7 @@ function engineExport(instanceDir: string): string | undefined {
   const p = join(resolve(instanceDir), "engine.yaml");
   if (!existsSync(p)) return undefined;
   try {
-    const c = Bun.YAML.parse(readFileSync(p, "utf8")) as any;
+    const c = parseYaml(readFileSync(p, "utf8"),p) as any;
     const e = c?.tracker?.export;
     return typeof e === "string" && e.trim() ? e.trim() : undefined;
   } catch { return undefined; }
@@ -56,7 +57,7 @@ export function loadTracker(instanceDir: string, opts: { from?: string } = {}): 
   }
   if (existsSync(mp)) {
     try {
-      const { mapping, problems } = normalizeMapping(Bun.YAML.parse(readFileSync(mp, "utf8")));
+      const { mapping, problems } = normalizeMapping(parseYaml(readFileSync(mp, "utf8"),mp));
       if (mapping) t.mapping = mapping;
       for (const message of problems) t.problems.push({ file: `tracker/${FILES.mapping}`, message });
     } catch (e) { t.problems.push({ file: `tracker/${FILES.mapping}`, message: `does not parse: ${(e as Error).message}` }); }

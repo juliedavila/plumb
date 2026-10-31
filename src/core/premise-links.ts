@@ -1,4 +1,5 @@
-// Read-only reconciliation evidence. Only current, explicitly confirmed links affect normal impact.
+import { parseYaml } from "./yaml.ts";
+// Read-only reconciliation evidence and design declarations. Current confirmations and declarations affect impact.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Claim, Finding, Model, Plan, PremiseLink, PremiseLinks, PremiseRun } from "../types.ts";
@@ -17,11 +18,31 @@ const map = (v: unknown): v is Record<string, any> => !!v && typeof v === "objec
 const text = (v: unknown): v is string => typeof v === "string" && !!v.trim();
 const texts = (v: unknown): v is string[] => Array.isArray(v) && v.every(text);
 const integer = (v: unknown) => Number.isInteger(v) && Number(v) >= 0;
-export const emptyPremiseLinks = (): PremiseLinks => ({ links: [], runs: [], debt: { found: 0, stale: 0, flags: 0, last_run: null } });
+export const emptyPremiseLinks = (): PremiseLinks => ({ links: [], runs: [], debt: { declared: 0, found: 0, stale: 0, flags: 0, last_run: null } });
+
+/** Cross-design claim references are declarations frozen with the design, not discoveries. */
+export function declaredPremiseLinks(model: Model, designs: string[] = []): PremiseLink[] {
+  const claims = new Map((model.claims ?? []).map(c => [c.id,c]));
+  const namespaces = new Set([...designs, ...[...claims.keys()].map(id => id.split(":")[0])]);
+  const links: PremiseLink[] = [];
+  for (const c of [...claims.values()].filter(c => c.kind === "premise")) for (const to of new Set(c.rests_on ?? [])) {
+    if (!to.includes(":") || !c.id.includes(":") || to.split(":")[0] === c.id.split(":")[0]) continue;
+    const target = claims.get(to);
+    links.push({ id: `declared:${c.id}->${to}`, from: c.id, to, type: "depends-on", status: "declared",
+      declaration: { source: "model.yaml rests_on.claims" },
+      hashes: { from: premiseHash(c), to: target ? premiseHash(target) : "" }, statements: { from: c.statement, to: target?.statement ?? "external premise" }, changed: [],
+      ...(!namespaces.has(to.split(":")[0]) ? { external: true } : {}),
+    });
+  }
+  return links;
+}
 
 /** Validate against the qualified composed model. Missing designs are outside this scope, never invented records. */
 export function validatePremiseLinks(raw: unknown, model: Model, designs: string[]): { data: PremiseLinks; findings: Finding[] } {
   const data = emptyPremiseLinks(), findings: Finding[] = [];
+  data.links = declaredPremiseLinks(model,designs);
+  const allClaims = new Set((model.claims ?? []).map(c => c.id));
+  for (const link of data.links) if (!link.external && !allClaims.has(link.to)) findings.push({ pack: "premises", rule: "links-valid", severity: "error", at: link.from, atKind: "claim", message: `model.yaml: ${link.id} names ${link.to}, which does not resolve to a claim in its present design` });
   const issue = (at: string, message: string, severity: Finding["severity"] = "error") => findings.push({ pack: "premises", rule: "links-valid", severity, at, atKind: "instance", message: `premise-links.yaml: ${message}` });
   if (!map(raw)) { issue("premise-links.yaml", "must be a mapping with links and runs"); return { data, findings }; }
   for (const k of Object.keys(raw)) if (!["links", "runs"].includes(k)) issue("premise-links.yaml", `unknown top-level key ${k}`, "warning");
@@ -38,6 +59,8 @@ export function validatePremiseLinks(raw: unknown, model: Model, designs: string
     if (ids.has(x.id)) { issue(at, `duplicate link id ${x.id}`); duplicates.add(x.id); }
     ids.add(x.id);
     if (!["depends-on", "contradicts", "duplicates"].includes(x.type)) issue(at, `unknown link type ${String(x.type)}`);
+    const declared = data.links.find(l => l.status === "declared" && l.from === x.from && l.to === x.to && l.type === x.type);
+    if (declared) issue(at, `${x.id} duplicates ${declared.id}: ${x.from} already declares a dependency on ${x.to}`, "warning");
     if (!map(x.found) || ![x.found.by, x.found.at, x.found.reasoning].every(text) || !texts(x.found.sources) || !x.found.sources.length) issue(at, "found needs by, at, reasoning and non-empty sources");
     const absent: string[] = [];
     for (const side of ["from", "to"] as const) {
@@ -93,14 +116,14 @@ export function validatePremiseLinks(raw: unknown, model: Model, designs: string
     stack.pop(); done.add(id);
   };
   for (const id of edges.keys()) visit(id);
-  data.debt = { found: data.links.filter((l) => l.type === "depends-on" && l.status === "found").length, stale: data.links.filter((l) => l.type === "depends-on" && l.status === "stale").length, flags: data.links.filter((l) => l.type !== "depends-on").length, last_run: data.runs.at(-1) ?? null };
+  data.debt = { declared: data.links.filter(l => l.status === "declared").length, found: data.links.filter((l) => l.type === "depends-on" && l.status === "found").length, stale: data.links.filter((l) => l.type === "depends-on" && l.status === "stale").length, flags: data.links.filter((l) => l.type !== "depends-on").length, last_run: data.runs.at(-1) ?? null };
   return { data, findings };
 }
 
 export function readPremiseLinks(dir: string | undefined, model: Model, designs: string[]) {
-  if (!dir || !existsSync(join(dir, "premise-links.yaml"))) return { data: emptyPremiseLinks(), findings: [] as Finding[] };
-  try { return validatePremiseLinks(Bun.YAML.parse(readFileSync(join(dir, "premise-links.yaml"), "utf8")), model, designs); }
-  catch (e) { return { data: emptyPremiseLinks(), findings: [{ pack: "premises", rule: "links-valid", severity: "error", at: "premise-links.yaml", atKind: "instance", message: `premise-links.yaml could not load: ${(e as Error).message}` }] as Finding[] }; }
+  if (!dir || !existsSync(join(dir, "premise-links.yaml"))) return validatePremiseLinks({},model,designs);
+  try { return validatePremiseLinks(parseYaml(readFileSync(join(dir, "premise-links.yaml"), "utf8"),join(dir,"premise-links.yaml")), model, designs); }
+  catch (e) { const data = emptyPremiseLinks(); data.links = declaredPremiseLinks(model,designs); return { data, findings: [{ pack: "premises", rule: "links-valid", severity: "error", at: "premise-links.yaml", atKind: "instance", message: `premise-links.yaml could not load: ${(e as Error).message}` }] as Finding[] }; }
 }
 
 /** Shared register claims bypass the design resolver. Check their settling work in the same scope. */
@@ -131,8 +154,8 @@ export function premisesProjection(designs: string[], model: Model, plan: Plan, 
 }
 export function premisesText(p: ReturnType<typeof premisesProjection>): string {
   let design = "";
-  return p.premises.map((c) => {
+  return `Declared links: ${p.debt.declared}\n` + (p.premises.map((c) => {
     const heading = c.design !== design ? `\n# ${c.design}\n` : ""; design = c.design;
-    return `${heading}\n${c.id} (${c.grade})\n${c.statement}\nFalsifier: ${c.falsifier}\nLoad: ${c.load ?? ""}\nIf it flips: ${c.if_it_flips ?? ""}\nRests on: ${c.rests_on.join(", ") || "none"}\nSettling units: ${c.settling_units.map((u) => `${u.id} (${u.status ?? "not in this workspace"})`).join(", ") || "none"}\nHash: ${c.hash}\nLinks: ${c.links.map((l) => `${l.id} ${l.from} ${l.type} ${l.to} (${l.status})`).join(", ") || "none"}\n`;
-  }).join("").trim() || "No premises in scope.";
+    return `${heading}\n${c.id} (${c.grade})\n${c.statement}\nFalsifier: ${c.falsifier}\nLoad: ${c.load ?? ""}\nIf it flips: ${c.if_it_flips ?? ""}\nRests on: ${c.rests_on.join(", ") || "none"}\nSettling units: ${c.settling_units.map((u) => `${u.id} (${u.status ?? "not in this workspace"})`).join(", ") || "none"}\nHash: ${c.hash}\nLinks: ${c.links.map((l) => `${l.id} ${l.from} ${l.type} ${l.to} (${l.status}${l.external ? ", external" : ""})`).join(", ") || "none"}\n`;
+  }).join("").trim() || "No premises in scope.");
 }

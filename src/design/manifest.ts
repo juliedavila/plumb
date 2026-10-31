@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 // Interface 1 editions are untrusted inputs until every stamped byte has been verified.
 import { existsSync, lstatSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -15,7 +16,7 @@ export interface VerifiedEdition { stamp: EditionStamp & { plumb: PlumbInterface
 const fail = (file: string, why: string): never => { throw new Error(`${file}: ${why}`); };
 export function mapping(bytes: Uint8Array, file: string): Raw {
   let value: unknown;
-  try { value = Bun.YAML.parse(Buffer.from(bytes).toString("utf8")); }
+  try { value = parseYaml(Buffer.from(bytes).toString("utf8"),file); }
   catch (e) { return fail(file, `YAML parse error: ${(e as Error).message}`); }
   if (!value || typeof value !== "object" || Array.isArray(value)) fail(file, "expected a YAML mapping");
   return value as Raw;

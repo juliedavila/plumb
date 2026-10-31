@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 // Migration step 0.3 to 0.4. Idempotent: run twice, it changes nothing the second time.
 //
 // - engine.yaml: writes schema: "0.4" and a namespace (the instance's name as a namespace, unless one is written);
@@ -75,8 +76,9 @@ export const step0304: MigrateStep = {
     for (const entry of DEPRECATED_KEYS) {
       const f = join(dir, entry.file), t = ws.read(f);
       if (t === undefined || generatedBy(t)) continue;
-      const r = renameKey(t, entry);
-      if (r.unsafe) ws.note(`${entry.file}: the key ${entry.old} is written where it cannot be told apart from ${entry.path}; rename it to ${entry.new} by hand`);
+      const r = renameKey(t, entry, f);
+      if (r.problem) ws.note(r.problem);
+      else if (r.unsafe) ws.note(`${entry.file}: the key ${entry.old} is written where it cannot be told apart from ${entry.path}; rename it to ${entry.new} by hand`);
       else if (r.lines.length) ws.write(f, r.text);
     }
     if (ws.opts.root) moveTeams(ws, ns, unq(topValue(text, "title")) || ns || basename(dir));
@@ -91,14 +93,14 @@ function moveTeams(ws: Workspace, ns: string | undefined, title: string): void {
   }
   const model = ws.read(join(ws.dir, "model.yaml"));
   let teams: Record<string, unknown>[] = [];
-  try { const m = model ? Bun.YAML.parse(model) as Record<string, unknown> : undefined; teams = Array.isArray(m?.teams) ? (m!.teams as Record<string, unknown>[]).filter((t) => t && typeof t === "object") : []; } catch { /* the build reports a model that does not parse */ }
+  try { const m = model ? parseYaml(model,join(ws.dir,"model.yaml")) as Record<string, unknown> : undefined; teams = Array.isArray(m?.teams) ? (m!.teams as Record<string, unknown>[]).filter((t) => t && typeof t === "object") : []; } catch (e) { ws.note((e as Error).message); }
   if (!teams.length) return;
   if (!ns) { ws.note("the teams are not moved: the design has no namespace yet"); return; }
   const pdir = join(root, "patches");
   const existing = existsSync(pdir) ? readdirSync(pdir).filter((f) => /\.ya?ml$/.test(f)) : [];
   const pending = ws.pending(pdir);
   if ([...existing, ...pending].some((f) => f.endsWith(`-move-teams-from-${ns}.yaml`))) return; // proposed already
-  const ids = existing.map((f) => { try { return String((Bun.YAML.parse(readFileSync(join(pdir, f), "utf8")) as Record<string, unknown>)?.id ?? ""); } catch { return ""; } });
+  const ids = existing.map((f) => { try { return String((parseYaml(readFileSync(join(pdir, f), "utf8"),join(pdir,f)) as Record<string, unknown>)?.id ?? ""); } catch (e) { ws.note((e as Error).message); return ""; } });
   const n = Math.max(0, ...[...ids, ...pending].map((x) => Number(/^P-(\d+)/.exec(x)?.[1] ?? 0))) + 1;
   const id = `P-${String(n).padStart(3, "0")}`;
   ws.write(join(pdir, `${id}-move-teams-from-${ns}.yaml`), teamsMovePatch(id, ns, title, teams, ws.today));

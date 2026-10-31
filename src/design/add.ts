@@ -2,6 +2,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, wr
 import { join, resolve, relative } from "node:path";
 import { adapterPaths, copyEdition, derive, workspaceTeams, writeAdapters, writeSharedRoot } from "./adapters.ts";
 import { designId, hash, mapping, regularFile, yamlText, type Raw, type VerifiedEdition } from "./manifest.ts";
+import { invocation, shellArg, localPath } from "../core/invocation.ts";
 import { EditionSource, type SourceOptions } from "./source.ts";
 
 export interface AddOptions extends SourceOptions { workspace?: string; withPins?: boolean }
@@ -30,7 +31,10 @@ export async function addDesign(namespace: string, version: string, options: Add
   try {
     const planned = new Map<string,VerifiedEdition>(), visiting = new Set<string>();
     const order: VerifiedEdition[] = [];
-    const command = (ns: string,v: string) => `plumb design add ${ns}@${v} --from ${JSON.stringify(source.pinFrom(namespace,version))} --workspace ${JSON.stringify(workspace)}${options.ref ? ` --ref ${JSON.stringify(options.ref)}` : ""}`;
+    const command = (ns: string,v: string) => {
+      const from = source.pinFrom(ns,v);
+      return from ? `Run: ${invocation()} design add ${ns}@${v} --from ${shellArg(from.startsWith("github:") ? from : localPath(from))} --workspace ${shellArg(localPath(workspace))}` : `No nearby pin folder found. The --from folder must directly hold edition.yaml for ${ns}@${v} and its listed files.`;
+    };
     const present = (ns: string) => {
       const file = join(instances,ns,"edition.yaml");
       return existsSync(file) ? { stamp: read(file), sha256: hash(readFileSync(file)) } : undefined;
@@ -62,7 +66,7 @@ export async function addDesign(namespace: string, version: string, options: Add
         if (installed && (installed.stamp.version !== pin.version || installed.sha256 !== pin.sha256))
           throw new Error(`${pin.namespace}/edition.yaml: installed version/hash conflicts with pin ${pin.namespace}@${pin.version}`);
         if (!installed && !planned.has(pin.namespace) && !options.withPins)
-          throw new Error(`${ns}/edition.yaml: missing pin ${pin.namespace}@${pin.version}. Run: ${command(pin.namespace,pin.version)}`);
+          throw new Error(`${ns}/edition.yaml: missing pin ${pin.namespace}@${pin.version}. ${command(pin.namespace,pin.version)}`);
         await visit(pin.namespace,pin.version,pin.sha256,installed ? join(instances,pin.namespace,"editions",pin.version) : undefined);
       }
       visiting.delete(ns);
@@ -96,7 +100,7 @@ export async function addDesign(namespace: string, version: string, options: Add
     // Commit verified bytes and derived files. All live state outside the three generated files is retained.
     writeSharedRoot(root,first.bytes.get(first.stamp.shared!.path)!,first.stamp.manual_work ? first.bytes.get(first.stamp.manual_work.path) : undefined,
       [...planned.values()].map(ed=>({namespace:ed.stamp.namespace!,version:ed.stamp.version,sha256:ed.sha256})),priorRoot);
-    if (unresolved.size || existsSync(draft)) writeFileSync(draft,yamlText({ owners: Object.fromEntries([...unresolved].sort().map(role=>[role,{teams:[]}])) }));
+    if (unresolved.size || existsSync(draft)) writeFileSync(draft,"# Declare teams below, or in org.yaml. Map each owner role to declared team ids.\n# Copy rows into team-map.yaml. Keep teams: [] for roles you cannot map yet.\n# Empty mappings remain unresolved and builds report their owner findings.\n" + yamlText({ teams: [], owners: Object.fromEntries([...unresolved].sort().map(role=>[role,{teams:[]}])) }));
     return derived.map(({ed,data,paths}) => {
       const dir = join(instances,ed.stamp.namespace!), frozen = join(dir,"editions",ed.stamp.version);
       mkdirSync(frozen,{recursive:true}); copyEdition(ed,frozen);
@@ -110,7 +114,7 @@ export async function addDesign(namespace: string, version: string, options: Add
 }
 
 export async function designCli(args: string[]): Promise<number> {
-  const usage = "usage: plumb design add <namespace>@<version> --from <folder | github:<owner>/<repo>> [--workspace <dir>] [--with-pins] [--ref <git ref>] [--path <path in repo>]";
+  const usage = `usage: ${invocation()} design add <namespace>@<version> --from <folder | github:<owner>/<repo>> [--workspace <dir>] [--with-pins] [--ref <git ref>] [--path <path in repo>]`;
   if (args[0] !== "add" || !/^[^@]+@[^@]+$/.test(args[1] ?? "")) throw new Error(usage);
   const options: Raw = {};
   for (let i=2;i<args.length;i++) {
@@ -128,7 +132,7 @@ export async function designCli(args: string[]): Promise<number> {
   const portfolios = join(workspace,"portfolios");
   const nested = existsSync(portfolios) ? readdirSync(portfolios).find(p=>existsSync(join(portfolios,p,"portfolio.yaml"))) : undefined;
   const portfolio = existsSync(join(workspace,"portfolio.yaml")) ? workspace : nested ? join(portfolios,nested) : undefined;
-  if (portfolio) console.log(`Next: plumb portfolio build ${portfolio}`);
-  else console.log(`Next: plumb build ${relative(process.cwd(),join(workspace,"instances",ns)) || join("instances",ns)}`);
+  if (portfolio) console.log(`Next: ${invocation()} portfolio build ${shellArg(localPath(portfolio))}`);
+  else console.log(`Next: ${invocation()} build ${shellArg(localPath(join(workspace,"instances",ns)))}`);
   return 0;
 }

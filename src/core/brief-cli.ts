@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // `bun plumb.ts brief <instance-dir>`: what changed and what needs a person, as Markdown, read-only.
 //
 // It builds the instance in memory (nothing is written, not even build/) and prints, in this order: the plan's status
@@ -50,7 +51,7 @@ export async function briefMd(dir: string): Promise<string> {
   const errors = b.findings.filter((f) => f.severity === "error");
   L.push("", `### Error findings (${errors.length})`, "");
   for (const f of errors.slice(0, 15)) L.push(`- \`${f.pack}/${f.rule}@${f.at}\`: ${cut(f.text ?? f.message)}`);
-  if (errors.length > 15) L.push(`- and ${errors.length - 15} more: run \`bun plumb.ts check ${dir}\``);
+  if (errors.length > 15) L.push(`- and ${errors.length - 15} more: run \`${invocation()} check ${dir}\``);
   if (!errors.length) L.push("- none");
   const t = b.tracker?.reconcile;
   L.push("", "### Tracker", "");

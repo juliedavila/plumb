@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // The portfolio: composition, the lock, and the portfolio's checks and impact as
 // data. src/site/portfolio.ts renders the page; src/core/capacity.ts computes capacity and load.
 //
@@ -55,7 +56,7 @@ export function readPortfolio(pathIn: string): PortfolioFile {
   const path = existsSync(p) && statSync(p).isDirectory() ? join(p, "portfolio.yaml") : p;
   if (!existsSync(path)) throw new Error(`${relative(process.cwd(), path) || path}: no portfolio.yaml here`);
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(path, "utf8")); } catch (e) { throw new Error(`${path}: YAML parse error: ${(e as Error).message}`); }
+  try { raw = parseYaml(readFileSync(path, "utf8")); } catch (e) { throw new Error(`portfolio.yaml: YAML parse error: ${(e as Error).message}`); }
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error(`${path}: a portfolio is a mapping (schema, name, title, root, designs)`);
   const r = raw as Raw;
   const dir = dirname(path);
@@ -429,7 +430,7 @@ export async function runPortfolio(pathIn: string, opts: PortfolioOptions = {}):
   const data: PortfolioData = {
     engine: { version: ENGINE_VERSION, built }, portfolio: portfolioWords(file, mode),
     designs: runs.map((r) => designWords(r, mode, file)),
-    ...(existsSync(join(root.dir, "premise-links.yaml")) ? { premiseLinks: readPremiseLinks(root.dir, graph.model, composed.map((d) => d.namespace)).data } : {}),
+    ...(existsSync(join(root.dir,"premise-links.yaml")) || readPremiseLinks(undefined,graph.model,[]).data.links.length ? { premiseLinks: readPremiseLinks(root.dir, graph.model, composed.map((d) => d.namespace)).data } : {}),
     findings, seams, ...(marks ? { marks } : {}),
     notes: [...graph.notes, ...seams.notes.filter((n) => !graph.notes.includes(n)), ...(marks ? [] : ["No mark derivation reached this build (src/core/shared.ts computeMarks), so every undeclared crossing counts as security-relevant."]),
       ...(load?.notes ?? []).filter((n) => !graph.notes.includes(n))],
@@ -473,7 +474,7 @@ function sinceRelease(r: DesignRun): { version: string; accepted_patches: number
   const frozen = new Set<string>();
   const pd = join(ed.dir, "patches");
   if (existsSync(pd)) for (const f of readdirSync(pd).filter((x) => /\.ya?ml$/.test(x))) {
-    try { const p = Bun.YAML.parse(readFileSync(join(pd, f), "utf8")) as Raw; if (p?.id != null) frozen.add(String(p.id)); } catch { /* unreadable: not frozen */ }
+    try { const p = parseYaml(readFileSync(join(pd, f), "utf8"),join(pd,f)) as Raw; if (p?.id != null) frozen.add(String(p.id)); } catch { /* unreadable: not frozen */ }
   }
   return { version: ed.version, accepted_patches: r.inst.patches.filter((p) => p.status === "accepted" && !frozen.has(p.id)).length };
 }
@@ -504,7 +505,12 @@ function lockSection(file: PortfolioFile, mode: PortfolioMode, built: string, ro
 export function readLock(file: PortfolioFile): PortfolioLock {
   const p = join(file.dir, "portfolio.lock");
   if (!existsSync(p)) return {};
-  try { const r = Bun.YAML.parse(readFileSync(p, "utf8")) as PortfolioLock | null; return r && typeof r === "object" ? r : {}; } catch { return {}; }
+  try {
+    const r = parseYaml(readFileSync(p, "utf8"),p) as PortfolioLock | null; return r && typeof r === "object" ? r : {};
+  } catch (e) {
+    console.warn(`${relative(process.cwd(), p)}: ${(e as Error).message}; rebuilding portfolio.lock`);
+    return {};
+  }
 }
 
 /** portfolio.lock as text: the section this build wrote, and the other mode's as it was. */

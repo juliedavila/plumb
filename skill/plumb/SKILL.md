@@ -3,9 +3,9 @@ name: plumb
 description: "Plumb tracks a complex system as designed against as built. Work a Plumb 0.6 portfolio or instance from local files. Orient, reconcile premises across designs, propose estimates and slowdowns, declare seam exceptions, confirm current state on a person's word, refresh BAU from tracker exports, review patches, record status and prepare a deck. Open generated designs in Obsidian and write vault annotations. Use in a folder holding plumb.ts. Do not change engine code or published edition files."
 ---
 
-# Plumb 0.6.0
+# Plumb 0.6.1
 
-Run `bun plumb.ts` from the product folder, or `plumb` from the workspace when linked. Use paths to designs, roots and portfolios. Read the workflow for the requested task before writing.
+Run `bun plumb.ts` from the product folder, or `plumb` from the workspace when linked. From an unlinked workspace, use `bun ../plumb/plumb.ts` (adjust the relative path to the product folder). Use paths to designs, roots and portfolios. Read the workflow for the requested task before writing.
 
 ## Locations
 
@@ -53,3 +53,5 @@ Every number and verdict comes from a command or a named file. Label estimates a
 ## Install
 
 Copy `skill/plumb` into `.claude/skills/` from the bundle root, then start Claude Code there. Where automatic skills are off, ask the agent to read this file and its requested workflow.
+
+A premise whose `rests_on: { claims: [shared:ID] }` names a shared claim creates a read-only declared link, just as a reference to another design does.

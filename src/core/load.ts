@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // Load an instance directory: engine.yaml, model.yaml, plan.yaml, patches/*.yaml.
 // Normalizes records: ids become strings, single values become lists where a list is expected,
 // and unknown keys move into `attrs` (which packs may read).
@@ -64,9 +65,9 @@ type Raw = Record<string, unknown>;
 function readYaml(path: string): unknown {
   const text = readFileSync(path, "utf8");
   try {
-    return Bun.YAML.parse(text);
+    return parseYaml(text,path);
   } catch (e) {
-    throw new Error(`${path}: YAML parse error: ${(e as Error).message}`);
+    throw new Error(`${path.split(/[\\/]/).pop()}: YAML parse error: ${(e as Error).message}`);
   }
 }
 
@@ -202,7 +203,7 @@ export function applyMilestones(dir: string, plan: Plan, findings?: Finding[]): 
   const path = join(dir, "milestones.yaml");
   if (!existsSync(path)) return [];
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(path, "utf8")); } catch (e) { return [`milestones.yaml: YAML parse error: ${(e as Error).message}`]; }
+  try { raw = parseYaml(readFileSync(path, "utf8"),path); } catch (e) { return [`milestones.yaml: YAML parse error: ${(e as Error).message}`]; }
   const m = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Raw).milestones : undefined;
   if (!m || typeof m !== "object" || Array.isArray(m)) return ["milestones.yaml: expected a mapping under milestones: from phase ids to { delivers, means, target, override }"];
   const problems: string[] = [];
@@ -247,7 +248,7 @@ export function applyProgress(dir: string, plan: Plan, findings: Finding[], opts
   const path = join(dir, "progress.yaml");
   if (!existsSync(path)) return [];
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(path, "utf8")); } catch (e) { return [`progress.yaml: YAML parse error: ${(e as Error).message}`]; }
+  try { raw = parseYaml(readFileSync(path, "utf8"),path); } catch (e) { return [`progress.yaml: YAML parse error: ${(e as Error).message}`]; }
   const m = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Raw).units : undefined;
   if (m == null) return [];
   if (typeof m !== "object" || Array.isArray(m)) return ["progress.yaml: expected a mapping under units: from unit ids to { status, date, by, reason }"];
@@ -301,7 +302,7 @@ export function normClaim(raw: Raw): Claim {
   return prune({
     id: String(k.id), statement: str(k.statement) ?? "", kind: (str(k.kind)?.trim().toLowerCase() ?? "premise") as Claim["kind"],
     grade: (str(k.grade)?.trim().toLowerCase() ?? "untested") as Claim["grade"],
-    source: str(k.source), fallback: str(k.fallback), rests_on: strList(k.rests_on), attrs,
+    source: str(k.source), fallback: str(k.fallback), rests_on: strList(k.rests_on && typeof k.rests_on === "object" && !Array.isArray(k.rests_on) && "claims" in k.rests_on ? (k.rests_on as Raw).claims : k.rests_on), attrs,
   });
 }
 
@@ -534,7 +535,7 @@ export function loadInstance(dirIn: string, opts: LoadOptions = {}): Instance {
       const rel = `${pd}/${f}`;
       let raw: unknown;
       try {
-        raw = Bun.YAML.parse(readFileSync(join(pdir, f), "utf8"));
+        raw = parseYaml(readFileSync(join(pdir, f), "utf8"),join(pdir,f));
       } catch (e) {
         loadFindings.push(patchProblem(rel, `${rel}: YAML parse error: ${(e as Error).message}; the patch is skipped`));
         continue;

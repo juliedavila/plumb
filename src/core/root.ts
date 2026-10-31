@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // The shared root: one folder at the root of the import graph. Its engine.yaml says
 // kind: root; seams.yaml (and manual-work.yaml when the catalog is its own file) holds the shared layer, namespace
 // `shared`, as the editions ship it; org.yaml, optional, holds the org layer, namespace `org`; team-map.yaml maps every
@@ -48,7 +49,7 @@ const isMap = (v: unknown): v is Raw => !!v && typeof v === "object" && !Array.i
 function readYamlFile(path: string): { raw?: unknown; bytes?: string; problem?: string } {
   if (!existsSync(path)) return {};
   const bytes = readFileSync(path, "utf8");
-  try { return { raw: Bun.YAML.parse(bytes), bytes }; } catch (e) { return { bytes, problem: `YAML parse error: ${(e as Error).message}` }; }
+  try { return { raw: parseYaml(bytes,path), bytes }; } catch (e) { return { bytes, problem: `YAML parse error: ${(e as Error).message}` }; }
 }
 
 /** Is this folder a shared root (its engine.yaml says kind: root)? */
@@ -228,7 +229,7 @@ function readRootPatches(dir: string, findings: Finding[]): Patch[] {
   for (const f of readdirSync(pdir).filter((x) => /\.ya?ml$/.test(x)).sort(natCompare)) {
     const rel = `patches/${f}`;
     let raw: unknown;
-    try { raw = Bun.YAML.parse(readFileSync(join(pdir, f), "utf8")); }
+    try { raw = parseYaml(readFileSync(join(pdir, f), "utf8"),join(pdir,f)); }
     catch (e) { findings.push(patchProblem(rel, `${rel}: YAML parse error: ${(e as Error).message}; the patch is skipped`)); continue; }
     if (raw === null || raw === undefined) raw = {};
     if (typeof raw !== "object" || Array.isArray(raw)) { findings.push(patchProblem(rel, `${rel}: a patch file must be a mapping (id, title, status, why, ops), not a ${Array.isArray(raw) ? "list" : typeof raw}; the patch is skipped`)); continue; }

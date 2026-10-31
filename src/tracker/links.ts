@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 // <instance>/tracker/links.yaml: confirmed matches between units and tracker issues.
 // The file is a mapping from unit id to its issue, with who confirmed it and when as plain fields, so wiring a
 // unit to an issue is a reviewed change to one file:
@@ -15,7 +16,7 @@ export interface LinksParse { links: TrackerLink[]; problems: string[] }
 export function parseLinks(text: string): LinksParse {
   const problems: string[] = [];
   let raw: unknown;
-  try { raw = Bun.YAML.parse(text); } catch (e) { return { links: [], problems: [`links.yaml does not parse: ${(e as Error).message}`] }; }
+  try { raw = parseYaml(text,"links.yaml"); } catch (e) { return { links: [], problems: [`links.yaml does not parse: ${(e as Error).message}`] }; }
   if (raw === null || raw === undefined) return { links: [], problems };
   if (typeof raw !== "object" || Array.isArray(raw)) return { links: [], problems: ["links.yaml must be a mapping from unit id to {issue, confirmed_by, confirmed_at}"] };
   const links: TrackerLink[] = [];

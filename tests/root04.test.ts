@@ -204,8 +204,8 @@ ops:
 `);
     const { bundle: b } = await buildBundle(join(d, "designs/premerge"), { built: BUILT });
     const stale = b.findings.filter((f) => f.rule === "xref-pin-stale" && f.at === "seams.yaml");
-    expect(stale.length).toBe(1);
-    expect(stale[0].message).toMatch(/: none of the \d+ shared records this design names changed$/);
+    expect(stale.length).toBe(0);
+    expect(stale).toEqual([]);
   });
 
   testEx("a design loads against a root already loaded, with or without one root patch, as a portfolio's impact needs", () => {

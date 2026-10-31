@@ -189,7 +189,7 @@ claims:
     grade: inference
     source: "Follows from IN-1 and from pre-merge checks' premise that teams keep a trusted check switched on."
     fallback: Keep a sampled manual triage of repeat classes until a quarter of yield data shows they stopped.
-    rests_on: [IN-1, premerge:PM-2]   # a claim may rest on another design's claim: descriptive, so no dependency
+    rests_on: [IN-1, premerge:PM-2]   # declared dependency, frozen with this design
 views:
   - id: intake-flow
     title: From scanner to queue

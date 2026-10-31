@@ -1,3 +1,4 @@
+import { parseYaml } from "./yaml.ts";
 // Tour mode data: <instance>/tour.yaml, an authored sequence of steps over live targets.
 // The build checks every step against the compiled model: a step whose target (or a highlighted element) is gone
 // keeps its place in the tour, says so on the page, and the build prints a warning. The tour never claims what the
@@ -37,7 +38,7 @@ export function loadTour(dir: string): { tour?: Tour; problems: string[] } {
   const path = join(dir, "tour.yaml");
   if (!existsSync(path)) return { problems: [] };
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(path, "utf8")); } catch (e) { return { problems: [`tour.yaml: YAML parse error: ${(e as Error).message}`] }; }
+  try { raw = parseYaml(readFileSync(path, "utf8"),path); } catch (e) { return { problems: [`tour.yaml: YAML parse error: ${(e as Error).message}`] }; }
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { problems: ["tour.yaml: must be a mapping with title and steps"] };
   const r = raw as Raw;
   const problems: string[] = [];

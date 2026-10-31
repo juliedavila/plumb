@@ -1,3 +1,5 @@
+import { invocation } from "../core/invocation.ts";
+import { parseYaml } from "../core/yaml.ts";
 // `bun plumb.ts tracker <draft-mapping|measure> <root>`: the tracker workflow on a shared root, whose org mapping
 // (tracker/mapping.yaml, kind: org) measures the teams' standing work. Files
 // only: an agent saves the raw export (one search over the teams' projects for issues updated within the window, with
@@ -25,8 +27,8 @@ import { measureBau } from "./bau.ts";
 import { measureMd, writeMeasure } from "./measures.ts";
 import { draftRefresh, writeRefresh } from "./refresh.ts";
 
-export const ORG_TRACKER_USAGE = `  bun plumb.ts tracker draft-mapping <root-dir> [--force]          a shared root: an org mapping (kind: org) from the inventory and org.yaml
-  plumb tracker measure       <root-dir> [--from <raw-export-dir>] [--as-of <YYYY-MM-DD>] [--portfolio <portfolio.yaml>] [--today <YYYY-MM-DD>]
+export const ORG_TRACKER_USAGE = `  ${invocation()} tracker draft-mapping <root-dir> [--force]          a shared root: an org mapping (kind: org) from the inventory and org.yaml
+  ${invocation()} tracker measure       <root-dir> [--from <raw-export-dir>] [--as-of <YYYY-MM-DD>] [--portfolio <portfolio.yaml>] [--today <YYYY-MM-DD>]
                                   [--draft-patch (--agent <name> [--tool <tool>] [--model <model>] | --by <role>) [--requested-by <role>] [--limits]]`;
 
 const opt = (args: string[], name: string) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };
@@ -35,7 +37,7 @@ const opt = (args: string[], name: string) => { const i = args.indexOf(name); re
 export function portfolioLinks(file: string, rootDir: string): { designs: { namespace: string; links: TrackerLink[] }[]; notes: string[] } {
   const notes: string[] = [];
   let raw: any;
-  try { raw = Bun.YAML.parse(readFileSync(file, "utf8")); } catch (e) { throw new Error(`${file} does not read: ${(e as Error).message}`); }
+  try { raw = parseYaml(readFileSync(file, "utf8"),file); } catch (e) { throw new Error(`${file} does not read: ${(e as Error).message}`); }
   const base = dirname(resolve(file));
   if (raw?.root && resolve(base, String(raw.root)) !== resolve(rootDir)) notes.push(`The portfolio's root is ${raw.root}, not this root; its designs' links are read all the same.`);
   const designs: { namespace: string; links: TrackerLink[] }[] = [];
@@ -43,7 +45,7 @@ export function portfolioLinks(file: string, rootDir: string): { designs: { name
     if (!d || typeof d !== "object" || d.from == null) continue;
     const dir = resolve(base, String(d.from));
     let ns = d.namespace != null ? String(d.namespace) : undefined;
-    if (!ns && existsSync(join(dir, "engine.yaml"))) { try { ns = (Bun.YAML.parse(readFileSync(join(dir, "engine.yaml"), "utf8")) as any)?.namespace; } catch { /* named by the portfolio or not at all */ } }
+    if (!ns && existsSync(join(dir, "engine.yaml"))) { try { ns = (parseYaml(readFileSync(join(dir, "engine.yaml"), "utf8"),join(dir,"engine.yaml")) as any)?.namespace; } catch (e) { notes.push((e as Error).message); } }
     if (!ns) { notes.push(`The design at ${d.from} has no namespace, so its links cannot name its units; skipped.`); continue; }
     const lp = join(dir, "tracker", FILES.links);
     if (!existsSync(lp)) continue;
@@ -57,7 +59,7 @@ export function portfolioLinks(file: string, rootDir: string): { designs: { name
 export async function orgTrackerCli(sub: string, rootDir: string, rest: string[]): Promise<number> {
   const tdir = trackerDir(rootDir);
   if (sub === "reconcile" || sub === "export") {
-    console.error(`${rootDir} is a shared root: its tracker measures the teams' standing work (bun plumb.ts tracker measure <root>). Reconcile and export line up a design's units with issues, so run them on a design.`);
+    console.error(`${rootDir} is a shared root: its tracker measures the teams' standing work (${invocation()} tracker measure <root>). Reconcile and export line up a design's units with issues, so run them on a design.`);
     return 2;
   }
   const root = loadRoot(rootDir);
@@ -71,13 +73,13 @@ export async function orgTrackerCli(sub: string, rootDir: string, rest: string[]
 
   if (sub === "draft-mapping") {
     const t = loadTracker(rootDir);
-    if (!t?.inventory) { console.error(`no ${FILES.inventory} in ${tdir}: run bun plumb.ts tracker discover <root> --from <export dir> first`); return 1; }
+    if (!t?.inventory) { console.error(`no ${FILES.inventory} in ${tdir}: run ${invocation()} tracker discover <root> --from <export dir> first`); return 1; }
     const adapter = getAdapter(t.inventory.adapter);
     if (!adapter.draftOrgMapping) { console.error(`the ${adapter.title} adapter cannot draft an org mapping yet; write tracker/mapping.yaml with kind: org by hand`); return 1; }
     const text = adapter.draftOrgMapping(t.inventory, { teams, activities });
     const target = existsSync(join(tdir, FILES.mapping)) && !rest.includes("--force") ? join(tdir, "mapping.draft.yaml") : join(tdir, FILES.mapping);
     writeFileSync(target, text);
-    console.log(`wrote ${target}${target.endsWith("draft.yaml") ? " (mapping.yaml exists and is kept; compare the two, or pass --force to replace it)" : ""}. Edit it until it is right; \`bun plumb.ts check <root>\` validates it against the inventory.`);
+    console.log(`wrote ${target}${target.endsWith("draft.yaml") ? " (mapping.yaml exists and is kept; compare the two, or pass --force to replace it)" : ""}. Edit it until it is right; \`${invocation()} check <root>\` validates it against the inventory.`);
     return 0;
   }
 
@@ -92,15 +94,15 @@ export async function orgTrackerCli(sub: string, rootDir: string, rest: string[]
 
   const from = opt(rest, "--from");
   const t = loadTracker(rootDir, { ...(from ? { from } : {}) });
-  if (!t) { console.error(`no tracker/ folder in ${rootDir}: save the export, then run bun plumb.ts tracker discover <root> --from <export dir>`); return 1; }
+  if (!t) { console.error(`no tracker/ folder in ${rootDir}: save the export, then run ${invocation()} tracker discover <root> --from <export dir>`); return 1; }
   if (t.problems.length) { console.error(t.problems.map((p) => `${p.file}: ${p.message}`).join("\n")); return 1; }
-  if (!t.inventory) { console.error(`no ${FILES.inventory} in ${tdir}: run bun plumb.ts tracker discover <root> --from <export dir> first`); return 1; }
-  if (!t.mapping) { console.error(`no ${FILES.mapping} in ${tdir}: run bun plumb.ts tracker draft-mapping <root> and edit the result`); return 1; }
-  if (!isOrgMapping(t.mapping)) { console.error("tracker/mapping.yaml is a design's own mapping; a shared root's says kind: org (bun plumb.ts tracker draft-mapping <root> drafts one)"); return 1; }
+  if (!t.inventory) { console.error(`no ${FILES.inventory} in ${tdir}: run ${invocation()} tracker discover <root> --from <export dir> first`); return 1; }
+  if (!t.mapping) { console.error(`no ${FILES.mapping} in ${tdir}: run ${invocation()} tracker draft-mapping <root> and edit the result`); return 1; }
+  if (!isOrgMapping(t.mapping)) { console.error(`tracker/mapping.yaml is a design's own mapping; a shared root's says kind: org (${invocation()} tracker draft-mapping <root> drafts one)`); return 1; }
   if (!t.issues) { console.error("there is no export to measure: pass --from <raw-export-dir>, or set tracker.export in the root's engine.yaml"); return 1; }
   const missing = validateOrgMapping(t.mapping, t.inventory, { teams, activities }).filter((p) => p.kind === "missing");
   if (missing.length) {
-    console.error(["The mapping names what the tracker or the org layer does not hold, so nothing was measured:", ...missing.map((p) => `- ${p.message}`), "Fix tracker/mapping.yaml (bun plumb.ts check <root> lists the same), then measure again."].join("\n"));
+    console.error(["The mapping names what the tracker or the org layer does not hold, so nothing was measured:", ...missing.map((p) => `- ${p.message}`), `Fix tracker/mapping.yaml (${invocation()} check <root> lists the same), then measure again.`].join("\n"));
     return 1;
   }
 

@@ -1,4 +1,4 @@
-# Plumb 0.6.0 demo
+# Plumb 0.6.1 demo
 
 All data in this demo is fictional. Run from the Plumb folder with Bun.
 

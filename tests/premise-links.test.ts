@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type { Claim, Model, Plan, PremiseLink } from "../src/types.ts";
 import { premiseHash, readPremiseLinks, validatePremiseLinks } from "../src/core/premise-links.ts";
 import { allPremiseImpacts, exposure, premiseImpact } from "../src/core/premise.ts";
-import { premisesCommand } from "../src/core/premises-command.ts";
+import { premisesCommand as commandWithDiagnostics } from "../src/core/premises-command.ts";
 import { buildBundle } from "../src/core/bundle.ts";
 import { buildRoot } from "../src/core/root-build.ts";
 import { composeDesign } from "../src/core/compose.ts";
@@ -15,6 +15,13 @@ import { reconciliationSection, exposureLine } from "../src/site/strategy.ts";
 import { renderPortfolio } from "../src/site/portfolio.ts";
 import { portfolioPages } from "../src/site/portfolio-build.ts";
 import { buildDeck } from "../src/core/deck.ts";
+
+const capturedDiagnostics: string[] = [];
+async function premisesCommand(scope: string, json = false) {
+  const write = process.stderr.write;
+  process.stderr.write = ((chunk: any) => { capturedDiagnostics.push(String(chunk)); return true; }) as typeof write;
+  try { return await commandWithDiagnostics(scope,json); } finally { process.stderr.write = write; }
+}
 
 const claim = (id: string): Claim => ({ id, statement: `Premise ${id} holds.`, kind: "premise", grade: "untested", fallback: "Retain manual review.", attrs: { falsifier: "A sample fails the check.", load: "Automated approval relies on this." } });
 const model = (): Model => ({ teams: [], systems: [], zones: [], elements: [{ id: "a:part", name: "Approval", kind: "part", rests_on: ["a:A"] }], relationships: [], contracts: [], views: [], claims: [claim("a:A"), claim("b:B"), claim("c:C")] });
@@ -49,7 +56,7 @@ describe("premise reconciliation evidence", () => {
     expect(data.links.map((l) => l.status)).toEqual(["found", "confirmed", "stale", "stale"]);
     expect(data.links.map((l) => l.changed)).toEqual([[], [], ["from"], ["to"]]);
     expect(data.links[1].hashes.from).toBe(premiseHash(claim("a:A")));
-    expect(data.debt).toEqual({ found: 1, stale: 2, flags: 0, last_run: run });
+    expect(data.debt).toEqual({ declared: 0, found: 1, stale: 2, flags: 0, last_run: run });
     expect(raw).toEqual(copy);
   });
   const invalid: [string, (x: any) => void, string][] = [
@@ -257,9 +264,9 @@ describe("builds, projections and pages", () => {
     expect((await buildRoot(join(dir, "shared"))).bundle.premiseLinks!.links).toEqual([]);
     const presentPortfolio = await portfolioPages(join(dir, "portfolio"));
     expect(presentPortfolio.data.premiseLinks!.links).toEqual([]);
-    expect(renderPortfolio(presentPortfolio.data)).toContain("Reconciliation: 0 found links await a person, 0 stale links and 0 review flags.");
-    presentPortfolio.data.premiseLinks!.debt = { found: 1, stale: 1, flags: 1, last_run: null };
-    expect(renderPortfolio(presentPortfolio.data)).toContain("Reconciliation: 1 found link awaits a person, 1 stale link and 1 review flag.");
+    expect(renderPortfolio(presentPortfolio.data)).toContain("Reconciliation: 0 declared links, 0 found links await a person, 0 stale links and 0 review flags.");
+    presentPortfolio.data.premiseLinks!.debt = { declared: 0, found: 1, stale: 1, flags: 1, last_run: null };
+    expect(renderPortfolio(presentPortfolio.data)).toContain("Reconciliation: 0 declared links, 1 found link awaits a person, 1 stale link and 1 review flag.");
   });
   test("review flags occur only in their own group and all debt counts use proper English", async () => {
     const { bundle } = await buildBundle(join(fixture().dir, "designs/alpha"));
@@ -418,7 +425,7 @@ describe("builds, projections and pages", () => {
   test("example has all statuses, debt, immutable evidence, detail clauses, MCP links and preview", async () => {
     const dir = join(import.meta.dir, "../examples"), file = join(dir, "shared/premise-links.yaml"), before = readFileSync(file, "utf8");
     const run = await runPortfolio(join(dir, "portfolio"));
-    expect(run.data.premiseLinks!.links.map((l) => l.status)).toEqual(["confirmed", "found", "stale", "found"]);
+    expect(run.data.premiseLinks!.links.map((l) => l.status)).toEqual(["declared", "confirmed", "found", "stale", "found"]);
     expect(run.data.premiseLinks!.debt).toMatchObject({ found: 1, stale: 1, flags: 1 });
     const b = run.designs.find((d) => d.namespace === "intake")!.bundle!, html = renderSite(b);
     expect(html).toContain("The last run considered 17 pairs across intake, premerge, inventory, shared and skipped 0: every cross-design pair including the shared register.");

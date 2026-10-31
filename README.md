@@ -1,4 +1,4 @@
-# Plumb 0.6.0
+# Plumb 0.6.1
 
 Plumb tracks a complex system as designed against the system as built. Systems worth designing are usually built over years: part of the target already exists, part is in flight, and other long-horizon efforts run alongside it, some touching it and some not. Plumb keeps the design, the plan, what stands today and the decisions between them in checked local files, so the distance between as-designed and as-built is a record you can query, part by part.
 
@@ -10,7 +10,7 @@ Builds write one HTML page per design that opens from disk, a portfolio page acr
 
 ## Start here
 
-Run commands from the folder holding `plumb.ts`. Run `bun link` once to make the `plumb` command available from a workspace.
+Run commands below from the folder holding `plumb.ts`. `bun link` is optional. Without linking, run `bun <path-to-plumb>/plumb.ts` from any workspace. Paths in command arguments are relative to where you run the command. For example, from an adopter workspace holding the Plumb source in `tools/plumb/`, run `bun tools/plumb/plumb.ts build plumb/instances/intake`. When using the adopter skills, the Plumb workspace is `<adopter workspace>/plumb`, beside `upstream/` and `org/`.
 
 ```sh
 bun test
@@ -35,7 +35,22 @@ For the lone value stream, run `bun plumb.ts build examples/delivery-stream` and
 | Decisions | Root or design `patches/*.yaml`. Proposed patches have no effect until accepted with `decision: { by, at, reason }`. |
 | Released designs | `editions/<version>/edition.yaml` and frozen inputs. Building an edition uses today's live state. |
 
-Paths in engine.yaml are relative to its folder. Paths in portfolio.yaml are relative to the portfolio folder. A design imports only its root. Dependencies across designs pass through shared capabilities and crossings. A pin records the exact version and SHA-256 of another design's edition.yaml. It does not grant access to that design's records.
+Portfolio fields are read from `portfolio.yaml`:
+
+| Field | Type | Default | Effect |
+|---|---|---|---|
+| schema | string | absent | Records the portfolio schema label. |
+| name | string | portfolio folder name | Names the portfolio and default output folder. |
+| title | string | name | Labels the portfolio page and brief. |
+| root | string | required | Shared root folder, relative to this file. |
+| designs | list of mappings | required, nonempty | Selects the composed designs. |
+| designs[].namespace | string | required | Names the design namespace. |
+| designs[].from | string | required | Design folder, relative to this file. |
+| presenting | string | released | Read as metadata. This field does not select a mode. Presenting mode selects newest released editions. |
+| working | string | latest | Read as metadata. This field does not select a mode. Working mode uses live design files. |
+| horizon_months | number | 12 | Positive values are rounded down for the roadmap month horizon. Zero or negative values use 12. |
+
+Paths in engine.yaml are relative to its folder. Paths in portfolio.yaml are relative to the portfolio folder. A design imports only its root. Structural dependencies across designs pass through shared capabilities and crossings. Premise dependencies use declared or reconciled links. A pin records the exact version and SHA-256 of another design's edition.yaml. It does not grant access to that design's records.
 
 Use `namespace:id` outside the current design, or `namespace:kind/id` where a kind is needed. Bare ids resolve to the design, then shared, then org for team fields. Two homes are an error. Descriptive views, claim links and notes can name outside records. Composition resolves them together.
 
@@ -86,7 +101,7 @@ Run `bun plumb.ts premises examples/portfolio --json` to read every premise besi
 
 Keep `premise-links.yaml` in the shared root beside `team-map.yaml`. The skill workflow `skill/plumb/workflows/reconcile-premises.md` compares pairs and proposes found links with quoted evidence. A person confirms one link at a time with clauses picked from the premises and their current hashes. Changed text makes that confirmation stale. The engine never confirms a discovery.
 
-Current confirmed dependencies extend the existing impact walk. Found and stale dependencies appear under “Would cascade if confirmed”. Contradictions and duplicates stay review flags. Strategy shows links and reconciliation debt. The portfolio shows debt counts. A settling unit can use `namespace:unit-id` to name work in another design. Its status counts when that design is composed.
+Design premises can declare cross-design dependencies in `rests_on.claims`, for example `claims: [inventory:IV-1]`. Plumb loads these as depends-on links with status `declared`, never writes them to premise-links.yaml, and includes them in the impact walk alongside current confirmed links. A lone build marks absent-design targets external. A found link duplicating a declaration produces a warning naming both. Current confirmed dependencies extend the existing impact walk. Found and stale dependencies appear under “Would cascade if confirmed”. Contradictions and duplicates stay review flags. Strategy shows links and reconciliation debt. The portfolio shows debt counts. A settling unit can use `namespace:unit-id` to name work in another design. Its status counts when that design is composed.
 
 ## Current state
 
@@ -149,15 +164,18 @@ On the destination machine run `bun test`, build the fictional examples, then ad
 ```sh
 bun plumb.ts design add premerge@1.0.0 --from tests/fixtures/editions --workspace ./workspace --with-pins
 bun plumb.ts design add intake@1.0.0 --from github:example/repair-designs --workspace ./workspace
+bun plumb.ts design add intake@1.0.0 --from ../repair-designs --workspace ./workspace
 ```
 
-An edition must ship `edition.yaml` with `plumb.interface: 1` and hashed engine-format inputs. Plumb verifies every listed file, the manifest digest, shared seams and manual-work bytes, and exact pins before writing. Missing pins print the command to add them; `--with-pins` verifies and adds dependencies first. Frozen published files stay byte-identical. Re-adding an identical stamp re-derives its live files and frozen adapters while retaining progress, notes, current state, tracker, reports, patches, deck and tour.
+A local clone root works as `--from`: Plumb finds `editions/<namespace>/<version>/edition.yaml` beneath it. A direct edition folder also works. Pins may live in `<from>/pins/<namespace>/edition.yaml` or `<from>/pins/<namespace>/<version>/edition.yaml`.
 
-Roles resolve through `instances/shared/team-map.yaml`. Optional `org.yaml` holds the teams once. Unresolved owners retain their role text; Plumb writes a sorted `team-map.draft.yaml` for you to complete. It never replaces the written team map. GitHub editions default to the tag `<namespace>-v<version>` and path `editions/<namespace>/<version>`; `--ref` and `--path` override their location. Files are limited to 32 MB and each edition to 256 MB; redirects cannot leave the source host. The hashes prove that every file matches the edition's own manifest. No signature stands behind that manifest, so an edition is as trustworthy as the repository and tag it comes from.
+An edition must ship `edition.yaml` with `plumb.interface: 1` and hashed engine-format inputs. Plumb verifies every listed file, the manifest digest, shared seams and manual-work bytes, and exact pins before writing. Missing pins print a usable command when a matching nearby folder exists, otherwise explain which folder must hold the edition; `--with-pins` verifies and adds dependencies first. Each added edition has its own frozen copy under `instances/<namespace>/editions/<version>/`. This is expected. The adopter's `upstream/` remains its read-only copy. Frozen published files stay byte-identical. Re-adding an identical stamp re-derives its live files and frozen adapters while retaining progress, notes, current state, tracker, reports, patches, deck and tour.
+
+Roles resolve through `instances/shared/team-map.yaml`. Optional `org.yaml` holds the teams once. Unresolved owners retain their role text; Plumb writes a sorted `team-map.draft.yaml` for you to complete. It never replaces the written team map. An owner row with `teams: []` is accepted as an unresolved placeholder. Keep rows you cannot map yet and fill them from supplied evidence. A first build with an unfinished map reports one error per unmapped owner role reference, so one role used by several records can produce several errors. The brief names the error class and count when all errors share a class. GitHub editions default to the tag `<namespace>-v<version>` and path `editions/<namespace>/<version>`; `--ref` and `--path` override their location. Files are limited to 32 MB and each edition to 256 MB; redirects cannot leave the source host. The hashes prove that every file matches the edition's own manifest. No signature stands behind that manifest, so an edition is as trustworthy as the repository and tag it comes from.
 
 ## Configuration
 
-`PLUMB_SCRUB_LIST` selects the external scrub list. The default is `~/.config/plumb/scrub.txt`. The former `DE_SCRUB_LIST` setting and `~/.config/design-engine/scrub.txt` path remain fallbacks and print a deprecation note when used. `PLUMB_GITHUB_RAW` overrides the GitHub raw base URL (`DE_GITHUB_RAW` is the deprecated fallback).
+`PLUMB_SCRUB_LIST` selects the external scrub list. The default is `~/.config/plumb/scrub.txt`. The former `DE_SCRUB_LIST` setting and `~/.config/design-engine/scrub.txt` path remain fallbacks and print a deprecation note when used. The legacy path notice prints at most once per process. Plumb reads exactly two default home files: `~/.config/plumb/scrub.txt` when it exists, otherwise `~/.config/design-engine/scrub.txt` when it exists. It does not read other home files. An explicit `PLUMB_SCRUB_LIST` or fallback `DE_SCRUB_LIST` can select another path, including a home path. Existence checks precede reads. `PLUMB_GITHUB_RAW` overrides the GitHub raw base URL (`DE_GITHUB_RAW` is the deprecated fallback).
 
 Scrub lists contain case-insensitive regexes, optionally followed by ` => replacement`. `section: <regex>` declares Markdown heading text under which entries marked `allow-in-section:` may appear. The older `landscape:` entry marker is also read. Without a section declaration, a marked entry is allowed nowhere. Vault packaging applies every pattern everywhere.
 

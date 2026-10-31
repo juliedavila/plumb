@@ -38,7 +38,7 @@ export function writeAdapters(frozen: string, sourceSha: string, values: { engin
 
 export function workspaceTeams(root: string) {
   const map = readTeamMap(join(root,"team-map.yaml"));
-  const problems = map?.problems.filter(p => !p.includes("names no team")) ?? [];
+  const problems = map?.problems ?? [];
   if (problems.length) throw new Error(problems.join("; "));
   const orgFile = join(root,"org.yaml");
   const org = existsSync(orgFile) ? mapping(requireBytes(orgFile),"org.yaml") : undefined;

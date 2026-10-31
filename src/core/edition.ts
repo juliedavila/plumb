@@ -1,3 +1,5 @@
+import { parseYaml } from "./yaml.ts";
+import { invocation } from "./invocation.ts";
 // Editions: released and latest, exact pins and the pin checks.
 //
 // A released edition is a folder <instance>/editions/<version>/ holding the frozen design (engine.yaml, model.yaml,
@@ -92,10 +94,10 @@ export function readEdition(instanceDir: string, version: string): EditionRef {
   const file = join(dir, "edition.yaml");
   if (!existsSync(file)) {
     const have = listEditions(instanceDir);
-    throw new Error(`${instanceDir} has no released edition ${version} (no ${relative(process.cwd(), file)}); ${have.length ? `released: ${have.join(", ")}` : "it has released none (bun plumb.ts release)"}`);
+    throw new Error(`${relative(process.cwd(), instanceDir)} has no released edition ${version} (no ${relative(process.cwd(), file)}); ${have.length ? `released: ${have.join(", ")}` : `it has released none (${invocation()} release)`}`);
   }
   let raw: unknown;
-  try { raw = Bun.YAML.parse(readFileSync(file, "utf8")); } catch (e) { throw new Error(`${file}: YAML parse error: ${(e as Error).message}`); }
+  try { raw = parseYaml(readFileSync(file, "utf8")); } catch (e) { throw new Error(`editions/${version}/edition.yaml: YAML parse error: ${(e as Error).message}`); }
   return { version, dir, sha256: fileSha256(file)!, stamp: normStamp(raw) };
 }
 
@@ -119,7 +121,7 @@ export function verifyEdition(ed: EditionRef): string[] {
   const adapter = join(ed.dir, "engine-import.yaml");
   if (existsSync(adapter)) {
     try {
-      const raw = Bun.YAML.parse(readFileSync(adapter, "utf8")) as any;
+      const raw = parseYaml(readFileSync(adapter, "utf8"),adapter) as any;
       if (raw?.source_sha256 !== ed.sha256) out.push("the engine adapter names a different edition stamp");
       if (raw.adapters && (typeof raw.adapters !== "object" || Array.isArray(raw.adapters) || Object.keys(raw.adapters).sort().join(",") !== "engine,model,plan")) out.push("the engine adapter paths are invalid");
       const paths = raw.adapters ? Object.values(raw.adapters) : ["engine.yaml", "model.engine.yaml", "plan.engine.yaml"];
@@ -139,7 +141,7 @@ export function verifyEdition(ed: EditionRef): string[] {
 export function readAdapterPaths(ed: EditionRef): { engine: string; model: string; plan: string } | undefined {
   const sidecar = join(ed.dir,"engine-import.yaml");
   if (!existsSync(sidecar)) return undefined;
-  const raw = Bun.YAML.parse(readFileSync(sidecar,"utf8")) as any;
+  const raw = parseYaml(readFileSync(sidecar,"utf8"),sidecar) as any;
   return raw.adapters ?? { engine: "engine.yaml", model: "model.engine.yaml", plan: "plan.engine.yaml" };
 }
 
@@ -223,7 +225,6 @@ export function release(inst: Instance, label: string, modelHash: string, opts: 
 
 const stale = (at: string, message: string): Finding => ({ pack: "core", rule: "xref-pin-stale", severity: "warning", at, atKind: "instance", message });
 /** What the records named came to: "none of the 3 <many> changed" or "the one <one> did not change"; "of the 3 <many>, ...". */
-const noneChanged = (n: number, one: string, many: string) => (n === 1 ? `the one ${one} did not change` : `none of the ${n} ${many} changed`);
 const ofThe = (n: number, one: string, many: string) => (n === 1 ? `of the one ${one}` : `of the ${n} ${many}`);
 const short = (h: string) => h.slice(0, 12);
 
@@ -259,7 +260,7 @@ function changedRecords(named: { kind: "element" | "unit"; id: string }[], a: { 
 /**
  * (i) A design pins another design's edition and the build composes a different edition of it (its working copy
  * included), or the edition under that version has another hash. One finding per pin, listing the pinned design's
- * records that the shared layer names and that are gone or changed apart from their wording, or saying none changed.
+ * records that the shared layer names and that are gone or changed apart from their wording, only when at least one changed.
  * `load` compiles a design folder as written, at a released edition or (undefined) its working copy.
  */
 export function pinStaleFinding(own: string, pin: Pin, d: ComposedDesign, root: RootInput | undefined, load: (dir: string, edition?: string) => { model: Model; plan: Plan }): Finding | undefined {
@@ -279,8 +280,9 @@ export function pinStaleFinding(own: string, pin: Pin, d: ComposedDesign, root: 
   try { diff = changedRecords(named, load(d.dir, pin.version), load(d.dir, d.edition)); }
   catch (e) { return stale(at, `${own} pins ${d.title} ${pin.version}, and this build composes ${composedAs}; the pinned edition could not be read to compare (${(e as Error).message})`); }
   const what = [...diff.changed.map((x) => `${x}, changed`), ...diff.gone];
+  if (!what.length) return undefined;
   const one = `record of ${d.title} the shared layer names`, many = `records of ${d.title} the shared layer names`;
-  return stale(at, `${own} pins ${d.title} ${pin.version}, and this build composes ${composedAs}: ${what.length ? `${ofThe(named.length, one, many)}, ${what.join("; ")}` : noneChanged(named.length, one, many)}`);
+  return stale(at, `${own} pins ${d.title} ${pin.version}, and this build composes ${composedAs}: ${ofThe(named.length, one, many)}, ${what.join("; ")}`);
 }
 
 /**
@@ -317,8 +319,9 @@ export function sharedStaleFinding(ed: EditionRef | undefined, root: RootInput |
     else if (!a) changed.push(`${n.kind} shared:${n.id}, new`);
     else if (bareOf(n.kind, a) !== bareOf(n.kind, b)) changed.push(`${n.kind} shared:${n.id}, changed`);
   }
+  if (!changed.length) return undefined;
   const one = "shared record this design names", many = "shared records this design names";
-  return stale(at, `${head}: ${changed.length ? `${ofThe(named.length, one, many)}, ${changed.join("; ")}` : noneChanged(named.length, one, many)}`);
+  return stale(at, `${head}: ${ofThe(named.length, one, many)}, ${changed.join("; ")}`);
 }
 
 // ---------- the import graph (core/xref-no-cycle) ----------

@@ -108,7 +108,7 @@ function designs(data: PortfolioData, page: PortfolioPageFacts, seen: Set<string
 <span class="line">${esc(`${fmt(r.counts.done)} of ${count(r.counts.units, "unit")} done`)} · ${errors ? `<span class="st fail sm">${icon("fail", "icon icon-sm")}<span class="w">${esc(count(errors, "error"))}</span></span>` : "no errors"}${warnings ? ` · ${esc(count(warnings, "warning"))}` : ""}</span>
 <span class="line pf-open">Open its page</span></a>`;
   }).join("\n");
-  return `<section class="section" id="designs" aria-labelledby="h-designs">${sectionHead("designs", "Designs", `${count(data.designs.length, "design")} over one shared root. Each opens its own page, built inside this portfolio.${data.premiseLinks ? ` Reconciliation: ${count(data.premiseLinks.debt.found, "found link")} ${data.premiseLinks.debt.found === 1 ? "awaits" : "await"} a person, ${count(data.premiseLinks.debt.stale, "stale link")} and ${count(data.premiseLinks.debt.flags, "review flag")}.` : ""}`, page, seen)}
+  return `<section class="section" id="designs" aria-labelledby="h-designs">${sectionHead("designs", "Designs", `${count(data.designs.length, "design")} over one shared root. Each opens its own page, built inside this portfolio.${data.premiseLinks ? ` Reconciliation: ${count(data.premiseLinks.debt.declared, "declared link")}, ${count(data.premiseLinks.debt.found, "found link")} ${data.premiseLinks.debt.found === 1 ? "awaits" : "await"} a person, ${count(data.premiseLinks.debt.stale, "stale link")} and ${count(data.premiseLinks.debt.flags, "review flag")}.` : ""}`, page, seen)}
 <div class="tiles" style="--tiles:${Math.min(3, Math.max(1, page.roadmap.rows.length))}">${tiles}</div></section>`;
 }
 

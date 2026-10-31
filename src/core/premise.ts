@@ -7,6 +7,7 @@
 
 import type { Claim, Model, Plan, PremiseExposure, PremiseImpact, PremiseLink, PremiseReach, PremiseStep, RecordKind } from "../types.ts";
 import { natCompare } from "./util.ts";
+import { declaredPremiseLinks } from "./premise-links.ts";
 
 type Ref = { kind: RecordKind; id: string };
 
@@ -16,7 +17,7 @@ export function restsOnIndex(model: Model, plan: Plan): Map<string, Ref[]> {
   const add = (kind: RecordKind, id: string, on?: string[]) => {
     for (const c of new Set(on ?? [])) { if (!ix.has(c)) ix.set(c, []); ix.get(c)!.push({ kind, id }); }
   };
-  for (const c of model.claims ?? []) add("claim", c.id, c.rests_on);
+  for (const c of model.claims ?? []) add("claim", c.id, c.rests_on?.filter(ref => c.kind !== "premise" || !c.id.includes(":") || !ref.includes(":") || c.id.split(":")[0] === ref.split(":")[0]));
   for (const p of plan.phases) add("phase", p.id, p.rests_on);
   for (const u of plan.units) add("unit", u.id, u.rests_on);
   for (const e of model.elements) add("element", e.id, e.rests_on);
@@ -27,6 +28,7 @@ export function restsOnIndex(model: Model, plan: Plan): Map<string, Ref[]> {
 const ORDER: Record<string, number> = { claim: 0, phase: 1, unit: 2, element: 3, relationship: 4 };
 
 export function premiseImpact(claimId: string, model: Model, plan: Plan, index = restsOnIndex(model, plan), links: PremiseLink[] = []): PremiseImpact {
+  links = [...declaredPremiseLinks(model).filter(d => !links.some(l => l.id === d.id)), ...links];
   const direct = [...(index.get(claimId) ?? [])];
   const dependents: PremiseReach[] = [], proposed: PremiseReach[] = [];
   // Confirmed paths are exhausted first. A shorter proposed path can never mask a confirmed path.
@@ -39,8 +41,8 @@ export function premiseImpact(claimId: string, model: Model, plan: Plan, index =
   while (queue.length || pending.length) {
     const cur = (queue.length ? queue : pending).shift()!;
     const edges: { ref: Ref; steps: PremiseStep[]; found: boolean }[] = (index.get(cur.id) ?? []).map((ref) => ({ ref, steps: cur.steps, found: cur.found }));
-    for (const link of links) if (link.type === "depends-on" && link.to === cur.id) {
-      const status = link.status === "confirmed" ? "confirmed" : "found";
+    for (const link of links) if (link.type === "depends-on" && link.to === cur.id && !link.external) {
+      const status = link.status === "declared" ? "declared" : link.status === "confirmed" ? "confirmed" : "found";
       edges.push({ ref: { kind: "claim", id: link.from }, steps: [...cur.steps, { id: link.id, status }], found: cur.found || status === "found" });
     }
     // Reaching a premise through a reconciliation link also reaches the work that settles it.
@@ -50,7 +52,7 @@ export function premiseImpact(claimId: string, model: Model, plan: Plan, index =
       const k = `${found ? "found" : "confirmed"}:${r.kind}:${r.id}`;
       if (seen.has(k)) continue;
       seen.add(k);
-      const d: PremiseReach = { ...r, via: cur.via, ...(steps.length ? { status: found ? "found" : "confirmed", links: steps } : {}) };
+      const d: PremiseReach = { ...r, via: cur.via, ...(steps.length ? { status: found ? "found" : steps.some(s => s.status === "declared") ? "declared" : "confirmed", links: steps } : {}) };
       (found ? proposed : dependents).push(d);
       if (!found && cur.id === claimId && !direct.some((x) => x.id === r.id && x.kind === r.kind)) direct.push(r);
       if (r.kind === "claim") (found ? pending : queue).push({ id: r.id, via: [...cur.via, r.id], steps, found });

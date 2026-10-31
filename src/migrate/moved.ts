@@ -1,3 +1,4 @@
+import { parseYaml } from "../core/yaml.ts";
 // Ids that a split moves: `plumb migrate --moved <moved.yaml>` rewrites them in an instance's hand-written
 // files: milestones, progress, tour, deck, notes, current state, the team map and the patches. Generated files are left
 // to their importer. These are not key renames: an id moves, often into a namespace (`U-434` to `intake:U-12`).
@@ -24,7 +25,7 @@ export function movedTargets(dir: string): string[] {
 
 /** Read moved.yaml into old id -> new id. Throws, in words, when it holds no map. */
 export function readMoved(path: string): Map<string, string> {
-  const raw = Bun.YAML.parse(readFileSync(path, "utf8")) as unknown;
+  const raw = parseYaml(readFileSync(path, "utf8"),path) as unknown;
   const out = new Map<string, string>();
   const add = (o: unknown, n: unknown) => { if (o != null && n != null && String(o) !== String(n)) out.set(String(o), String(n)); };
   const fromList = (xs: unknown[]) => { for (const x of xs) if (x && typeof x === "object") { const r = x as Record<string, unknown>; add(r.old ?? r.from, r.new ?? r.to); } };

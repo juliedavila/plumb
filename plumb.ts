@@ -48,23 +48,24 @@ import { isRootDir } from "./src/core/root.ts";
 import { ROOT_USAGE, rootCli } from "./src/core/root-build.ts";
 import { designCli } from "./src/design/add.ts";
 
+import { invocation } from "./src/core/invocation.ts";
 const ROOT = import.meta.dir;
 const USAGE = `usage:
-  plumb build  <instance-dir> [--out <dir>] [--edition <version>]
-  plumb check  <instance-dir> [--edition <version>]
-  plumb brief  <instance-dir>
-  plumb impact <instance-dir> <patch-id>
-  plumb plan   <instance-dir>
-  plumb premises <instance-or-root-or-portfolio> [--json]
-  plumb premise <instance-dir> [claim-id]
-  plumb diff   <instance-dir> --from <bundle.json | git ref | edition folder> [--to ...] [--save] [--json]
-  plumb report <instance-dir> [--presented]
-  plumb dev    <instance-dir | portfolio> [--port 4317] [--out <dir>]
-  plumb vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]
-  plumb publish <out-dir> <instance-dir | portfolio>...
-  plumb design add <namespace>@<version> --from <source> [--workspace <dir>] [--with-pins] [--ref <ref>] [--path <path>]
-  plumb package <out-dir> [--with-mcp]
-  plumb release <instance-dir> --label <version>
+  ${invocation()} build  <instance-dir> [--out <dir>] [--edition <version>]
+  ${invocation()} check  <instance-dir> [--edition <version>]
+  ${invocation()} brief  <instance-dir>
+  ${invocation()} impact <instance-dir> <patch-id>
+  ${invocation()} plan   <instance-dir>
+  ${invocation()} premises <instance-or-root-or-portfolio> [--json]
+  ${invocation()} premise <instance-dir> [claim-id]
+  ${invocation()} diff   <instance-dir> --from <bundle.json | git ref | edition folder> [--to ...] [--save] [--json]
+  ${invocation()} report <instance-dir> [--presented]
+  ${invocation()} dev    <instance-dir | portfolio> [--port 4317] [--out <dir>]
+  ${invocation()} vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]
+  ${invocation()} publish <out-dir> <instance-dir | portfolio>...
+  ${invocation()} design add <namespace>@<version> --from <source> [--workspace <dir>] [--with-pins] [--ref <ref>] [--path <path>]
+  ${invocation()} package <out-dir> [--with-mcp]
+  ${invocation()} release <instance-dir> --label <version>
   ${MIGRATE_USAGE.replace(/^usage: /, "")}
 ${PORTFOLIO_USAGE.replace(/^usage:\n/, "")}
 ${ROOT_USAGE}

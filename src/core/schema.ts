@@ -1,3 +1,4 @@
+import { invocation } from "./invocation.ts";
 // Schema versions. The engine reads schema 0.3 and 0.4.
 //
 // - No `schema:` and no 0.4 key: schema 0.3, read in silence. This is every lone instance, and it builds as 0.3.1 did.
@@ -53,7 +54,7 @@ export function readSchema(cfgRaw: Record<string, unknown>, dir: string, unitsRa
   const v = cfgRaw.schema;
   const declared = v === undefined || v === null ? undefined : String(v).trim();
   const uses04 = keys04(cfgRaw, dir, unitsRaw);
-  const migrate = `bun plumb.ts migrate ${at(dir)}`;
+  const migrate = `${invocation()} migrate ${at(dir)}`;
   if (declared === undefined) {
     if (!uses04.length) return { read: "0.3", uses04, findings: [], warnings: [] };
     return { read: "0.4", uses04, warnings: [], findings: [schemaFinding("warning",
