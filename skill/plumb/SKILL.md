@@ -3,7 +3,9 @@ name: plumb
 description: "Plumb tracks a complex system as designed against as built. Work a Plumb 0.6 portfolio or instance from local files. Orient, reconcile premises across designs, propose estimates and slowdowns, declare seam exceptions, confirm current state on a person's word, refresh BAU from tracker exports, review patches, record status and prepare a deck. Open generated designs in Obsidian and write vault annotations. Use in a folder holding plumb.ts. Do not change engine code or published edition files."
 ---
 
-# Plumb 0.6.2
+# Plumb 0.6.3
+
+Requires Bun 1.3.14 or later (the version Plumb is tested on). Tested on macOS.
 
 Run `bun plumb.ts` from the product folder, or `plumb` from the workspace when linked. From an unlinked workspace, use `bun <path-to-plumb>/plumb.ts` (adjust the relative path to the product folder). Use paths to designs, roots and portfolios. Read the workflow for the requested task before writing.
 
@@ -28,7 +30,7 @@ A standalone package has no installed designs. Add released editions with `plumb
 | Estimate update, slowdown or seam exception | `workflows/org-decisions.md` |
 | Reconcile premises across designs | `workflows/reconcile-premises.md` |
 | Discover or confirm current state | `workflows/current-state.md` |
-| Refresh BAU shares from exported tracker files | `workflows/refresh-bau.md` |
+| Refresh BAU (business as usual) shares from exported tracker files | `workflows/refresh-bau.md` |
 | Open the design in Obsidian or write a note in the vault | `workflows/obsidian.md` |
 | Answer a note | `workflows/answer-a-note.md` |
 | Propose a design change | `workflows/draft-a-patch.md` |
@@ -46,7 +48,7 @@ You may edit a requested note, a progress entry, milestone words or override, an
 
 When a proposal has no supplied title or patch `why`, write a short title naming the requested change and a neutral `why` that restates the supplied facts. This is agent wording, not a quotation or an attributed motive. Do not invent a benefit, meeting, tradeoff or risk acceptance. For example, use “Set AppSec platform capacity to 7” and “The requested WIP limit is 7 concurrent units.” A required decision reason or exception rationale still needs the person's words.
 
-Accept or reject a patch only when the user has decided it in this conversation. Record `decision: { by, at, reason }`. Existing authorization applies. Root decisions use portfolio impact, not `plumb impact <root>`. Build and tracker commands may write generated files. Use Bun and TypeScript only. Do not install dependencies or call the network. Raw tracker data arrives as exported files.
+Accept or reject a patch only when the user has decided it in this conversation. Record `decision: { by, at, reason }`. Existing authorization applies. Root decisions use portfolio impact, not `plumb impact <root>`. Build and tracker commands may write generated files. Use Bun and TypeScript only. Do not install dependencies. The network is allowed only for `design add --from github:` when the person names that repository. Raw tracker data arrives as exported files.
 
 Every number and verdict comes from a command or a named file. Label estimates and discovered records. Say when a baseline is absent. Report failures as failures. An exception changes only the seam rule. Composed security findings retain their severity. Plain sentences lead with the result. No em dashes or semicolon chains.
 

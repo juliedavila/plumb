@@ -28,7 +28,7 @@ import { measureMd, writeMeasure } from "./measures.ts";
 import { draftRefresh, writeRefresh } from "./refresh.ts";
 
 export const ORG_TRACKER_USAGE = `  ${invocation()} tracker draft-mapping <root-dir> [--force]          a shared root: an org mapping (kind: org) from the inventory and org.yaml
-  ${invocation()} tracker measure       <root-dir> [--from <raw-export-dir>] [--as-of <YYYY-MM-DD>] [--portfolio <portfolio.yaml>] [--today <YYYY-MM-DD>]
+  ${invocation()} tracker measure       <root-dir> [--from <raw-export-dir>] [--as-of <YYYY-MM-DD>] [--portfolio <portfolio.yaml>] [--today <YYYY-MM-DD>]   measure standing work and optionally propose a refresh
                                   [--draft-patch (--agent <name> [--tool <tool>] [--model <model>] | --by <role>) [--requested-by <role>] [--limits]]`;
 
 const opt = (args: string[], name: string) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };

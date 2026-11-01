@@ -10,6 +10,7 @@ import { portfolioPages, writePortfolioPages } from "../site/portfolio-build.ts"
 import { portfolioBriefMd } from "./portfolio-brief.ts";
 import { isDate } from "./estimate.ts";
 
+/** Usage for composing, checking and reading a portfolio or evaluating a root proposal. */
 export const PORTFOLIO_USAGE = `usage:
   ${invocation()} portfolio build  <portfolio> [--presenting] [--out <dir>] [--today <YYYY-MM-DD>]   compose and check; write the portfolio page, each design's page built inside it, portfolio.json and portfolio.lock
   ${invocation()} portfolio check  <portfolio> [--presenting] [--today <YYYY-MM-DD>]                 every finding across the designs as Markdown; exit 1 on errors
@@ -20,6 +21,7 @@ export const PORTFOLIO_USAGE = `usage:
 
 const rel = (p: string) => relative(process.cwd(), p) || p;
 
+/** Dispatch portfolio builds, checks, impact reports and read-only briefs with optional dated composition. */
 export async function portfolioCli(args: string[], engineRoot: string): Promise<number> {
   const [sub, target, ...rest] = args;
   if (!sub || sub === "-h" || sub === "--help" || !target) { console.log(PORTFOLIO_USAGE); return sub && target ? 0 : 2; }

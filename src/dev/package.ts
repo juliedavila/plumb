@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
 
 /** Top-level files that ship. */
-const TOP = ["plumb.ts", "package.json", "README.md", "SPEC.md", "DEMO.md", "CHANGELOG.md", ".gitignore"];
+const TOP = ["plumb.ts", "package.json", "README.md", "SPEC.md", "DEMO.md", "CHANGELOG.md", "SECURITY.md", "CONTRIBUTING.md", "LICENSE", ".gitignore"];
 /** Directories that ship whole (less the exclusions below). */
 const DIRS = ["src", "packs", "templates", "tests", "skill", "examples"];
 /** The MCP server and its own test: shipped only with --with-mcp. src/mcp/tools.ts (pure query functions, used by tests) ships. */
@@ -48,6 +48,20 @@ function walk(root: string, rel: string, out: string[]) {
 }
 
 const sha256 = (buf: Uint8Array) => new Bun.CryptoHasher("sha256").update(buf).digest("hex");
+
+/** Git's index lists eligible working files; an unpacked source has no tracking restriction. */
+function trackedFiles(root: string): Set<string> | undefined {
+  const git = (args: string[]) => Bun.spawnSync(["git", "-C", root, ...args], { env: { PATH: process.env.PATH ?? "/usr/bin:/bin" }, stdout: "pipe", stderr: "pipe" });
+  const probe = git(["rev-parse", "--is-inside-work-tree"]);
+  if (probe.exitCode !== 0) {
+    if (/not a git repository/.test(probe.stderr.toString())) return undefined;
+    throw new Error(`cannot determine Git tracking: ${probe.stderr.toString().trim()}`);
+  }
+  if (probe.stdout.toString().trim() !== "true") return undefined;
+  const listed = git(["ls-files", "--cached", "-z", "--", "."]);
+  if (listed.exitCode !== 0) throw new Error(`cannot list Git tracked files: ${listed.stderr.toString().trim()}`);
+  return new Set(listed.stdout.toString().split("\0").filter(Boolean));
+}
 
 // Addresses on domains reserved for documentation and tests (RFC 2606, RFC 6761) are placeholders, not addresses.
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
@@ -113,7 +127,8 @@ export async function packageBundle(outDir: string, opts: PackageOptions): Promi
     const files: string[] = [];
     for (const f of TOP) if (existsSync(join(root, f))) files.push(f);
     for (const d of DIRS) walk(root, d, files);
-    const shipped = files.filter((f) => opts.withMcp || !MCP_FILES.includes(f));
+    const tracked = trackedFiles(root);
+    const shipped = files.filter((f) => (!tracked || tracked.has(f)) && (opts.withMcp || !MCP_FILES.includes(f)));
     for (const f of shipped) { mkdirSync(dirname(join(stage, f)), { recursive: true }); cpSync(join(root, f), join(stage, f)); }
     if (!shipped.includes("skill/plumb/SKILL.md")) throw new Error("skill/plumb/SKILL.md is missing from the tree being packaged");
     if (!opts.withMcp) {

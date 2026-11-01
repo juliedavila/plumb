@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { localPath, shellArg } from "../src/core/invocation.ts";
 import { addDesign } from "../src/design/add.ts";
 import { hash, yamlText, FILE_LIMIT } from "../src/design/manifest.ts";
-import { filesDigest, readEdition, verifyEdition } from "../src/core/edition.ts";
+import { filesDigest, normStamp, readEdition, verifyEdition } from "../src/core/edition.ts";
 import { buildBundle } from "../src/core/bundle.ts";
 import { loadInstance } from "../src/core/load.ts";
 import { runPortfolio } from "../src/core/portfolio.ts";
@@ -48,8 +48,24 @@ describe("design add from folders",()=>{
     expect(readFileSync(join(pin,"notes.yaml"),"utf8")).toBe("notes: []\n# keep\n");
   });
   test("deterministic generator; direct, namespace/version, and editions/namespace/version layouts",async()=>{
-    const generated=temp();makeEditions(generated);
-    expect(readFileSync(join(generated,"premerge/1.0.0/edition.yaml"))).toEqual(readFileSync(join(fixtures,"premerge/1.0.0/edition.yaml")));
+    const generated=temp(), repeated=temp();makeEditions(generated);makeEditions(repeated);
+    for(const ns of ["intake","premerge"]){
+      const dir=release(generated,ns),stored=release(fixtures,ns), stamp=Y(join(dir,"edition.yaml")), fixture=Y(join(stored,"edition.yaml"));
+      const paths=["edition.yaml",...fixture.files.map((f:any)=>f.path)];
+      for(const file of paths){
+        expect(readFileSync(join(dir,file))).toEqual(readFileSync(join(release(repeated,ns),file)));
+        if(file!=="edition.yaml")expect(Y(join(dir,file))).toEqual(Y(join(stored,file)));
+      }
+      // Manifest hashes describe serializer bytes; compare its full structure with hashes derived from this run.
+      const expected=structuredClone(fixture);
+      for(const file of expected.files)file.sha256=hash(readFileSync(join(dir,file.path)));
+      expected.shared.sha256=hash(readFileSync(join(dir,expected.shared.path)));
+      expected.manual_work.sha256=hash(readFileSync(join(dir,expected.manual_work.path)));
+      expected.digest=filesDigest(expected.files);
+      for(const pin of expected.pins)pin.sha256=hash(readFileSync(join(release(generated,pin.namespace),"edition.yaml")));
+      expect(stamp).toEqual(expected);
+      expect(verifyEdition({dir,version:"1.0.0",sha256:hash(readFileSync(join(dir,"edition.yaml"))),stamp:normStamp(stamp)})).toEqual([]);
+    }
     const nested=temp();cpSync(fixtures,join(nested,"editions"),{recursive:true});
     for(const from of [release(fixtures),fixtures,nested]){
       const workspace=temp();const result=await add(workspace,from);

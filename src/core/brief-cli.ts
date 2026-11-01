@@ -15,6 +15,7 @@ const cut = (s: string, n = 140) => { const t = s.replace(/\s+/g, " ").trim(); r
 const cell = (s: string) => s.replace(/\|/g, "\\|");
 const n = (k: number, one: string, many = one + "s") => `${k} ${k === 1 ? one : many}`;
 
+/** Build a design in memory and render its status, changes and decisions needing a person as Markdown. */
 export async function briefMd(dir: string): Promise<string> {
   const { bundle: b, warnings } = await buildBundle(resolve(dir));
   const L: string[] = [`# Brief: ${b.instance.title}`, "", `Built ${b.engine.built}. Model hash \`${(b.engine.modelHash ?? "").slice(0, 12)}\` (a new patch's provenance.based_on).`, ""];
@@ -78,6 +79,7 @@ export async function briefMd(dir: string): Promise<string> {
   return L.join("\n");
 }
 
+/** Print the read-only design brief and return success. */
 export async function briefCli(dir: string): Promise<number> {
   console.log(await briefMd(dir));
   return 0;

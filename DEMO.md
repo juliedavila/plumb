@@ -1,4 +1,6 @@
-# Plumb 0.6.2 demo
+# Plumb 0.6.3 demo
+
+Requires Bun 1.3.14 or later (the version Plumb is tested on). Tested on macOS.
 
 All data in this demo is fictional. Run from the Plumb folder with Bun.
 

@@ -24,10 +24,10 @@ import { ORG_TRACKER_USAGE, orgTrackerCli } from "./org-cli.ts";
 import { inventoryChanges } from "./inventory-diff.ts";
 
 export const TRACKER_USAGE = `usage:
-  ${invocation()} tracker discover      <instance-dir> --from <raw-export-dir> [--adapter jira]
-  ${invocation()} tracker draft-mapping <instance-dir> [--force]
-  ${invocation()} tracker reconcile     <instance-dir> [--from <raw-export-dir>]
-  ${invocation()} tracker export        <instance-dir> [--out <file>]
+  ${invocation()} tracker discover      <instance-dir> --from <raw-export-dir> [--adapter jira]   inventory exported tracker files
+  ${invocation()} tracker draft-mapping <instance-dir> [--force]   draft a mapping from the inventory
+  ${invocation()} tracker reconcile     <instance-dir> [--from <raw-export-dir>]   compare design units with tracker issues
+  ${invocation()} tracker export        <instance-dir> [--out <file>]   export unlinked units for tracker import
 ${ORG_TRACKER_USAGE}`;
 
 const opt = (args: string[], name: string) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : undefined; };

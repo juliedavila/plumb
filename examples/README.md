@@ -1,8 +1,8 @@
 # The example portfolio
 
-Fictional data for engine 0.4's portfolio features (see SPEC.md for the shared-root contract). Three designs share one root and six teams. Every name is invented: teams are named by what they do, people by role titles, and no organization, sector or product appears.
+Fictional data for Plumb's schema 0.4 portfolio features (see SPEC.md for the shared-root contract). Three designs share one root and six teams. Every name is invented: teams are named by what they do, people by role titles, and no organization, sector or product appears.
 
-The 0.4 engine loads, checks and renders this portfolio. Run `bun plumb.ts portfolio build examples/portfolio --today 2026-11-16` from the engine root and open `build/portfolio-example/index.html`. Error findings are deliberate. The build writes its outputs and exits 1. The expectations below are executable regression cases.
+Plumb loads, checks and renders this schema 0.4 portfolio. Run `bun plumb.ts portfolio build examples/portfolio --today 2026-11-16` from the engine root and open `build/portfolio-example/index.html`. Error findings are deliberate. The build writes its outputs and exits 1. The expectations below are executable regression cases.
 
 ## What is here
 
@@ -268,7 +268,7 @@ The examples use the following file shapes and interpretation rules.
 1. seams.yaml lists `parts`, `claims`, `contracts`, `crossings`, `capabilities` (`provided_by` a list), `seams` (`exposure` keyed by the side whose own build reads it) and `names`. The catalog is its own file, manual-work.yaml, keyed `manual_work`.
 2. A module seam sits in the design's own model.yaml under `seams:`, with `between: [core, <module>]` and `crossings: [{ id, carries }]`. Parts carry `module: <name>`. The organization's exception for it is keyed `<namespace>:<seam id>`.
 3. Pins hold the full sha256 of the pinned edition.yaml.
-4. An edition folder holds the frozen engine.yaml, model.yaml, plan.yaml and copies of seams.yaml and manual-work.yaml, with edition.yaml listing `files`, `digest`, `shared` and `manual_work` (rehash.ts writes it as `de release` would). The frozen engine.yaml keeps `root: ../../shared`, which resolves from the instance folder, not the edition folder.
+4. An edition folder holds the frozen engine.yaml, model.yaml, plan.yaml and copies of seams.yaml and manual-work.yaml, with edition.yaml listing `files`, `digest`, `shared` and `manual_work` (rehash.ts writes it as `plumb release` would). The frozen engine.yaml keeps `root: ../../shared`, which resolves from the instance folder, not the edition folder.
 5. `shared_from` in the root's engine.yaml holds `{ editions, sha256 }`, the sha256 of seams.yaml only.
 6. Shipped floors use the authors' rule codes (`agent-input`, `signed-record`, `outsider-text`, `gate-feed`). A shipped floor is authoritative, an empty one included, and the engine adds nothing to it. The engine's signals give a provisional floor, labelled "engine signal: <which>", only to contracts and crossings the shipped file never held. The base fixture's Task ships the floor `agent-input`, as the shipped checks derive for what reaches the agent sandbox. Contracts also carry a `fields` list, and crossings a `point`, carried through.
 7. Root patches use `kind: relationship` for a crossing, and `kind: capability`, `seam`, `contract`, `team` and `activity`. A raise is `modify contract` with `set: { security: { raised: { by, why } } }`. An agent's provenance names it: `agent: { name: org-scout, tool: Claude Code }`.

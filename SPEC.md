@@ -1,4 +1,4 @@
-# Plumb 0.6.2 specification
+# Plumb 0.6.3 specification
 
 Plumb holds a complex system as designed against the system as built, for systems built over time: a local-first checked model with executable rule packs, proposals with impact reports, a capability-based plan, current state kept as discovered or confirmed, and generated views.
 
@@ -10,21 +10,28 @@ The 0.5 contract adds an Obsidian vault as generated output. Human annotations r
 
 - bun and TypeScript only. No npm dependencies at all (YAML via `Bun.YAML.parse`, tests via `bun test`). Never python.
 - Each design page is one self-contained HTML file: plain HTML, CSS and vanilla JavaScript, with the bundle inlined as JSON, no CDN, no fonts from the network, no library, opens from `file://`. Diagrams are SVG laid out by our own code.
-- Generated pages and examples use fictional names and role titles. Keep identifying details out. The external scrub list is read from `PLUMB_SCRUB_LIST`, else `~/.config/plumb/scrub.txt`.
+- Generated pages and examples use fictional names and role titles. Keep identifying details out. The external scrub list is read from `PLUMB_SCRUB_LIST`, with `DE_SCRUB_LIST` as a deprecated fallback. Without an explicit setting, use `~/.config/plumb/scrub.txt`, or `~/.config/design-engine/scrub.txt` as a legacy fallback when the Plumb file is absent. Legacy settings and paths print a deprecation notice.
 - Keep local working data out of distributables. Verify frozen design inputs before importing.
 
 ## Layout
 
 ```
 plumb/
-  plumb.ts                  CLI: designs, roots, portfolios, tracker, editions, migrations, packaging
-  src/types.ts           the shared contract in code
-  src/core/              load, compile (apply patches), rules runner, plan analysis, impact, bundle
-  src/site/              site generator: bundle -> one HTML file
-  src/mcp/               MCP stdio server over a built bundle
-  packs/<name>/index.ts  rule packs: export const pack: RulePack
-  instances/<name>/      an instance (layout below)
-  tests/                 bun test
+  plumb.ts               CLI for designs, roots, portfolios and distribution
+  src/types.ts           shared contract in code
+  src/core/              load, compile, rules, analysis, impact and bundles
+  src/site/              HTML pages and browser code
+  src/mcp/               optional MCP server and pure query tools
+  src/tracker/           exported tracker discovery, mapping and measurement
+  src/vault/             Obsidian generation and annotation import
+  src/design/            edition verification, transport and adoption
+  src/dev/               local server, publishing and packaging
+  src/migrate/           schema and moved-id migrations
+  packs/<name>/index.ts  executable rule packs
+  examples/              fictional designs, shared root and portfolio
+  skill/plumb/           agent skill and task workflows
+  templates/             initial design and notes files
+  tests/                 Bun tests and fixtures
 ```
 
 ## Plumb edition interface 1
@@ -70,10 +77,10 @@ Copy published bytes to `instances/<namespace>/editions/<version>/` and the live
 
 Create empty notes.yaml only when absent. Preserve existing progress, milestones, current state, notes, tracker, reports, deck, tour and patches. The shared root's shared_from.editions records every added design's namespace, version and stamp hash. Unresolved owners remain role text; merge them into a sorted `instances/shared/team-map.draft.yaml` with a shape comment, `teams: []` and `owners: { role: { teams: [] } }`. Empty owner mappings are accepted as unresolved placeholders, never replacing team-map.yaml. Print each design's resolved and unresolved role counts and the draft path. Suggest portfolio build only when a portfolio exists, otherwise build the added instance.
 
-## Instance layout
+## Design folder layout
 
 ```
-instances/<name>/
+<design>/
   engine.yaml     name, title, description, packs: [generic, ...], ladder (fidelity levels, default [none, stand-in, existing-tool, built]), glossary (optional, below)
   model.yaml      teams, systems, zones, elements, relationships, contracts, views
   plan.yaml       phases, units
@@ -112,14 +119,16 @@ Every YAML file of an instance is scanned for a key written twice in one mapping
 
 Compile = the base model and plan plus every **accepted** patch, applied in natural id order. `impact <patch>` compiles with and without that one patch (any status) and diffs. A finding that disappears because the record it sits on was removed is reported as gone with the record, not resolved. A record removed outright is listed under removed only, not again under cascade. Units affected also include units that move an element at either end of a relationship the patch's ops add or remove. A unit the cascade leaves with none of the parts it moved is a `core/unit-keeps-a-part` error (in the patch's impact, and in the build for an accepted patch). Each impact carries a `verdict` (`PatchVerdict`): `fail` when it introduces an error finding. `caution` (shown amber, never green) when findings leave only with a removed record, when its title or why names a unit that is not done (a precondition not met), or when they name a part (by its name of two words or more), a contract (its name split at capitals) or an id that no op touches (a contract is backed only by an op on it or a relationship carrying it, never by a cascade). Else `pass`. It holds the reasons in words, a reject line (the file and `status: rejected`, with `decision`) and a revise line (the file, or what to tell Claude).
 
-## 0.4 current state and shared-root decisions
+## Current-state and shared-root decision rules
 
-- `CUR-disposition`: a missing disposition in `current.yaml` is undecided. `core/current-valid` reports a warning while the record is discovered and an error once a person has confirmed it. A refused confirmation leaves it discovered. The Today block and record card show the gap. No disposition is inferred, so an undecided record drives neither retirement checks nor transition classification. Unknown dispositions and malformed records remain errors.
-- `CUR-shared`: a design records current state only for its own parts, including its today-only parts. Bare and namespaced references to shared parts, and references to another design's parts, are errors. A replacement may still be a shared part. Shared parts' current state has no home in 0.4.
-- `CUR-dates`: retirement ordering inside a design uses milestone order. across designs it uses target dates. If either target date is absent, order is unknown and no ordering finding is raised. The separate warning for a retirement that does not depend on its replacement's arrival still applies in the composition.
-- `ROOT-contracts`: every crossing held in the shared layer, including crossings on organization-added seams, needs a contract or a non-empty string `no_contract` explaining why none is needed. Write the reason on the crossing or in `attrs`. The loader keeps it in `attrs.no_contract`. `shared/crossing-valid` rejects a missing, blank or non-string reason when no contract is carried. A reason leaves security marks, never-cross restrictions and contract resolution checks in force.
-- `ROOT-floor`: floors come from the shipped checks. A patch that rewrites a floor, even to add relevance, is refused by `shared/mark-valid` and the computed floor stays unchanged. To add relevance, use `security.raised: { by, why }`. clearing a shipped floor never lowers a mark.
-- `ROOT-rowowner`: an explicitly written team's `row_owner` stays in the root's model hash, so changing it makes pending patches refer to an older root. When absent, the org view defaults the row owner to the lead without adding that default to the fingerprint. The lead itself and estimate notes remain wording, outside the model hash.
+The decision codes below name these behavior contracts.
+
+- `CUR-disposition` (undecided current-state disposition): a missing disposition in `current.yaml` is undecided. `core/current-valid` reports a warning while the record is discovered and an error once a person has confirmed it. A refused confirmation leaves it discovered. The Today block and record card show the gap. No disposition is inferred, so an undecided record drives neither retirement checks nor transition classification. Unknown dispositions and malformed records remain errors.
+- `CUR-shared` (ownership of current-state records): a design records current state only for its own parts, including its today-only parts. Bare and namespaced references to shared parts, and references to another design's parts, are errors. A replacement may still be a shared part. Shared parts' current state has no home in 0.4.
+- `CUR-dates` (retirement ordering): retirement ordering inside a design uses milestone order. across designs it uses target dates. If either target date is absent, order is unknown and no ordering finding is raised. The separate warning for a retirement that does not depend on its replacement's arrival still applies in the composition.
+- `ROOT-contracts` (crossing contract requirements): every crossing held in the shared layer, including crossings on organization-added seams, needs a contract or a non-empty string `no_contract` explaining why none is needed. Write the reason on the crossing or in `attrs`. The loader keeps it in `attrs.no_contract`. `shared/crossing-valid` rejects a missing, blank or non-string reason when no contract is carried. A reason leaves security marks, never-cross restrictions and contract resolution checks in force.
+- `ROOT-floor` (security floor integrity): floors come from the shipped checks. A patch that rewrites a floor, even to add relevance, is refused by `shared/mark-valid` and the computed floor stays unchanged. To add relevance, use `security.raised: { by, why }`. clearing a shipped floor never lowers a mark.
+- `ROOT-rowowner` (explicit row-owner fingerprinting): an explicitly written team's `row_owner` stays in the root's model hash, so changing it makes pending patches refer to an older root. When absent, the org view defaults the row owner to the lead without adding that default to the fingerprint. The lead itself and estimate notes remain wording, outside the model hash.
 
 ## Rule packs
 
@@ -158,7 +167,7 @@ A record rests on a claim when its `rests_on` names it. `premiseImpact` (src/cor
 
 ## Comparing builds
 
-`src/site/client/digest.js` (loaded by the page and by `src/core/diff.ts`) reduces a bundle to one short hash per part, relationship, unit, claim, finding, patch and note, with each one's state (a unit's done, doing, ready or blocked. A patch's status. A note's status. A claim's grade), and compares two digests into a `BuildDiff` (types.ts). Parts, relationships and units carry `~` and a four-character hash of the record without its name, title, label, description, owner, verifier and status, so a record whose only change is its wording or owner is `reworded` (counted apart in `counts[kind].reworded`), not changed. `DIGEST.churnText` says "Titles and owners were re-derived (by the importer, version a to b). The design did not change" when nothing else in the design changed, and a status move whose new side is an override carries `override` and `computed` ("went amber to green by override. Computed still amber", `DIGEST.moveText`). Findings new and gone, units newly ready or done, records added, removed and changed, notes added, answered and resolved, patches added and decided, claims regraded, and counts by kind. The page keeps the digest of the last build its reader saw in `localStorage` and leads the Overview with "Since you last looked". `bun plumb.ts diff <instance> --from <a> [--to <b>]` compares two builds, each a bundle file or the instance at a git ref. The other side defaults to the instance now. `--save` writes the comparison to `<instance>/diffs/`, and the Changes page shows saved comparisons.
+`src/site/client/digest.js` (loaded by the page and by `src/core/diff.ts`) reduces a bundle to one short hash per part, relationship, unit, claim, finding, patch and note, with each one's state (a unit's done, doing, ready or blocked. A patch's status. A note's status. A claim's grade), and compares two digests into a `BuildDiff` (types.ts). Parts, relationships and units carry `~` and a four-character hash of the record without its name, title, label, description, owner, verifier and status, so a record whose only change is its wording or owner is `reworded` (counted apart in `counts[kind].reworded`), not changed. `DIGEST.churnText` says "Titles and owners were re-derived (by the importer, version a to b). The design did not change" when nothing else in the design changed, and a status move whose new side is an override carries `override` and `computed` ("went amber to green by override. Computed still amber", `DIGEST.moveText`). Findings new and gone, units newly ready or done, records added, removed and changed, notes added, answered and resolved, patches added and decided, claims regraded, and counts by kind. The page keeps the digest of the last build its reader saw in `localStorage` and leads the Overview with "Since you last looked". `bun plumb.ts diff <instance> --from <a> [--to <b>]` compares two builds, each a bundle file, an edition folder or the instance at a git ref. The other side defaults to the instance now. `--save` writes the comparison to `<instance>/diffs/`, and the Changes page shows saved comparisons.
 
 ## Teams and roles
 
@@ -231,20 +240,24 @@ The model owns structure (units, phases, dependencies). The tracker owns live st
 
 ## CLI
 
+Run `bun plumb.ts --help` for the full command and option list, including `site`, `premises`, `portfolio`, `design add`, `tracker`, `release`, `migrate`, `dev` and `publish`. `<instance-dir>` means the design folder. Unknown options exit 2 with the option name, command and its usage line.
+
+Design `build`, `site` and `check` accept `--today YYYY-MM-DD`: build as of that date for ages, status and dated organization checks, using noon UTC as the repeatable build stamp. Shared-root `build` and `check` use the machine date.
+
 - `bun plumb.ts build <instance-dir>`: compile, check, analyze, layout, write `build/<name>/bundle.json` and `index.html`. Exit 1 on error findings, but still write the outputs (the demo shows red).
 - `bun plumb.ts check <instance-dir>`: findings to stdout, exit 1 on errors.
 - `bun plumb.ts brief <instance-dir>`: what changed and what needs a person, as Markdown, read-only (src/core/brief-cli.ts): the status sentence and a row per milestone (shown, computed, first reason, override), the since-report line, open questions, proposed patches with verdicts, error findings, the tracker's counts and newest update, build warnings, and the frontier ranked by `unblocksTransitive`. It builds in memory and writes nothing.
 - `bun plumb.ts impact <instance-dir> <patch-id>`: impact report as Markdown, opening with `## Verdict: <level> (...)`, its reasons, and the reject and revise lines.
 - `bun plumb.ts plan <instance-dir>`: frontier, critical path, phase progress as Markdown.
 - `bun plumb.ts premise <instance-dir> [claim-id]`: "if this is false" as Markdown. exit 1 on an unknown claim.
-- `bun plumb.ts diff <instance-dir> --from <bundle.json | git ref> [--to ...] [--save] [--json]`: compare built bundles or this instance at a git ref. Generated JSON is the portable comparison format for imported designs.
+- `bun plumb.ts diff <instance-dir> --from <bundle.json | git ref | edition folder> [--to ...] [--save] [--json]`: compare built bundles or this instance at a git ref. Generated JSON is the portable comparison format for imported designs.
 - `bun plumb.ts vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]`: write a generated Obsidian vault and import human annotations as proposal notes.
 - `bun plumb.ts package <out-dir> [--with-mcp]`: a verified standalone bundle (below).
 - `bun plumb.ts report <instance-dir> [--presented]`: save a report snapshot. say what changed since the deck's baseline before it.
 
 ## Package
 
-`plumb package <out-dir> [--with-mcp]` stages the standalone product: engine code, packs, templates, skill, docs, fictional examples, tests and fixtures. No workspace designs or pair importer ship. Build outputs, report snapshots, saved diffs, tracker measures, portfolio locks, editor litter and scrub lists are excluded. Fictional authored examples retain their scenario notes. The optional MCP server and its test ship only with `--with-mcp`; pure query tools always ship.
+`plumb package <out-dir> [--with-mcp]` stages the standalone product: engine code, packs, templates, skill, docs, fictional examples, tests and fixtures. No workspace designs ship. Inside a Git work tree, only files in Git's tracked-file index are eligible, including SECURITY.md and CONTRIBUTING.md once tracked. Outside a Git work tree the existing file and directory selection applies to all working files. Build outputs, report snapshots, saved diffs, tracker measures, portfolio locks, editor litter and scrub lists are excluded. Fictional authored examples retain their scenario notes. The optional MCP server and its test ship only with `--with-mcp`; pure query tools always ship.
 
 MANIFEST records each other file's SHA-256, size and relative path. A leak scan over every staged file, including MANIFEST, rejects home paths, real email addresses and configured scrub-list patterns. An absent scrub list is explicitly reported. A failed check writes no output. Output must be new or empty and outside the source tree.
 
@@ -306,7 +319,7 @@ The roadmap renders undated milestones as an ordered strip with one tile per pha
 
 `bun plumb.ts vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]` builds a generated Obsidian vault. It uses the same compiled model, accepted patches, plan, live current state and findings as the site. Portfolio builds compose their shared root and designs through `runPortfolio`. They do not write a portfolio lock. A lone design retains its existing schema behavior. Schema failures stop output. Existing error findings exit 1 after output, as a site build does.
 
-The engine version is 0.6.2. The design schema remains 0.4, and lone legacy instances retain their schema behavior.
+The engine version is 0.6.3. The design schema remains 0.4, and lone legacy instances retain their schema behavior.
 
 The vault contains one Markdown note per part, relationship, contract, unit, milestone, team and finding. It includes a design index for every design and a portfolio index when the input is a portfolio. Shared and org records have one home. Relationships link endpoints and carried contracts. Contracts link producers and consumers. Units link changed parts, owner teams and milestones. Findings link their subjects. Indexes link their records. References without a generated home are rendered as unresolved or outside references in plain text. The generator emits wikilinks only for notes present in the output. It requires no Obsidian plugins.
 
@@ -324,7 +337,7 @@ Generation sorts output and uses canonical serialization without build timestamp
 
 `--packaging` reuses `leakCheck` from `src/dev/package.ts`, with strict email checking. It reads the package scrub list from `PLUMB_SCRUB_LIST` or the usual user configuration location. All generated bytes, the manifest, existing engine notes and preserved human annotations are scanned before output. The initial scan precedes source-note imports. Scrub-list patterns have no landscape exemption in a vault. All email addresses are refused, including documentation placeholders. Home paths on macOS, Linux and Windows and tilde home paths are refused. A missing scrub list is reported as unchecked names. A failure prints only filenames, line numbers and match kinds. It retains the prior vault. Existing application settings under `.obsidian` are scanned during packaging and preserved without changes.
 
-## Premise reconciliation in 0.6
+## Premise reconciliation
 
 A premise is a claim with kind premise. Its falsifier is attrs.falsifier. Load and if_it_flips are attributes, and fallback is the claim's fallback. The shared premise register is normalized into the same model. Discovered evidence and person-confirmed evidence remain separate. The engine never writes reconciliation input or promotes found evidence.
 
@@ -362,7 +375,7 @@ Strategy details show incoming and outgoing links, status and confirmation claus
 
 The reconcile-premises workflow declares scope, inputs and done condition immediately. It runs the JSON projection, considers all cross-design pairs including shared premises or records exact selection and skipped-pair evidence, proposes found links quoting both relevant clauses, and records one run. It groups proposals by their possible cascades. Only a person's explicit word for one link authorizes confirmed with the clauses that person picked and current projection pins. It never bulk-confirms. A rebuild shows confirmed impact and proposed reach separately.
 
-## Adopter behavior in 0.6.1
+## Adopter source resolution and declared dependencies
 
 Local edition sources include the clone root, a direct edition, and namespace/version collections. Recursive pins also resolve at <from>/pins/<namespace>/edition.yaml and <from>/pins/<namespace>/<version>/edition.yaml. Missing-pin hints use a nearby matching source when one exists. Otherwise they name the required namespace@version/edition.yaml layout.
 

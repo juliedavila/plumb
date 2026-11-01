@@ -8,10 +8,10 @@ Use the shared root, not a design. Read the requested portfolio.yaml for the roo
 4. Measure and draft one proposed refresh:
 
 ```sh
-bun plumb.ts tracker measure examples/shared --from examples/shared/tracker/export --as-of 2026-11-01 --today 2026-11-16 --portfolio examples/portfolio/portfolio.yaml --draft-patch --agent bau-assistant --requested-by "the program lead"
+bun plumb.ts tracker measure examples/shared --from examples/shared/tracker/export --today 2026-11-02 --draft-patch --agent bau-assistant --requested-by "the program lead"
 ```
 
-Use the user's paths and dates for other exports. `--as-of` is the end of the measurement window. Without it the engine uses the export date, else the newest issue update. `--today` is when measured. The dates above reproduce the fictional fixture, not today's actual work. The engine writes `tracker/measures/<as-of>.json` and one proposed patch containing all measured changes. If the same refresh is already proposed, it names that patch and writes no duplicate. "Nothing to propose" means the measured values are already in force. Do not accept a pre-existing refresh as a shortcut.
+Use the user's paths and dates for other exports. `--as-of` is the end of the measurement window. Without it the engine uses the export date, else the newest issue update. `--today` is when measured. The command above reproduces the shipped fictional fixture: the export sets the window end to 2026-11-01, and measurement was on 2026-11-02. On a clean copy it reuses the existing measurement and proposal and writes nothing new. The engine writes `tracker/measures/<as-of>.json` and one proposed patch containing all measured changes. If the same refresh is already proposed, it names that patch and writes no duplicate. "Nothing to propose" means the measured values are already in force. Do not accept a pre-existing refresh as a shortcut.
 
 5. Run `bun plumb.ts portfolio impact <portfolio> <printed-patch-id>` when a patch is proposed, then `bun plumb.ts portfolio brief <portfolio>`. Report the actual id and file. Do not assume P-006, since earlier work may have used it.
 

@@ -1,29 +1,50 @@
-# Plumb 0.6.2
+# Plumb 0.6.3
 
-Plumb tracks a complex system as designed against the system as built. Systems worth designing are usually built over years: part of the target already exists, part is in flight, and other long-horizon efforts run alongside it, some touching it and some not. Plumb keeps the design, the plan, what stands today and the decisions between them in checked local files, so the distance between as-designed and as-built is a record you can query, part by part.
+Plumb tracks a complex system as designed against the system as built. Systems worth designing are usually built over years: part of the target already exists, part is in flight, and other long-horizon efforts run alongside it, some touching it and some not. Plumb keeps the [design](#terms), the plan, what stands today and the decisions between them in checked local files, so the distance between as-designed and as-built is a record you can query, part by part.
+
+Plumb is for teams that keep a design for a complex system and track it against what they run. It is pre-1.0: file formats may change between minor versions. Use `plumb migrate` and the [changelog](CHANGELOG.md) when moving between them.
+
+Documents: [Specification](SPEC.md), [Demo](DEMO.md), [Changelog](CHANGELOG.md), [Security](SECURITY.md), [Contributing](CONTRIBUTING.md), [License](LICENSE).
 
 Plumb keeps what was discovered apart from what was confirmed. A crawler, a tracker export or an agent records what it found, with its source and date; a person confirms with their name and the time. Plumb never promotes one to the other. Every proposed change carries an impact report, and people decide what to accept.
 
-A design can be your own or a released edition someone else publishes. `plumb design add` brings a released edition into a workspace after checking every file against its manifest and every pin against the design it names. Ratchet and Jig, published at github.com/juliedavila/toolroom, are example designs you can add this way.
+A design can be your own or a released [edition](#terms) someone else publishes. `plumb design add` brings a released edition into a workspace after checking every file against its manifest and every [pin](#terms) against the design it names. Ratchet and Jig, published at [github.com/juliedavila/toolroom](https://github.com/juliedavila/toolroom), are example designs you can add this way.
 
 Builds write one HTML page per design that opens from disk, a portfolio page across designs that share a root, or an Obsidian vault. Plumb is written in TypeScript for Bun and has no dependencies. All demo data is fictional.
 
 ## Start here
 
-Run commands below from the folder holding `plumb.ts`. `bun link` is optional. Without linking, run `bun <path-to-plumb>/plumb.ts` from any workspace. Paths in command arguments are relative to where you run the command. Plumb source may live anywhere outside `upstream/` and `org/`. From an adopter workspace, run `bun <path-to-plumb>/plumb.ts build plumb/instances/intake`. When using the adopter skills, the Plumb workspace is `<adopter workspace>/plumb`, beside `upstream/` and `org/`.
+Requires Bun 1.3.14 or later (the version Plumb is tested on). Tested on macOS.
 
-Home scrub files are optional; a fresh machine prints no home-path deprecation notice.
+Install Bun using its [installation instructions](https://bun.sh/docs/installation) if needed. Run these commands from the folder holding `plumb.ts`.
 
-```sh
-bun test
-bun plumb.ts portfolio brief examples/portfolio --today 2026-11-16
-bun plumb.ts portfolio build examples/portfolio --today 2026-11-16
-open build/portfolio-example/index.html
-```
+1. Run `bun test`. Expected: all tests pass. If it fails, check `bun --version` and read the named failure before continuing.
+2. Run `bun plumb.ts portfolio brief examples/portfolio --today 2026-11-16`. Expected: exit 0 and a status brief naming decisions that need a person. If it fails, check the working folder and the input path printed in the error.
+3. Run `bun plumb.ts portfolio build examples/portfolio --today 2026-11-16`. Expected: exit 1 by design because the fictional portfolio has findings; it still writes the page at the path it prints, normally `build/portfolio-example/index.html`. If it exits 2 or writes no page, read the error and correct the named path or input.
+4. Run `open build/portfolio-example/index.html`. Expected: the portfolio page opens in your browser on macOS. If it fails, open the printed HTML path from your browser's File menu.
 
-The example deliberately has findings. Builds exit 1 on error findings and still write the page and data. `--today` makes the example repeatable. Omit it for today's state. A rendered page is not a clean check.
+`--today` makes the example repeatable. Omit it for today's state. A rendered page is not a clean check.
 
-For the lone value stream, run `bun plumb.ts build examples/delivery-stream` and open `build/delivery-stream/index.html`. An instance without schema, namespace, root or pins retains the 0.3 behavior. Historical goldens permit only the engine version and build time to differ.
+## Terms
+
+- **Design:** a folder holding the model, plan and live files for one system design. CLI help calls this folder `<instance-dir>`.
+- **Edition:** a released, frozen set of design inputs with a version and manifest.
+- **Pin:** the exact version and SHA-256 of another design's edition manifest that a design depends on.
+- **Stamp:** `edition.yaml`, the release metadata and hashed file list used to verify an edition. A build stamp is the build time in `engine.built`.
+- **Presenting:** portfolio mode that selects released editions with current live state.
+- **Premise:** a claim the design rests on, with evidence and consequences if it is false.
+- **Seam:** a declared boundary between design modules or designs, with rules for what may cross it.
+- **Crossing:** a connection across that boundary, declared in the shared layer for connections between designs.
+- **BAU:** business as usual, the standing work that consumes team capacity alongside design work.
+- **WIP:** work in progress; a WIP limit caps concurrent units of work.
+
+## Build the delivery stream
+
+Run `bun plumb.ts build examples/delivery-stream` and open `build/delivery-stream/index.html`. Expected: exit 0 with warnings for the intentional findings. Read a failure's named input before retrying. Design `build` and `check` accept `--today YYYY-MM-DD` for ages, status and dated organization checks, with a repeatable build stamp at noon UTC.
+
+## Verify legacy output
+
+An instance without schema, namespace, root or pins retains the 0.3 behavior. Historical golden tests permit only the engine version and build time to differ. Run `bun test tests/lone-golden.test.ts` to check this contract.
 
 ## Files and ownership
 
@@ -61,11 +82,11 @@ Portfolio fields are read from `portfolio.yaml`:
 | designs | list of mappings | required, nonempty | Selects the composed designs. |
 | designs[].namespace | string | required | Names the design namespace. |
 | designs[].from | string | required | Design folder, relative to this file. |
-| presenting | string | released | Read as metadata. This field does not select a mode. Presenting mode selects newest released editions. |
+| presenting | string | released | Read as metadata. This field does not select a mode. [Presenting](#terms) mode selects newest released editions. |
 | working | string | latest | Read as metadata. This field does not select a mode. Working mode uses live design files. |
 | horizon_months | number | 12 | Positive values are rounded down for the roadmap month horizon. Zero or negative values use 12. |
 
-Paths in engine.yaml are relative to its folder. Paths in portfolio.yaml are relative to the portfolio folder. A design imports only its root. Structural dependencies across designs pass through shared capabilities and crossings. Premise dependencies use declared or reconciled links. A pin records the exact version and SHA-256 of another design's edition.yaml. It does not grant access to that design's records.
+Paths in engine.yaml are relative to its folder. Paths in portfolio.yaml are relative to the portfolio folder. A design imports only its root. Structural dependencies across designs pass through shared capabilities and [crossings](#terms). [Premise](#terms) dependencies use declared or reconciled links. A pin records the exact version and SHA-256 of another design's edition.yaml. It does not grant access to that design's records.
 
 Use `namespace:id` outside the current design, or `namespace:kind/id` where a kind is needed. Bare ids resolve to the design, then shared, then org for team fields. Two homes are an error. Descriptive views, claim links and notes can name outside records. Composition resolves them together.
 
@@ -75,8 +96,8 @@ Without org.yaml each imported design keeps its own teams. With it, teams live o
 
 | Command | Result |
 |---|---|
-| `bun plumb.ts build <design> [--out <dir>] [--edition <version>]` | Write bundle.json and index.html. Print the model hash for a patch's `provenance.based_on`. |
-| `bun plumb.ts check <design>` | Print findings. Error findings exit 1. |
+| `bun plumb.ts build <design> [--out <dir>] [--edition <version>] [--today YYYY-MM-DD]` | Write bundle.json and index.html. Print the model hash for a patch's `provenance.based_on`. |
+| `bun plumb.ts check <design> [--edition <version>] [--today YYYY-MM-DD]` | Print findings. Error findings exit 1. |
 | `bun plumb.ts brief <design>` | Read-only status, changes since a report, questions, proposals and work that can start. |
 | `bun plumb.ts plan <design>` | Ready work, blockers, milestone progress and critical path. |
 | `bun plumb.ts premises <instance-or-root-or-portfolio> [--json]` | Read every premise and reconciliation link in scope. |
@@ -104,11 +125,11 @@ Compare generated bundle JSON or this instance at a git ref with `plumb diff`.
 
 ## Estimates, workload and risk
 
-Capacity is a WIP limit in concurrent units. Each org number records `value`, `source`, `by`, `as_of` and `confidence`. Sources are person, agent, tracker and derived. Confidence is low, medium or high. Activity shares are fractions from zero to one. Accepted patches supply history. Measured values keep a person's stated figure beside them.
+Capacity is a [WIP](#terms) limit in concurrent units. Each org number records `value`, `source`, `by`, `as_of` and `confidence`. Sources are person, agent, tracker and derived. Confidence is low, medium or high. Activity shares are fractions from zero to one. Accepted patches supply history. Measured values keep a person's stated figure beside them.
 
 Activities consume part of a team's capacity. Units in progress across designs consume the rest. Relief names a unit or milestone and may retire or reduce an activity. The allowance is a premise until its condition is reached. Unit work types ship as defaults and can be overridden in progress.yaml with `flow_item: feature`, defect, risk or debt.
 
-Slowdowns record a temporary lower share, what will wait, the risk, acceptors, start and end. Exceptions record a seam, contracts, acceptor, end and why. An organization's exception list replaces that seam's shipped default. An empty list declines it. Exceptions relax only the seam rule. Composed security findings keep their severity. Security marks have a floor from the shipped checks that patches cannot lower. Raise relevance with `security.raised: { by, why }`.
+Slowdowns record a temporary lower share, what will wait, the risk, acceptors, start and end. Exceptions record a [seam](#terms), contracts, acceptor, end and why. An organization's exception list replaces that seam's shipped default. An empty list declines it. Exceptions relax only the seam rule. Composed security findings keep their severity. Security marks have a floor from the shipped checks that patches cannot lower. Raise relevance with `security.raised: { by, why }`.
 
 Use `skill/plumb/workflows/org-decisions.md` for proposals. Root changes are reviewed with portfolio impact. Accepting a risk and accepting a patch are separate decisions.
 
@@ -133,10 +154,10 @@ The engine reads exported files and never calls a tracker service. Discover firs
 ```sh
 bun plumb.ts tracker discover examples/shared --from examples/shared/tracker/export
 bun plumb.ts tracker draft-mapping examples/shared
-bun plumb.ts tracker measure examples/shared --as-of 2026-11-01 --today 2026-11-16 --portfolio examples/portfolio/portfolio.yaml --draft-patch --agent bau-assistant --requested-by "the program lead"
+bun plumb.ts tracker measure examples/shared --today 2026-11-02 --draft-patch --agent bau-assistant --requested-by "the program lead"
 ```
 
-An existing mapping is kept and the draft goes to mapping.draft.yaml. One measurement refresh produces one proposed patch for the whole refresh, or identifies an identical existing proposal. The fixture already has P-005 waiting. Measurement writes `tracker/measures/<date>.json`. It shows measured gaps before acceptance. Issue history gives time in doing. Without history the engine uses a lower confidence issue-count fallback.
+An existing mapping is kept and the draft goes to mapping.draft.yaml. One [BAU](#terms) measurement refresh produces one proposed patch for the whole refresh, or identifies an identical existing proposal. The fixture already has P-005 waiting. The command above reuses the shipped `tracker/measures/2026-11-01.json`: the export sets the window end, and `--today` sets when it was measured. It writes nothing new on a clean copy. It shows measured gaps before acceptance. Issue history gives time in doing. Without history the engine uses a lower confidence issue-count fallback.
 
 For one design, use `tracker discover`, `tracker draft-mapping`, `tracker reconcile` and, when requested, `tracker export`. Confirm matches in links.yaml only on the user's word. A tracker disagreement never overwrites plan status.
 
@@ -172,21 +193,28 @@ Package a new or empty directory outside the source tree:
 bun plumb.ts package <out-dir>
 ```
 
-The package contains Plumb, its packs, templates, skill, docs, tests and fictional examples. No workspace designs are bundled. Add released designs with the edition interface described below. MANIFEST records every shipped file hash and size. Home paths, real email addresses and external scrub-list patterns block packaging. The optional MCP server ships with `--with-mcp`.
+The package contains Plumb, its packs, templates, skill, docs, tests and fictional examples. Inside a Git work tree, only tracked files are eligible; outside one, the same file and directory exclusions apply to all working files. No workspace designs are bundled. Add released designs with the edition interface described below. MANIFEST records every shipped file hash and size. Home paths, real email addresses and external scrub-list patterns block packaging. The optional MCP server ships with `--with-mcp`.
 
 On the destination machine run `bun test`, build the fictional examples, then add your designs and write a team map in their shared root. Copy `skill/plumb` into your agent's skills folder or ask it to read that skill directly.
 
 ## Add a released design
 
+`bun link` is optional. Without linking, run `bun <path-to-plumb>/plumb.ts` from any workspace. Paths in command arguments are relative to where you run the command. Plumb source may live anywhere outside `upstream/` and `org/`. From an adopter workspace, run `bun <path-to-plumb>/plumb.ts build plumb/instances/intake`. When using the adopter skills, the Plumb workspace is `<adopter workspace>/plumb`, beside `upstream/` and `org/`.
+
 ```sh
 bun plumb.ts design add premerge@1.0.0 --from tests/fixtures/editions --workspace ./workspace --with-pins
-bun plumb.ts design add intake@1.0.0 --from github:example/repair-designs --workspace ./workspace
-bun plumb.ts design add intake@1.0.0 --from ../repair-designs --workspace ./workspace
+```
+
+For your own source, replace the placeholders below with a repository the person names or a local clone path:
+
+```sh
+bun plumb.ts design add intake@1.0.0 --from github:<owner>/<repo> --workspace ./workspace
+bun plumb.ts design add intake@1.0.0 --from "<path to a clone>" --workspace ./workspace
 ```
 
 A local clone root works as `--from`: Plumb finds `editions/<namespace>/<version>/edition.yaml` beneath it. A direct edition folder also works. Pins may live in `<from>/pins/<namespace>/edition.yaml` or `<from>/pins/<namespace>/<version>/edition.yaml`.
 
-An edition must ship `edition.yaml` with `plumb.interface: 1` and hashed engine-format inputs. Plumb verifies every listed file, the manifest digest, shared seams and manual-work bytes, and exact pins before writing. Missing pins print a usable command when a matching nearby folder exists, otherwise explain which folder must hold the edition; `--with-pins` verifies and adds dependencies first. Each added edition has its own frozen copy under `instances/<namespace>/editions/<version>/`. This is expected. The adopter's `upstream/` remains its read-only copy. Frozen published files stay byte-identical. With `--with-pins`, re-adding also regenerates every installed transitive pin against the current team map. Re-adding an identical stamp re-derives its live files and frozen adapters while retaining progress, notes, current state, tracker, reports, patches, deck and tour.
+An edition must ship `edition.yaml` with `plumb.interface: 1` and hashed engine-format inputs. Plumb verifies every listed file, the manifest digest, shared seams and manual-work bytes, and exact pins before writing. Missing pins print a usable command when a matching nearby folder exists, otherwise explain which folder must hold the edition; `--with-pins` verifies and adds dependencies first. Each added edition has its own frozen copy under `instances/<namespace>/editions/<version>/`. This is expected. The adopter's `upstream/` remains its read-only copy. Frozen published files stay byte-identical. With `--with-pins`, re-adding also regenerates every installed transitive pin against the current team map. Re-adding an identical [stamp](#terms) re-derives its live files and frozen adapters while retaining progress, notes, current state, tracker, reports, patches, deck and tour.
 
 A role string naming several parties maps to every team it names. Map the exact role string to all applicable team ids, for example:
 
@@ -205,6 +233,8 @@ Roles resolve through `instances/shared/team-map.yaml`. Optional `org.yaml` hold
 `PLUMB_SCRUB_LIST` selects the external scrub list. The default is `~/.config/plumb/scrub.txt`. The former `DE_SCRUB_LIST` setting and `~/.config/design-engine/scrub.txt` path remain fallbacks and print a deprecation note when used. The legacy path notice prints at most once per process. Plumb optionally reads one of two default home files: `~/.config/plumb/scrub.txt` when it exists, otherwise `~/.config/design-engine/scrub.txt` when it exists. It does not read other home files. An explicit `PLUMB_SCRUB_LIST` or fallback `DE_SCRUB_LIST` can select another path, including a home path. Existence checks precede reads. `PLUMB_GITHUB_RAW` overrides the GitHub raw base URL (`DE_GITHUB_RAW` is the deprecated fallback).
 
 Scrub lists contain case-insensitive regexes, optionally followed by ` => replacement`. `section: <regex>` declares Markdown heading text under which entries marked `allow-in-section:` may appear. The older `landscape:` entry marker is also read. Without a section declaration, a marked entry is allowed nowhere. Vault packaging applies every pattern everywhere.
+
+Home scrub files are optional; a fresh machine prints no home-path deprecation notice.
 
 ## Open a design in Obsidian
 

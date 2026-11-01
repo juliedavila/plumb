@@ -37,6 +37,7 @@ export function diffTotals(d: BuildDiff): string[] {
     .map(([k, c]) => `${(KIND_WORD[k] ?? [k, k + "s"])[1]}: +${c.added} −${c.removed} ~${c.changed}`);
 }
 
+/** Render a build comparison as Markdown, naming changes, findings and status moves. */
 export function diffMd(d: BuildDiff, title = "What changed", names?: Record<string, string>): string {
   const out = [`# ${title}`, "", `From **${sideName(d.from)}** to **${sideName(d.to)}**.`, ""];
   out.push("| Kind | Added | Removed | Changed | Reworded |", "|---|---|---|---|---|");
@@ -87,15 +88,15 @@ export function diffMd(d: BuildDiff, title = "What changed", names?: Record<stri
 }
 
 function git(cwd: string, args: string[]): string {
-  const p = Bun.spawnSync(["git", "-C", cwd, ...args], { stdout: "pipe", stderr: "pipe" });
+  const p = Bun.spawnSync(["git", "-C", cwd, ...args], { env: { PATH: process.env.PATH ?? "/usr/bin:/bin" }, stdout: "pipe", stderr: "pipe" });
   if (p.exitCode !== 0) throw new Error(`git ${args.join(" ")}: ${p.stderr.toString().trim()}`);
   return p.stdout.toString();
 }
 
-/** Write the instance directory as it stood at a git ref into a fresh temporary directory (git show per file). */
+/** Copy a design at a Git ref to a temporary directory, reading repository-relative paths and retaining design-relative paths. */
 export function instanceAtRef(dir: string, ref: string): string {
   const out = mkdtempSync(join(tmpdir(), "plumb-at-"));
-  const files = git(dir, ["ls-tree", "-r", "--name-only", ref, "--", "."]).split("\n").filter(Boolean);
+  const files = git(dir, ["ls-tree", "-r", "--full-name", "--name-only", "-z", ref, "--", "."]).split("\0").filter(Boolean);
   if (!files.length) throw new Error(`${ref} has no files under ${dir}`);
   const prefix = git(dir, ["rev-parse", "--show-prefix"]).trim();
   for (const f of files) {
@@ -122,6 +123,7 @@ export async function resolveSide(dir: string, value: string | undefined): Promi
   return { bundle, label: when ? `${value} of ${when}` : value, cleanup: () => rmSync(tmp, { recursive: true, force: true }) }; // a temporary directory
 }
 
+/** Compare bundle files or a design at Git refs and optionally save the comparison. */
 export async function diffCli(dir: string, args: string[]): Promise<number> {
   const opt = (k: string) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : undefined; };
   const from = opt("--from"), to = opt("--to");

@@ -1,14 +1,16 @@
 # Draft a patch
 
-**Scope.** One new file, `instances/<name>/patches/P-<NNN>-<slug>.yaml`, with `status: proposed`. No other file changes: the model and plan change only when a person accepts the patch.
+`<design>/` is the design's folder: `examples/delivery-stream` in this bundle, `instances/<namespace>` in an adopter workspace.
+
+**Scope.** One new file, `<design>/patches/P-<NNN>-<slug>.yaml`, with `status: proposed`. No other file changes: the model and plan change only when a person accepts the patch.
 **Inputs.** The change the user asked for, in their words, and who asked (a role).
 **Output.** The patch file, and its impact report summarised to the user: the verdict, what it adds, removes and changes, the findings it introduces and resolves.
 
 ## Steps
 
-1. `bun plumb.ts brief <inst>`: note the model hash (12 characters). That is `based_on`. It is the model in force: proposals not yet accepted do not change it, so several proposals drafted together share one `based_on`. (`bun plumb.ts build <inst>` prints the same value on its `model:` line. Never use its `hash:` line, which changes with notes and patches.)
-2. Find the records the change touches in `instances/<name>/model.yaml` and `plan.yaml`, by id. For an imported design, `milestones.yaml` and `progress.yaml` sit beside a generated plan. A patch never edits them.
-3. The id: one more than the highest `P-<NNN>` in `instances/<name>/patches/`, three digits (the delivery stream ships `P-001` and `P-002`, so its next is `P-003`). The slug: three to five words of the title, lowercase, joined by hyphens. The example below uses `P-003`. Use the id this step gives.
+1. `bun plumb.ts brief <design>`: note the model hash (12 characters). That is `based_on`. It is the model in force: proposals not yet accepted do not change it, so several proposals drafted together share one `based_on`. (`bun plumb.ts build <design>` prints the same value on its `model:` line. Never use its `hash:` line, which changes with notes and patches.)
+2. Find the records the change touches in `<design>/model.yaml` and `plan.yaml`, by id. For an imported design, `milestones.yaml` and `progress.yaml` sit beside a generated plan. A patch never edits them.
+3. The id: one more than the highest `P-<NNN>` in `<design>/patches/`, three digits (the delivery stream ships `P-001` and `P-002`, so its next is `P-003`). The slug: three to five words of the title, lowercase, joined by hyphens. The example below uses `P-003`. Use the id this step gives.
    If the user supplies no title, name the requested change in plain words. If they supply no patch `why`, restate the requested facts neutrally. One factual sentence is enough. Do not invent a motive, benefit or tradeoff, or attribute your wording to a person.
 4. Write the file:
 
@@ -48,7 +50,7 @@ ops:
 ```
 
    The impact report says when a flow value is the patch's own estimate ("This patch sets the WIP limit at …: its own estimate, with no measurement behind it"). Repeat that to the user.
-5. `bun plumb.ts impact <inst> P-003` (your patch's id). Read its `## Verdict` section.
+5. `bun plumb.ts impact <design> P-003` (your patch's id). Read its `## Verdict` section.
 6. If the verdict names something the why claims and no op backs, or a check the patch breaks that the user did not ask to break, revise the ops or the why and run step 5 again. Stop after three revisions and report where it stands.
 
 ## What to say
@@ -57,6 +59,6 @@ The verdict word as printed (`fail`, `caution` or `pass`) and its reasons, word 
 
 ## Done when
 
-The file parses (`bun plumb.ts check <inst>` shows no `core/patch-loads` error for it), `bun plumb.ts impact` printed its verdict, and the user has the verdict with its reasons.
+The file parses (`bun plumb.ts check <design>` shows no `core/patch-loads` error for it), `bun plumb.ts impact` printed its verdict, and the user has the verdict with its reasons.
 
 For a root estimate, slowdown, exception or shared record, use `org-decisions.md` and `bun plumb.ts portfolio impact <portfolio> <patch>`. Design patch kinds do not include org activities or exceptions. Never edit shipped shared files.

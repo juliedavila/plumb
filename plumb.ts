@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Plumb: the checked design CLI.
-//   bun plumb.ts build  <instance-dir> [--out <dir>] [--edition <version>]   compile, check, analyze, layout; write build/<name>/bundle.json and index.html (a released edition: build/<name>-<version>/)
-//   bun plumb.ts check  <instance-dir> [--edition <version>]   findings as Markdown; exit 1 on errors
+//   bun plumb.ts build  <instance-dir> [--out <dir>] [--edition <version>] [--today YYYY-MM-DD]   compile, check, analyze, layout; write build/<name>/bundle.json and index.html (a released edition: build/<name>-<version>/)
+//   bun plumb.ts check  <instance-dir> [--edition <version>] [--today YYYY-MM-DD]   findings as Markdown; exit 1 on errors
 //   bun plumb.ts brief  <instance-dir>                  what changed and what needs a person, read-only (src/core/brief-cli.ts)
 //   bun plumb.ts impact <instance-dir> <patch-id>       impact report as Markdown
 //   bun plumb.ts plan   <instance-dir>                  frontier, critical path, phase progress as Markdown
@@ -47,26 +47,61 @@ import { vaultCli } from "./src/vault/build.ts";
 import { isRootDir } from "./src/core/root.ts";
 import { ROOT_USAGE, rootCli } from "./src/core/root-build.ts";
 import { designCli } from "./src/design/add.ts";
-
+import { isDate } from "./src/core/estimate.ts";
 import { invocation } from "./src/core/invocation.ts";
+
+// Command-local options are validated before dispatch, including flags before a target.
+const values: Record<string, string[]> = {
+  build: ["out", "edition", "today"], site: ["out", "edition", "today"], check: ["edition", "today"],
+  brief: [], impact: [], plan: [], premises: [], premise: [], diff: ["from", "to"], report: [],
+  dev: ["port", "out"], vault: ["out", "today"], publish: [], package: [], release: ["label"], migrate: ["to", "root", "moved"],
+  "design add": ["from", "workspace", "ref", "path"],
+  "portfolio build": ["out", "today"], "portfolio check": ["today"], "portfolio impact": ["today"], "portfolio brief": ["today"],
+  "tracker discover": ["from", "adapter"], "tracker draft-mapping": [], "tracker reconcile": ["from"], "tracker export": ["out"],
+  "tracker measure": ["from", "as-of", "portfolio", "today", "agent", "tool", "model", "by", "requested-by"],
+};
+const switches: Record<string, string[]> = {
+  premises: ["json"], diff: ["save", "json"], report: ["presented"], vault: ["packaging"], package: ["with-mcp"], migrate: ["dry-run"],
+  "design add": ["with-pins"], "portfolio build": ["presenting"], "portfolio check": ["presenting"], "portfolio impact": ["presenting"], "portfolio brief": ["presenting"],
+  "tracker draft-mapping": ["force"], "tracker measure": ["draft-patch", "limits"],
+};
+
+/** Validate one command's flags without reading inputs or writing outputs. */
+function validateOptions(command: string, args: string[]): string | undefined {
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (!arg.startsWith("-")) continue;
+    if (arg === "--help" || arg === "-h") continue;
+    if (values[command]?.includes(arg.slice(2)) && arg.startsWith("--")) {
+      if (!args[i + 1] || args[i + 1].startsWith("-")) return `${arg} needs a value`;
+      i++;
+    } else if (!arg.startsWith("--") || !switches[command]?.includes(arg.slice(2))) return `unknown option ${arg} for ${command}`;
+  }
+}
+
+/** All public commands, including nested command names and the site alias. */
+const commands = Object.keys(values);
+
 const ROOT = import.meta.dir;
 const USAGE = `usage:
-  ${invocation()} build  <instance-dir> [--out <dir>] [--edition <version>]
-  ${invocation()} check  <instance-dir> [--edition <version>]
-  ${invocation()} brief  <instance-dir>
-  ${invocation()} impact <instance-dir> <patch-id>
-  ${invocation()} plan   <instance-dir>
-  ${invocation()} premises <instance-or-root-or-portfolio> [--json]
-  ${invocation()} premise <instance-dir> [claim-id]
-  ${invocation()} diff   <instance-dir> --from <bundle.json | git ref | edition folder> [--to ...] [--save] [--json]
-  ${invocation()} report <instance-dir> [--presented]
-  ${invocation()} dev    <instance-dir | portfolio> [--port 4317] [--out <dir>]
-  ${invocation()} vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]
-  ${invocation()} publish <out-dir> <instance-dir | portfolio>...
-  ${invocation()} design add <namespace>@<version> --from <source> [--workspace <dir>] [--with-pins] [--ref <ref>] [--path <path>]
-  ${invocation()} package <out-dir> [--with-mcp]
-  ${invocation()} release <instance-dir> --label <version>
-  ${MIGRATE_USAGE.replace(/^usage: /, "")}
+  ${invocation()} build  <instance-dir> [--out <dir>] [--edition <version>] [--today YYYY-MM-DD]   compile and check; write bundle.json and index.html
+  ${invocation()} site   <instance-dir> [--out <dir>] [--edition <version>] [--today YYYY-MM-DD]   alias for build
+  ${invocation()} check  <instance-dir> [--edition <version>] [--today YYYY-MM-DD]   print findings; exit 1 on errors
+  ${invocation()} brief  <instance-dir>   status, changes and what needs a person, read-only
+  ${invocation()} impact <instance-dir> <patch-id>   evaluate a design patch and print its verdict
+  ${invocation()} plan   <instance-dir>   ready work, blockers and critical path
+  ${invocation()} premises <instance-or-root-or-portfolio> [--json]   read premises and reconciliation links in scope
+  ${invocation()} premise <instance-dir> [claim-id]   rank claims or show what rests on one
+  ${invocation()} diff   <instance-dir> --from <bundle.json | git ref | edition folder> [--to ...] [--save] [--json]   compare builds
+  ${invocation()} report <instance-dir> [--presented]   save a report snapshot, optionally marked shown
+  ${invocation()} dev    <instance-dir | portfolio> [--port 4317] [--out <dir>]   serve locally and rebuild on changes
+  ${invocation()} vault <instance or portfolio> --out <dir> [--packaging] [--today YYYY-MM-DD]   generate an Obsidian vault and import annotations
+  ${invocation()} publish <out-dir> <instance-dir | portfolio>...   write a static folder with an index
+  ${invocation()} design add <namespace>@<version> --from <source> [--workspace <dir>] [--with-pins] [--ref <ref>] [--path <path>]   verify and add a released design
+  ${invocation()} package <out-dir> [--with-mcp]   write a checked standalone distribution
+  ${invocation()} release <instance-dir> --label <version>   freeze a released design edition
+  ${MIGRATE_USAGE.replace(/^usage: /, "")}   migrate schemas or moved ids
+<instance-dir> means the design folder. Design build, site and check --today build as of that date (ages, status and dated organization checks) at noon UTC, with a repeatable build stamp. Shared-root build and check use the machine date.
 ${PORTFOLIO_USAGE.replace(/^usage:\n/, "")}
 ${ROOT_USAGE}
 ${TRACKER_USAGE.replace(/^usage:\n/, "")}`;
@@ -87,6 +122,14 @@ async function renderSiteIfPresent(bundle: Bundle): Promise<string | undefined> 
 async function main(argv: string[]) {
   const [cmd, dir, ...rest] = argv;
   if (!cmd || cmd === "-h" || cmd === "--help" || cmd === "help") { console.log(USAGE); return 0; }
+  const nested = ["design", "portfolio", "tracker"].includes(cmd);
+  if (!commands.some(c => c.split(" ")[0] === cmd)) die(`unknown command "${cmd}"\n${USAGE}`);
+  const command = nested && dir && !dir.startsWith("-") ? `${cmd} ${dir}` : cmd;
+  if (nested && command !== cmd && !commands.includes(command)) die(`unknown ${cmd} command "${dir}"\n${USAGE}`);
+  const usage = USAGE.split("\n").filter(line => line.trimStart().startsWith(`${invocation()} ${command} `)).join("\n") || USAGE;
+  const optionError = validateOptions(command, argv.slice(nested && command !== cmd ? 2 : 1));
+  if (optionError) die(`${optionError}\nusage:\n${usage}`);
+  if (argv.includes("--help") || argv.includes("-h")) { console.log(`usage:\n${usage}`); return 0; }
   if (!dir) die(USAGE);
 
   if (cmd === "premises") { console.log(await premisesCommand(dir, rest.includes("--json"))); return 0; }
@@ -137,15 +180,22 @@ async function main(argv: string[]) {
   }
 
   // a shared root (its engine.yaml says kind: root): its own checks, in place of an instance's
-  if ((cmd === "check" || cmd === "build") && isRootDir(dir)) return rootCli(cmd, dir, rest, process.cwd());
+  if ((cmd === "check" || cmd === "build") && isRootDir(dir)) {
+    const unsupported = rest.find(arg => arg === "--today" || arg === "--edition");
+    if (unsupported) die(`unknown option ${unsupported} for ${cmd}\nusage:\n${ROOT_USAGE}`);
+    return rootCli(cmd, dir, rest, process.cwd());
+  }
 
   const ei = rest.indexOf("--edition");
   if (ei >= 0 && !rest[ei + 1]) die("--edition needs a version");
   const edition = ei >= 0 ? { edition: rest[ei + 1] } : {};
+  const ti = rest.indexOf("--today");
+  if (ti >= 0 && (!isDate(rest[ti + 1]) || new Date(`${rest[ti + 1]}T12:00:00.000Z`).toISOString().slice(0, 10) !== rest[ti + 1])) die("--today needs a valid date, YYYY-MM-DD");
+  const datedEdition = { ...edition, ...(ti >= 0 ? { built: `${rest[ti + 1]}T12:00:00.000Z` } : {}) };
 
   if (cmd === "build" || cmd === "site") {
     const oi = rest.indexOf("--out");
-    const { bundle, warnings } = await buildBundle(dir, edition);
+    const { bundle, warnings } = await buildBundle(dir, datedEdition);
     for (const w of warnings) process.stderr.write(w + "\n");
     const outDir = oi >= 0 && rest[oi + 1] ? resolve(rest[oi + 1]) : join(process.cwd(), "build", bundle.instance.name + (bundle.instance.edition ? `-${bundle.instance.edition.version}` : ""));
     mkdirSync(outDir, { recursive: true });
@@ -164,7 +214,7 @@ async function main(argv: string[]) {
   }
 
   if (cmd === "check") {
-    const { bundle } = await buildBundle(dir, edition);
+    const { bundle } = await buildBundle(dir, datedEdition);
     console.log(findingsMd(bundle.findings, `Checks: ${bundle.instance.title}`));
     return bundle.findings.some((f) => f.severity === "error") ? 1 : 0;
   }

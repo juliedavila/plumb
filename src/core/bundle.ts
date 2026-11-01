@@ -31,8 +31,8 @@ import { streamLayout } from "./flow-layout.ts";
 import { instanceMeasured } from "./flow-measured.ts";
 
 // 0.6.1: adoption fixes and design-declared links.
-// 0.6.2: workspace polish, pinned regeneration and structural premise output.
-export const ENGINE_VERSION = "0.6.2";
+// 0.6.3: repeatable dated builds, strict CLI options and tracked-file packaging.
+export const ENGINE_VERSION = "0.6.3";
 
 /** sha256 of the canonical JSON of the inputs: instance config, model, plan, patches. No timestamp, no absolute paths. */
 export function contentHash(inst: Instance): string {
@@ -68,6 +68,7 @@ export interface BuildResult { bundle: Bundle; instance: Instance; packs: RulePa
 import { addReaderText } from "./reader.ts";
 import { glossary } from "./glossary.ts";
 
+/** Compile and check a design, using built's date for relative checks and previous's layout orders when supplied. */
 export async function buildBundle(dirOrInstance: string | Instance, opts: { built?: string; previous?: Bundle; edition?: string; compose?: ComposedDesign[] } = {}): Promise<BuildResult> {
   const inst = typeof dirOrInstance === "string" ? loadInstance(dirOrInstance, { ...(opts.edition !== undefined ? { edition: opts.edition } : {}), ...(opts.compose ? { compose: opts.compose } : {}) }) : dirOrInstance;
   // Flow values' age is counted to the build date; a build time that is not a date (tests pass "x") counts no age.
